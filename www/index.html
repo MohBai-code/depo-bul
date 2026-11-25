@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Depo Bul</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#17191c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Depo Bul">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: hırdavat deposunun iş aleti — net, hızlı, eldivenle bile basılır.
+   IDEA: depo zeminindeki sarı-siyah güvenlik çizgileri ve raf etiketleri.
+   PICTURE: kuşbakışı depo planı; girişten rafa yürüyen işçi + rafın önden görünümü.
+   COLOUR/TYPE: asfalt gri zemin, güvenlik sarısı, turuncu vurgu; Barlow Condensed tabela harfleri.
+   LAYOUT: üstte arama, altında harita + raf önü yan yana; telefonda alt alta. */
+:root{color-scheme:light dark;--bg:light-dark(#eceae4,#15171a);--panel:light-dark(#fff,#1f2227);--ink:light-dark(#17191c,#f1efe9);--mut:light-dark(#5d6168,#a3a7ad);--floor:light-dark(#d9d6ce,#2a2d32);--rack:light-dark(#3a3f47,#555c66);--yel:#f5b800;--org:#ff6a13;--line:light-dark(#c9c5bb,#3a3e44)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Barlow,system-ui,sans-serif;overflow-x:clip}
+h1,h2,.big{font-family:"Barlow Condensed",Barlow,sans-serif;font-weight:800;line-height:1.05;margin:0}
+header{background:#17191c;color:#f1efe9;padding:16px max(5vw,16px) 20px;position:relative}
+header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:8px;background:repeating-linear-gradient(-45deg,var(--yel) 0 14px,#17191c 14px 28px)}
+.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;max-width:1240px;margin:0 auto}
+h1{font-size:clamp(32px,6vw,44px)}h1 b{color:var(--yel)}
+.st{font-size:13px;color:#a3a7ad}
+.srch{max-width:1240px;margin:12px auto 8px;position:relative}
+#q{width:100%;font:600 20px Barlow,sans-serif;padding:14px 16px;border-radius:12px;border:3px solid var(--yel);background:#fff;color:#17191c}
+#q:focus{outline:3px solid var(--org);outline-offset:2px}
+#sug{list-style:none;margin:6px 0 0;padding:0;background:var(--panel);color:var(--ink);border-radius:12px;overflow:hidden;position:absolute;left:0;right:0;z-index:5;box-shadow:0 12px 30px #0006}
+#sug li button{all:unset;display:flex;justify-content:space-between;gap:10px;width:100%;box-sizing:border-box;padding:12px 16px;min-height:44px;cursor:pointer;border-bottom:1px solid var(--line)}
+#sug li button:hover,#sug li button:focus-visible{background:color-mix(in srgb,var(--yel) 25%,transparent)}
+#sug small{color:var(--mut);white-space:nowrap}
+main{max-width:1240px;margin:0 auto;padding:16px max(4vw,12px) 40px}
+.res{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;background:var(--panel);border-radius:14px;padding:14px 18px;margin-bottom:14px;border-left:8px solid var(--yel)}
+.res .big{font-size:clamp(28px,5vw,40px)}.res .loc{font:800 22px "Barlow Condensed",sans-serif;color:var(--org);white-space:nowrap}
+.res p{margin:0;color:var(--mut);flex-basis:100%}
+.grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px}
+.card{background:var(--panel);border-radius:14px;padding:12px}
+.card h2{font-size:22px;margin:2px 4px 8px}
+#map,#front{width:100%;height:auto;display:block}
+.mapw{aspect-ratio:12/16;max-height:72vh;margin:0 auto}
+.btn{font:600 16px Barlow,sans-serif;min-height:44px;padding:8px 16px;border-radius:10px;border:2px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+.btn.p{background:var(--yel);border-color:var(--yel);color:#17191c}
+.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--org);outline-offset:2px}
+details{background:var(--panel);border-radius:14px;margin-top:14px;padding:4px 16px}
+summary{font:800 22px "Barlow Condensed",sans-serif;padding:12px 0;cursor:pointer;min-height:44px}
+form .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:10px}
+label{font-size:13px;color:var(--mut);display:flex;flex-direction:column;gap:4px}
+input,select{font:16px Barlow,sans-serif;padding:10px;border-radius:8px;border:2px solid var(--line);background:var(--bg);color:var(--ink);min-height:44px;width:100%}
+table{width:100%;border-collapse:collapse;font-size:15px}td,th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-space:nowrap}
+.scroll{overflow-x:auto}.acts{display:flex;gap:6px;flex-wrap:wrap}.acts .btn{min-height:36px;padding:4px 10px;font-size:14px}
+.note{font-size:13px;color:var(--mut);margin:8px 0}
+.pulse{animation:pl 1s ease-in-out infinite alternate}@keyframes pl{from{opacity:1}to{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.pulse{animation:none}}
+@media(max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;white-space:normal;color:var(--mut)}.stack td:empty{display:none}}
+</style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script></head>
+<body>
+<header>
+  <div class="top"><h1>Depo <b>Bul</b></h1><span class="st" id="st">Yükleniyor…</span></div>
+  <div class="srch">
+    <input id="q" type="search" placeholder="Ürün adı veya kodu yaz… (örn. dübel)" autocomplete="off" aria-label="Ürün ara">
+    <ul id="sug" hidden></ul>
+  </div>
+</header>
+<main>
+  <div class="res" id="res"><div><div class="big">Ne arıyorsun?</div><p>Ürünü yaz, depodaki yerini girişten başlayarak göstereyim.</p></div></div>
+  <div class="grid">
+    <div class="card"><h2>Depo planı</h2><div class="mapw"><svg id="map" role="img" aria-label="Depo kuşbakışı plan"></svg></div></div>
+    <div class="card"><h2 id="fh">Raf önü</h2><svg id="front" role="img" aria-label="Rafın önden görünümü"></svg><p class="note" id="fn">Bir ürün seçince rafın hangi katında ve bölmesinde olduğu burada yanıp söner.</p></div>
+  </div>
+
+  <details id="pd">
+    <summary>Ürün ekle / düzenle</summary>
+    <form id="pf">
+      <div class="row">
+        <label>Ürün adı<input id="f_ad" required></label>
+        <label>Kod / barkod<input id="f_kod"></label>
+        <label>Raf<select id="f_raf"></select></label>
+        <label>Bölme<input id="f_bol" type="number" min="1" value="1"></label>
+        <label>Kat (alttan)<input id="f_kat" type="number" min="1" value="1"></label>
+        <label>Adet<input id="f_adet" type="number" min="0"></label>
+      </div>
+      <div class="acts"><button class="btn p" type="submit" id="f_ok">Kaydet</button><button class="btn" type="button" id="f_new">Temizle</button></div>
+    </form>
+    <div class="scroll"><table class="stack"><thead><tr><th>Ürün</th><th>Kod</th><th>Yer</th><th>Adet</th><th></th></tr></thead><tbody id="pl"></tbody></table></div>
+    <p class="note" id="sample"></p>
+  </details>
+
+  <details>
+    <summary>Depo planını düzenle</summary>
+    <p class="note">Depoyu kareli kağıt gibi düşün: X soldan sağa, Y yukarıdan aşağıya kare sayısı. Bölme rafın boyunca kaç parçaya ayrıldığını, Kat kaç raf katı olduğunu belirler.</p>
+    <div class="row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px">
+      <label>Genişlik (kare)<input id="g_c" type="number" min="4" max="60"></label>
+      <label>Uzunluk (kare)<input id="g_r" type="number" min="4" max="60"></label>
+      <label>Giriş X<input id="g_x" type="number" min="0"></label>
+      <label>Giriş Y<input id="g_y" type="number" min="0"></label>
+    </div>
+    <div class="scroll"><table><thead><tr><th>Raf</th><th>X</th><th>Y</th><th>Gen.</th><th>Uzun.</th><th>Kat</th><th>Bölme</th><th></th></tr></thead><tbody id="rl"></tbody></table></div>
+    <div class="acts" style="margin:12px 0"><button class="btn" id="r_add" type="button">Raf ekle</button><button class="btn p" id="r_save" type="button">Planı kaydet</button></div>
+  </details>
+  <details>
+    <summary>Listeyi paylaş / içe al</summary>
+    <p class="note">Listeyi diğer telefonlara göndermek için <b>Paylaş</b>'a bas ve WhatsApp'ı seç. Karşı taraf mesajın tamamını kopyalayıp aşağıdaki kutuya yapıştırır, sonra <b>İçe al</b>'a basar. Excel'den kaydedilmiş bir .csv dosyası da yükleyebilirsin (sütun sırası: ad;kod;raf;bölme;kat;adet).</p>
+    <div class="acts" style="margin-bottom:10px"><button class="btn p" type="button" id="x_share">Paylaş</button><button class="btn" type="button" id="x_copy">Kopyala</button><label class="btn" style="flex-direction:row;align-items:center;color:var(--ink);font-size:16px">CSV dosyası seç<input id="x_file" type="file" accept=".csv,.txt,text/csv,text/plain" hidden></label></div>
+    <textarea id="x_txt" rows="5" style="width:100%;font:14px/1.4 Barlow,sans-serif;padding:10px;border-radius:8px;border:2px solid var(--line);background:var(--bg);color:var(--ink)" placeholder="Gelen listeyi buraya yapıştır"></textarea>
+    <div class="acts" style="margin:10px 0 14px"><button class="btn p" type="button" id="x_imp">İçe al (listeyi değiştirir)</button><span class="note" id="x_msg" aria-live="polite"></span></div>
+  </details>
+</main>
+<script>
+{
+const SAMPLE_PLAN={cols:44,rows:27,giris:{x:30,y:26},disari:[{x:0,y:12,w:18,h:15},{x:21,y:0,w:23,h:7}],raflar:[
+ {ad:"A",x:1,y:0,w:20,h:1,kat:5,bol:10},{ad:"B",x:0,y:1,w:1,h:10,kat:5,bol:5},{ad:"C",x:3,y:2,w:14,h:1,kat:5,bol:7},
+ {ad:"D",x:3,y:6,w:14,h:1,kat:5,bol:7},{ad:"E",x:3,y:9,w:14,h:1,kat:5,bol:7},{ad:"F",x:2,y:11,w:16,h:1,kat:5,bol:8},
+ {ad:"G",x:20,y:2,w:1,h:5,kat:5,bol:3},{ad:"H",x:22,y:7,w:22,h:1,kat:5,bol:11},
+ {ad:"I",x:18,y:12,w:1,h:14,kat:5,bol:7},{ad:"J",x:22,y:12,w:1,h:14,kat:5,bol:7},{ad:"K",x:27,y:12,w:1,h:14,kat:5,bol:7},
+ {ad:"L",x:31,y:12,w:1,h:14,kat:5,bol:7},{ad:"M",x:36,y:12,w:1,h:14,kat:5,bol:7},{ad:"N",x:40,y:12,w:1,h:14,kat:5,bol:7},{ad:"O",x:43,y:12,w:1,h:14,kat:5,bol:7}]};
+const SAMPLE_PRODS=[["Sunta vidası 4x40","VD440","A",3,2,500],["Dübel 8 mm","DB08","A",5,3,1200],["Matkap ucu seti","MU10","B",2,4,18],
+ ["Silikon şeffaf","SL01","C",7,2,64],["Boya fırçası 2 inç","BF02","D",4,3,40],["Su terazisi 60 cm","ST60","B",8,5,9],["Çekiç 500 g","CK50","B",1,2,22],
+ ["Pense","PN01","B",1,3,30],["PPR boru 20 mm","PP20","E",2,1,80],["Musluk bataryası","MB01","F",2,3,12],["Kablo 2x1,5","KB15","C",2,1,25],
+ ["Sıva altı priz","PR01","C",3,4,150],["LED ampul 9 W","LD09","D",8,4,200],["İzole bant","IB01","A",7,4,300],["Zımpara 120","ZM12","D",6,2,90],
+ ["Menteşe","MN01","A",9,1,140],["Barel kilit","BK01","C",9,3,15],["Bahçe hortumu","BH01","F",3,1,7]];
+const NS="http://www.w3.org/2000/svg",$=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+const norm=s=>String(s||"").toLocaleLowerCase("tr").replace(/ı/g,"i").replace(/ğ/g,"g").replace(/ü/g,"u").replace(/ş/g,"s").replace(/ö/g,"o").replace(/ç/g,"c").replace(/\s+/g," ").trim();
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let plan=JSON.parse(JSON.stringify(SAMPLE_PLAN)),prods=[],db=null,cur=null,editId=null,anim=0;
+
+/* ---------- veri ---------- */
+const dataOf=d=>({id:d.id,...(typeof d.data==="function"?d.data():(d.data||{}))});
+const docsOf=s=>(s&&(s.docs||(Array.isArray(s)?s:[])))||[];
+const LS="depobul-v1";
+function lsLoad(){try{const o=JSON.parse(localStorage.getItem(LS));if(o&&o.plan){plan=o.plan;prods=o.prods||[];return true}}catch(e){}return false}
+function lsSave(){try{localStorage.setItem(LS,JSON.stringify({plan,prods}))}catch(e){}}
+function sampleProds(){return SAMPLE_PRODS.map((p,i)=>({id:"s"+i,ad:p[0],kod:p[1],raf:p[2],bolme:p[3],kat:p[4],adet:p[5]}))}
+async function saveProd(p){
+  if(db){const id=p.id||("u"+Date.now().toString(36));const {id:_,...body}=p;await db.collection("urunler").doc(id).set(body);if(!hasSnap){p.id=id;upsert(p)}}
+  else{p.id=p.id||("u"+Date.now().toString(36));upsert(p);lsSave()}
+}
+function upsert(p){const i=prods.findIndex(x=>x.id===p.id);if(i>=0)prods[i]=p;else prods.push(p);renderList()}
+async function delProd(id){if(db){await db.collection("urunler").doc(id).delete();if(!hasSnap){prods=prods.filter(p=>p.id!==id);renderList()}}else{prods=prods.filter(p=>p.id!==id);lsSave();renderList()}}
+async function savePlan(){if(db)await db.doc("ayar/depo").set(plan);else lsSave()}
+let hasSnap=false;
+(async()=>{
+  await null;
+  const tm=setTimeout(()=>{if(!db)offline()},10000);
+  try{db=window.claude&&window.claude.use?await window.claude.use("db"):null}catch(e){db=null}
+  clearTimeout(tm);
+  if(!db){offline();return}
+  try{const s=await db.doc("ayar/depo").get();const d=s&&(typeof s.data==="function"?s.data():s.data);if(d&&d.raflar)plan=d}catch(e){}
+  try{db.collection("urunler").onSnapshot(s=>{hasSnap=true;prods=docsOf(s).map(dataOf);renderList();if(cur){const n=prods.find(p=>p.id===cur.id);if(n)show(n,false)}})}
+  catch(e){try{prods=docsOf(await db.collection("urunler").get()).map(dataOf)}catch(e2){}}
+  $("st").textContent="Ortak depo kaydı · herkes aynı listeyi görür";
+  drawMap();fillPlanForm();renderList();
+})();
+function offline(){if(db)return;if(!lsLoad()){prods=sampleProds()}$("st").textContent="Bu cihazda kayıtlı";$("sample").textContent=prods.some(p=>String(p.id).startsWith("s"))?"Listede örnek ürünler var; kendi ürünlerini ekledikçe silebilirsin.":"";drawMap();fillPlanForm();renderList()}
+
+/* ---------- geometri ---------- */
+const rafBy=ad=>plan.raflar.find(r=>norm(r.ad)===norm(ad));
+const cells=r=>Math.max(r.w,r.h),len=r=>Math.max(1,Math.min(+r.bol||cells(r),cells(r))),vert=r=>r.h>=r.w;
+function segCells(r,b){const n=len(r),L=cells(r);b=Math.min(Math.max(1,+b||1),n);const a=Math.floor((b-1)*L/n),z=Math.max(a,Math.ceil(b*L/n)-1),c=[];
+  for(let s=a;s<=z;s++){if(vert(r))for(let i=0;i<r.w;i++)c.push([r.x+i,r.y+s]);else for(let j=0;j<r.h;j++)c.push([r.x+s,r.y+j])}return c}
+function outside(){const O=new Set();for(const d of plan.disari||[])for(let i=0;i<d.w;i++)for(let j=0;j<d.h;j++)O.add((d.x+i)+","+(d.y+j));return O}
+function blocked(){const B=outside();for(const r of plan.raflar)for(let i=0;i<r.w;i++)for(let j=0;j<r.h;j++)B.add((r.x+i)+","+(r.y+j));return B}
+function route(r,b){
+  const B=blocked(),C=plan.cols,R=plan.rows,T=new Set();
+  for(const [x,y] of segCells(r,b))for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx>=0&&ny>=0&&nx<C&&ny<R&&!B.has(nx+","+ny))T.add(nx+","+ny)}
+  const s=plan.giris.x+","+plan.giris.y,prev={[s]:null},q=[[plan.giris.x,plan.giris.y]];let end=null;
+  while(q.length){const [x,y]=q.shift(),k=x+","+y;if(T.has(k)){end=k;break}
+    for(const [dx,dy] of [[0,-1],[1,0],[-1,0],[0,1]]){const nx=x+dx,ny=y+dy,nk=nx+","+ny;if(nx<0||ny<0||nx>=C||ny>=R||B.has(nk)||nk in prev)continue;prev[nk]=k;q.push([nx,ny])}}
+  if(!end)return null;const pts=[];for(let k=end;k;k=prev[k])pts.unshift(k.split(",").map(Number));return pts;
+}
+
+/* ---------- çizim ---------- */
+function drawMap(hl){
+  const S=10,W=plan.cols*S,H=plan.rows*S,m=$("map");
+  m.setAttribute("viewBox",`-2 -2 ${W+4} ${H+12}`);document.querySelector(".mapw").style.aspectRatio=`${W+4}/${H+12}`;
+  let g=`<defs><pattern id="hz" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="6" fill="#f5b800"/><rect x="3" width="3" height="6" fill="#17191c"/></pattern>
+  <pattern id="tl" width="${S}" height="${S}" patternUnits="userSpaceOnUse"><path d="M${S} 0V${S}H0" fill="none" stroke="var(--line)" stroke-width=".3"/></pattern></defs>
+`;
+  const O=outside(),ins=(x,y)=>x>=0&&y>=0&&x<plan.cols&&y<plan.rows&&!O.has(x+","+y);let fl="",wl="";
+  for(let x=0;x<plan.cols;x++)for(let y=0;y<plan.rows;y++){if(!ins(x,y))continue;fl+=`M${x*S} ${y*S}h${S}v${S}h-${S}z`;
+    const door=x>=plan.giris.x-1&&x<=plan.giris.x+1&&y===plan.giris.y;
+    if(!ins(x,y-1))wl+=`M${x*S} ${y*S}h${S}`;if(!ins(x,y+1)&&!door)wl+=`M${x*S} ${(y+1)*S}h${S}`;
+    if(!ins(x-1,y))wl+=`M${x*S} ${y*S}v${S}`;if(!ins(x+1,y))wl+=`M${(x+1)*S} ${y*S}v${S}`}
+  g+=`<path d="${fl}" fill="var(--floor)"/><path d="${fl}" fill="url(#tl)"/><path d="${wl}" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="square" fill="none"/>`;
+  for(const r of plan.raflar){const x=r.x*S,y=r.y*S,w=r.w*S,h=r.h*S,act=hl&&hl.r===r,n=len(r),L=cells(r);
+    g+=`<rect x="${x+1.2}" y="${y+1.8}" width="${w-1.6}" height="${h-1.6}" rx="1" fill="#0003"/>
+    <rect x="${x+.6}" y="${y+.6}" width="${w-1.2}" height="${h-1.2}" rx="1" fill="${act?"#4a3a12":"var(--rack)"}" stroke="${act?"#f5b800":"none"}" stroke-width=".8"/>`;
+    for(let i=1;i<n;i++){const o=Math.floor(i*L/n)*S;g+=vert(r)?`<line x1="${x+1}" x2="${x+w-1}" y1="${y+o}" y2="${y+o}" stroke="#fff4" stroke-width=".5"/>`:`<line y1="${y+1}" y2="${y+h-1}" x1="${x+o}" x2="${x+o}" stroke="#fff4" stroke-width=".5"/>`}
+    g+=`<text x="${x+w/2}" y="${y+h/2+2.6}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="#fff" stroke="#0008" stroke-width=".4" paint-order="stroke">${esc(r.ad)}</text>`}
+  const gx=plan.giris.x*S,gy=plan.giris.y*S;
+  g+=`<rect x="${gx-S}" y="${gy+S-1.5}" width="${S*3}" height="3" fill="url(#hz)"/><text x="${gx+S/2}" y="${gy+S+8}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="var(--ink)">GİRİŞ</text>`;
+  if(hl){for(const [cx,cy] of segCells(hl.r,hl.b))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#f5b800"/>`;
+    if(hl.pts){const d=hl.pts.map(([x,y],i)=>(i?"L":"M")+(x*S+S/2)+" "+(y*S+S/2)).join(" ");
+      g+=`<path id="rt" d="${d}" fill="none" stroke="#ff6a13" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 2.2"/>
+      <g id="wk"><circle r="4" fill="#ff6a13" stroke="#fff" stroke-width="1"/><circle r="1.4" fill="#fff"/></g>`}}
+  m.innerHTML=g;
+  if(hl&&hl.pts){const p=$("rt"),wk=$("wk"),L=p.getTotalLength(),t0=performance.now(),dur=RM?0:Math.min(2600,400+L*22);cancelAnimationFrame(anim);
+    p.style.strokeDashoffset=0;const mask=p.cloneNode();mask.removeAttribute("id");mask.setAttribute("stroke","var(--floor)");mask.setAttribute("stroke-dasharray",L+" "+L);mask.setAttribute("stroke-width","3");p.after(mask);
+    const step=t=>{const k=dur?Math.min(1,(t-t0)/dur):1,e=1-Math.pow(1-k,3),pt=p.getPointAtLength(L*e);wk.setAttribute("transform",`translate(${pt.x} ${pt.y})`);mask.style.strokeDashoffset=-L*e;if(k<1)anim=requestAnimationFrame(step);else mask.remove()};anim=requestAnimationFrame(step)}
+}
+function drawFront(r,b,k){
+  const n=len(r),K=r.kat||4,cw=28,kh=30,W=n*cw+24,H=K*kh+34,f=$("front");f.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  let g=`<rect x="6" y="6" width="5" height="${H-14}" fill="var(--rack)"/><rect x="${W-11}" y="6" width="5" height="${H-14}" fill="var(--rack)"/>`;
+  for(let i=0;i<K;i++){const y=6+(K-1-i)*kh;
+    g+=`<rect x="6" y="${y+kh-4}" width="${W-12}" height="4" fill="${i+1===+k?"#f5b800":"var(--rack)"}"/><text x="${W-2}" y="${y+kh-8}" font-size="8" text-anchor="end" fill="var(--mut)" font-family="Barlow">${i+1}</text>`;
+    for(let j=0;j<n;j++){const x=12+j*cw,hit=i+1===+k&&j+1===+b;const bh=hit?kh-9:10+((i*7+j*5)%9);
+      g+=`<rect ${hit?'class="pulse"':""} x="${x+3}" y="${y+kh-4-bh}" width="${cw-6}" height="${bh}" rx="1.5" fill="${hit?"#ff6a13":"color-mix(in srgb,var(--mut) 35%,transparent)"}" ${hit?'stroke="#f5b800" stroke-width="2"':""}/>`}}
+  for(let j=0;j<n;j++)g+=`<text x="${12+j*cw+cw/2}" y="${H-4}" font-size="8" text-anchor="middle" fill="${j+1===+b?"var(--org)":"var(--mut)"}" font-weight="${j+1===+b?700:400}" font-family="Barlow">${j+1}</text>`;
+  f.innerHTML=g;$("fh").textContent=`${r.ad} rafı · önden`;
+  $("fn").textContent=`Alttaki sayılar bölme, sağdakiler kat. Turuncu kutu: ${b}. bölme, ${k}. kat (alttan sayılır).`;
+}
+
+/* ---------- arama ---------- */
+function find(q){const n=norm(q);if(!n)return[];const w=n.split(" ");
+  return prods.map(p=>{const h=norm(p.ad+" "+(p.kod||""));let s=0;for(const t of w){if(!h.includes(t))return null;s+=h.startsWith(t)?3:(h.includes(" "+t)?2:1)}return[s,p]}).filter(Boolean).sort((a,b)=>b[0]-a[0]).slice(0,8).map(x=>x[1])}
+const qi=$("q"),sug=$("sug");
+qi.addEventListener("input",()=>{const r=find(qi.value);if(!qi.value.trim()){sug.hidden=true;return}
+  sug.innerHTML=r.length?r.map(p=>`<li><button type="button" data-id="${esc(p.id)}"><span>${esc(p.ad)}</span><small>${esc(p.raf)} · ${esc(p.bolme)}. bölme · ${esc(p.kat)}. kat</small></button></li>`).join(""):`<li><button type="button" disabled><span>Bulunamadı</span><small>Aşağıdan ekleyebilirsin</small></button></li>`;sug.hidden=false});
+qi.addEventListener("keydown",e=>{if(e.key==="Enter"){const r=find(qi.value);if(r[0])pick(r[0])}if(e.key==="Escape")sug.hidden=true});
+sug.addEventListener("click",e=>{const b=e.target.closest("button[data-id]");if(b)pick(prods.find(p=>String(p.id)===b.dataset.id))});
+document.addEventListener("click",e=>{if(!e.target.closest(".srch"))sug.hidden=true});
+function pick(p){if(!p)return;sug.hidden=true;qi.value=p.ad;qi.blur();show(p,true)}
+function show(p,go){cur=p;const r=rafBy(p.raf);const res=$("res");
+  if(!r){res.innerHTML=`<div><div class="big">${esc(p.ad)}</div><p>“${esc(p.raf)}” adlı raf planda yok. Ürünün rafını düzelt ya da planı güncelle.</p></div>`;drawMap();return}
+  const b=Math.min(Math.max(1,+p.bolme||1),len(r)),k=Math.min(Math.max(1,+p.kat||1),r.kat||1),pts=route(r,b);
+  res.innerHTML=`<div class="big">${esc(p.ad)}</div><div class="loc">${esc(r.ad)} rafı · ${b}. bölme · ${k}. kat</div><p>${pts?`Girişten yaklaşık ${Math.max(0,pts.length-1)} adım kare. `:"Bu rafa giden yol bulunamadı, planı kontrol et. "}${p.adet!=null&&p.adet!==""?`Kayıtlı adet: ${esc(p.adet)}.`:""}${p.kod?` Kod: ${esc(p.kod)}.`:""}</p>`;
+  drawMap({r,b,pts:go?pts:pts});drawFront(r,b,k);
+  if(go&&matchMedia("(max-width:760px)").matches)res.scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})}
+
+/* ---------- ürün listesi ---------- */
+function rafOpts(){$("f_raf").innerHTML=plan.raflar.map(r=>`<option value="${esc(r.ad)}">${esc(r.ad)}</option>`).join("")}
+function renderList(){rafOpts();const L=[...prods].sort((a,b)=>String(a.ad).localeCompare(String(b.ad),"tr"));
+  $("pl").innerHTML=L.length?L.map(p=>`<tr><td>${esc(p.ad)}</td><td>${esc(p.kod)}</td><td>${esc(p.raf)} / ${esc(p.bolme)} / ${esc(p.kat)}</td><td class="n">${esc(p.adet)}</td><td><div class="acts"><button class="btn" data-go="${esc(p.id)}">Göster</button><button class="btn" data-ed="${esc(p.id)}">Düzenle</button><button class="btn" data-del="${esc(p.id)}">Sil</button></div></td></tr>`).join(""):`<tr><td colspan="5">Henüz ürün yok. Yukarıdaki formdan ilk ürünü ekle.</td></tr>`;
+  $("st").textContent=(db?"Ortak depo kaydı":"Bu cihazda kayıtlı")+` · ${prods.length} ürün`}
+$("pl").addEventListener("click",async e=>{const t=e.target.closest("button");if(!t)return;const id=t.dataset.go||t.dataset.ed||t.dataset.del,p=prods.find(x=>String(x.id)===id);if(!p)return;
+  if(t.dataset.go){pick(p);window.scrollTo({top:0,behavior:RM?"auto":"smooth"})}
+  if(t.dataset.ed){editId=p.id;$("f_ad").value=p.ad;$("f_kod").value=p.kod||"";$("f_raf").value=p.raf;$("f_bol").value=p.bolme;$("f_kat").value=p.kat;$("f_adet").value=p.adet??"";$("f_ok").textContent="Güncelle";$("f_ad").focus()}
+  if(t.dataset.del){if(t.dataset.sure){try{await delProd(p.id)}catch(err){$("st").textContent="Silinemedi, tekrar dene"}}else{t.dataset.sure=1;t.textContent="Emin misin?";setTimeout(()=>{t.textContent="Sil";delete t.dataset.sure},3000)}}});
+function clearForm(){editId=null;$("pf").reset();$("f_ok").textContent="Kaydet"}
+$("f_new").addEventListener("click",clearForm);
+$("pf").addEventListener("submit",async e=>{e.preventDefault();const p={id:editId||undefined,ad:$("f_ad").value.trim(),kod:$("f_kod").value.trim(),raf:$("f_raf").value,bolme:+$("f_bol").value||1,kat:+$("f_kat").value||1,adet:$("f_adet").value===""?"":+$("f_adet").value};
+  if(!p.ad)return;try{await saveProd(p);clearForm();$("st").textContent="Kaydedildi ✓"}catch(err){$("st").textContent="Kaydedilemedi, tekrar dene"}});
+
+/* ---------- plan düzenleme ---------- */
+function fillPlanForm(){$("g_c").value=plan.cols;$("g_r").value=plan.rows;$("g_x").value=plan.giris.x;$("g_y").value=plan.giris.y;
+  $("rl").innerHTML=plan.raflar.map((r,i)=>`<tr data-i="${i}">${["ad","x","y","w","h","kat","bol"].map(f=>`<td><input aria-label="${f}" data-f="${f}" ${f==="ad"?"":'type="number" min="'+(f==="x"||f==="y"?0:1)+'"'} value="${esc(r[f])}" style="min-width:${f==="ad"?70:56}px"></td>`).join("")}<td><button class="btn" type="button" data-rm="${i}">Sil</button></td></tr>`).join("")}
+function readPlanForm(){const raflar=[...$("rl").rows].map(tr=>{const o={};for(const i of tr.querySelectorAll("input"))o[i.dataset.f]=i.dataset.f==="ad"?i.value.trim():Math.max(0,+i.value||0);o.w=Math.max(1,o.w);o.h=Math.max(1,o.h);o.kat=Math.max(1,o.kat);o.bol=Math.max(1,o.bol||Math.max(o.w,o.h));return o}).filter(r=>r.ad);
+  return{cols:Math.min(60,Math.max(4,+$("g_c").value||12)),rows:Math.min(60,Math.max(4,+$("g_r").value||16)),giris:{x:+$("g_x").value||0,y:+$("g_y").value||0},disari:plan.disari||[],raflar}}
+$("rl").addEventListener("click",e=>{const b=e.target.closest("[data-rm]");if(b){plan=readPlanForm();plan.raflar.splice(+b.dataset.rm,1);fillPlanForm();drawMap()}});
+$("rl").addEventListener("input",()=>{plan=readPlanForm();drawMap()});
+for(const id of ["g_c","g_r","g_x","g_y"])$(id).addEventListener("input",()=>{plan=readPlanForm();drawMap()});
+$("r_add").addEventListener("click",()=>{plan=readPlanForm();const used=new Set(plan.raflar.map(r=>r.ad));let c=65;while(used.has(String.fromCharCode(c))&&c<90)c++;plan.raflar.push({ad:String.fromCharCode(c),x:0,y:0,w:1,h:3,kat:4,bol:3});fillPlanForm();drawMap()});
+$("r_save").addEventListener("click",async()=>{plan=readPlanForm();try{await savePlan();$("st").textContent="Plan kaydedildi ✓";renderList();drawMap();if(cur)show(cur,false)}catch(e){$("st").textContent="Plan kaydedilemedi"}});
+
+/* ---------- paylaş / içe al ---------- */
+const clean=v=>String(v??"").replace(/[;\r\n]/g,",").trim();
+function exportText(){return ["DEPOBUL1","#PLAN "+JSON.stringify(plan),"ad;kod;raf;bolme;kat;adet",...[...prods].sort((a,b)=>String(a.ad).localeCompare(String(b.ad),"tr")).map(p=>[p.ad,p.kod,p.raf,p.bolme,p.kat,p.adet].map(clean).join(";"))].join("\n")}
+function parseText(t){let np=null;const out=[];for(const raw of String(t).split(/\r?\n/)){const l=raw.trim();if(!l||l==="DEPOBUL1")continue;
+  if(l.startsWith("#PLAN ")){try{const o=JSON.parse(l.slice(6));if(o&&Array.isArray(o.raflar)&&o.cols&&o.rows&&o.giris)np=o}catch(e){}continue}
+  const f=l.split(l.includes(";")?";":(l.includes("\t")?"\t":","));if(f.length<3||norm(f[0])==="ad")continue;
+  out.push({ad:f[0].trim(),kod:(f[1]||"").trim(),raf:(f[2]||"").trim(),bolme:+f[3]||1,kat:+f[4]||1,adet:f[5]===undefined||f[5].trim()===""?"":+f[5]||0})}
+  return{np,out:out.filter(p=>p.ad)}}
+const xm=m=>{$("x_msg").textContent=m};
+async function copyText(t){try{await navigator.clipboard.writeText(t);xm("Kopyalandı ✓ WhatsApp'a yapıştırabilirsin.");return}catch(e){}
+  const ta=$("x_txt");ta.value=t;ta.select();try{document.execCommand("copy");xm("Kopyalandı ✓")}catch(e){xm("Kutudaki metni seçip kopyala.")}}
+$("x_copy").addEventListener("click",()=>copyText(exportText()));
+$("x_share").addEventListener("click",async()=>{const text=exportText(),P=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.Share;
+  try{if(P){await P.share({title:"Depo Bul listesi",text,dialogTitle:"Listeyi paylaş"});return}if(navigator.share){await navigator.share({title:"Depo Bul listesi",text});return}}catch(e){if(e&&e.name==="AbortError")return}
+  copyText(text)});
+$("x_file").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;let t=await f.text();if(t.includes("\ufffd")){try{t=new TextDecoder("windows-1254").decode(await f.arrayBuffer())}catch(er){}}$("x_txt").value=t;xm(f.name+" yüklendi. Şimdi İçe al'a bas.");e.target.value=""});
+$("x_imp").addEventListener("click",async e=>{const b=e.currentTarget,{np,out}=parseText($("x_txt").value);
+  if(!out.length&&!np){xm("Kutuda okunabilir ürün bulunamadı.");return}
+  if(!b.dataset.sure){b.dataset.sure=1;b.textContent=`Emin misin? ${out.length} ürün yüklenecek`;setTimeout(()=>{b.textContent="İçe al (listeyi değiştirir)";delete b.dataset.sure},4000);return}
+  delete b.dataset.sure;b.textContent="İçe al (listeyi değiştirir)";
+  try{if(np){plan=np;await savePlan();fillPlanForm()}
+    if(out.length){if(db){for(const p of [...prods])await db.collection("urunler").doc(p.id).delete();for(const [i,p] of out.entries())await db.collection("urunler").doc("i"+Date.now().toString(36)+i).set(p)}
+      else{prods=out.map((p,i)=>({id:"i"+i+Date.now().toString(36),...p}));lsSave()}}
+    renderList();drawMap();cur=null;xm(`İçe alındı ✓ ${out.length} ürün${np?" ve depo planı":""}.`);$("x_txt").value=""}catch(er){xm("İçe alınamadı, tekrar dene.")}});
+if("serviceWorker" in navigator&&location.protocol==="https:"&&!location.hostname.endsWith("claude.ai")&&location.hostname!=="localhost"){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+
+drawMap();
+}
+</script>
+</body>
+</html>
