@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Depo Bul</title>
+<title>Koray Teknik Hırdavat</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#17191c">
+<meta name="theme-color" content="#058a8e">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Depo Bul">
+<meta name="apple-mobile-web-app-title" content="Koray Teknik">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
@@ -17,19 +17,19 @@
    PICTURE: kuşbakışı depo planı; girişten rafa yürüyen işçi + rafın önden görünümü.
    COLOUR/TYPE: asfalt gri zemin, güvenlik sarısı, turuncu vurgu; Barlow Condensed tabela harfleri.
    LAYOUT: üstte arama, altında harita + raf önü yan yana; telefonda alt alta. */
-:root{color-scheme:light dark;--bg:light-dark(#eceae4,#15171a);--panel:light-dark(#fff,#1f2227);--ink:light-dark(#17191c,#f1efe9);--mut:light-dark(#5d6168,#a3a7ad);--floor:light-dark(#d9d6ce,#2a2d32);--rack:light-dark(#3a3f47,#555c66);--yel:#f5b800;--org:#ff6a13;--line:light-dark(#c9c5bb,#3a3e44)}
+:root{color-scheme:light dark;--bg:light-dark(#eceae4,#15171a);--panel:light-dark(#fff,#1f2227);--ink:light-dark(#17191c,#f1efe9);--mut:light-dark(#5d6168,#a3a7ad);--floor:light-dark(#d9d6ce,#2a2d32);--rack:light-dark(#3a3f47,#555c66);--yel:#058a8e;--org:#ff6a13;--line:light-dark(#c9c5bb,#3a3e44)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Barlow,system-ui,sans-serif;overflow-x:clip}
 h1,h2,.big{font-family:"Barlow Condensed",Barlow,sans-serif;font-weight:800;line-height:1.05;margin:0}
-header{background:#17191c;color:#f1efe9;padding:16px max(5vw,16px) 20px;position:relative}
-header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:8px;background:repeating-linear-gradient(-45deg,var(--yel) 0 14px,#17191c 14px 28px)}
-.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;max-width:1240px;margin:0 auto}
-h1{font-size:clamp(32px,6vw,44px)}h1 b{color:var(--yel)}
-.st{font-size:13px;color:#a3a7ad}
+header{background:#058a8e;color:#fff;padding:16px max(5vw,16px) 20px;position:relative}
+header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:8px;background:repeating-linear-gradient(-45deg,#fff 0 14px,#04585b 14px 28px)}
+.top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px;max-width:1240px;margin:0 auto}
+h1{font-size:clamp(28px,6vw,44px)}h1 b{color:#fff;font-weight:600}
+.st{font-size:13px;color:#e3f4f4}
 .srch{max-width:1240px;margin:12px auto 8px;position:relative}
-#q{width:100%;font:600 20px Barlow,sans-serif;padding:14px 16px;border-radius:12px;border:3px solid var(--yel);background:#fff;color:#17191c}
-#q:focus{outline:3px solid var(--org);outline-offset:2px}
+#q{width:100%;font:600 20px Barlow,sans-serif;padding:14px 16px;border-radius:12px;border:3px solid #fff;background:#fff;color:#17191c}
+#q:focus{outline:3px solid #04585b;outline-offset:2px}
 #sug{list-style:none;margin:6px 0 0;padding:0;background:var(--panel);color:var(--ink);border-radius:12px;overflow:hidden;position:absolute;left:0;right:0;z-index:5;box-shadow:0 12px 30px #0006}
 #sug li button{all:unset;display:flex;justify-content:space-between;gap:10px;width:100%;box-sizing:border-box;padding:12px 16px;min-height:44px;cursor:pointer;border-bottom:1px solid var(--line)}
 #sug li button:hover,#sug li button:focus-visible{background:color-mix(in srgb,var(--yel) 25%,transparent)}
@@ -44,7 +44,7 @@ main{max-width:1240px;margin:0 auto;padding:16px max(4vw,12px) 40px}
 #map,#front{width:100%;height:auto;display:block}
 .mapw{aspect-ratio:12/16;max-height:72vh;margin:0 auto}
 .btn{font:600 16px Barlow,sans-serif;min-height:44px;padding:8px 16px;border-radius:10px;border:2px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
-.btn.p{background:var(--yel);border-color:var(--yel);color:#17191c}
+.btn.p{background:var(--yel);border-color:var(--yel);color:#fff}
 .btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--org);outline-offset:2px}
 details{background:var(--panel);border-radius:14px;margin-top:14px;padding:4px 16px}
 summary{font:800 22px "Barlow Condensed",sans-serif;padding:12px 0;cursor:pointer;min-height:44px}
@@ -62,7 +62,7 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
 </style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script></head>
 <body>
 <header>
-  <div class="top"><h1>Depo <b>Bul</b></h1><span class="st" id="st">Yükleniyor…</span></div>
+  <div class="top"><h1>Koray Teknik <b>Hırdavat</b></h1><span class="st" id="st">Yükleniyor…</span></div>
   <div class="srch">
     <input id="q" type="search" placeholder="Ürün adı veya kodu yaz… (örn. dübel)" autocomplete="off" aria-label="Ürün ara">
     <ul id="sug" hidden></ul>
@@ -180,7 +180,7 @@ function route(r,b){
 function drawMap(hl){
   const S=10,W=plan.cols*S,H=plan.rows*S,m=$("map");
   m.setAttribute("viewBox",`-2 -2 ${W+4} ${H+12}`);document.querySelector(".mapw").style.aspectRatio=`${W+4}/${H+12}`;
-  let g=`<defs><pattern id="hz" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="6" fill="#f5b800"/><rect x="3" width="3" height="6" fill="#17191c"/></pattern>
+  let g=`<defs><pattern id="hz" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="6" fill="#058a8e"/><rect x="3" width="3" height="6" fill="#04585b"/></pattern>
   <pattern id="tl" width="${S}" height="${S}" patternUnits="userSpaceOnUse"><path d="M${S} 0V${S}H0" fill="none" stroke="var(--line)" stroke-width=".3"/></pattern></defs>
 `;
   const O=outside(),ins=(x,y)=>x>=0&&y>=0&&x<plan.cols&&y<plan.rows&&!O.has(x+","+y);let fl="",wl="";
@@ -191,12 +191,12 @@ function drawMap(hl){
   g+=`<path d="${fl}" fill="var(--floor)"/><path d="${fl}" fill="url(#tl)"/><path d="${wl}" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="square" fill="none"/>`;
   for(const r of plan.raflar){const x=r.x*S,y=r.y*S,w=r.w*S,h=r.h*S,act=hl&&hl.r===r,n=len(r),L=cells(r);
     g+=`<rect x="${x+1.2}" y="${y+1.8}" width="${w-1.6}" height="${h-1.6}" rx="1" fill="#0003"/>
-    <rect x="${x+.6}" y="${y+.6}" width="${w-1.2}" height="${h-1.2}" rx="1" fill="${act?"#4a3a12":"var(--rack)"}" stroke="${act?"#f5b800":"none"}" stroke-width=".8"/>`;
+    <rect x="${x+.6}" y="${y+.6}" width="${w-1.2}" height="${h-1.2}" rx="1" fill="${act?"#04585b":"var(--rack)"}" stroke="${act?"#058a8e":"none"}" stroke-width=".8"/>`;
     for(let i=1;i<n;i++){const o=Math.floor(i*L/n)*S;g+=vert(r)?`<line x1="${x+1}" x2="${x+w-1}" y1="${y+o}" y2="${y+o}" stroke="#fff4" stroke-width=".5"/>`:`<line y1="${y+1}" y2="${y+h-1}" x1="${x+o}" x2="${x+o}" stroke="#fff4" stroke-width=".5"/>`}
     g+=`<text x="${x+w/2}" y="${y+h/2+2.6}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="#fff" stroke="#0008" stroke-width=".4" paint-order="stroke">${esc(r.ad)}</text>`}
   const gx=plan.giris.x*S,gy=plan.giris.y*S;
   g+=`<rect x="${gx-S}" y="${gy+S-1.5}" width="${S*3}" height="3" fill="url(#hz)"/><text x="${gx+S/2}" y="${gy+S+8}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="var(--ink)">GİRİŞ</text>`;
-  if(hl){for(const [cx,cy] of segCells(hl.r,hl.b))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#f5b800"/>`;
+  if(hl){for(const [cx,cy] of segCells(hl.r,hl.b))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#058a8e"/>`;
     if(hl.pts){const d=hl.pts.map(([x,y],i)=>(i?"L":"M")+(x*S+S/2)+" "+(y*S+S/2)).join(" ");
       g+=`<path id="rt" d="${d}" fill="none" stroke="#ff6a13" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 2.2"/>
       <g id="wk"><circle r="4" fill="#ff6a13" stroke="#fff" stroke-width="1"/><circle r="1.4" fill="#fff"/></g>`}}
@@ -209,9 +209,9 @@ function drawFront(r,b,k){
   const n=len(r),K=r.kat||4,cw=28,kh=30,W=n*cw+24,H=K*kh+34,f=$("front");f.setAttribute("viewBox",`0 0 ${W} ${H}`);
   let g=`<rect x="6" y="6" width="5" height="${H-14}" fill="var(--rack)"/><rect x="${W-11}" y="6" width="5" height="${H-14}" fill="var(--rack)"/>`;
   for(let i=0;i<K;i++){const y=6+(K-1-i)*kh;
-    g+=`<rect x="6" y="${y+kh-4}" width="${W-12}" height="4" fill="${i+1===+k?"#f5b800":"var(--rack)"}"/><text x="${W-2}" y="${y+kh-8}" font-size="8" text-anchor="end" fill="var(--mut)" font-family="Barlow">${i+1}</text>`;
+    g+=`<rect x="6" y="${y+kh-4}" width="${W-12}" height="4" fill="${i+1===+k?"#058a8e":"var(--rack)"}"/><text x="${W-2}" y="${y+kh-8}" font-size="8" text-anchor="end" fill="var(--mut)" font-family="Barlow">${i+1}</text>`;
     for(let j=0;j<n;j++){const x=12+j*cw,hit=i+1===+k&&j+1===+b;const bh=hit?kh-9:10+((i*7+j*5)%9);
-      g+=`<rect ${hit?'class="pulse"':""} x="${x+3}" y="${y+kh-4-bh}" width="${cw-6}" height="${bh}" rx="1.5" fill="${hit?"#ff6a13":"color-mix(in srgb,var(--mut) 35%,transparent)"}" ${hit?'stroke="#f5b800" stroke-width="2"':""}/>`}}
+      g+=`<rect ${hit?'class="pulse"':""} x="${x+3}" y="${y+kh-4-bh}" width="${cw-6}" height="${bh}" rx="1.5" fill="${hit?"#ff6a13":"color-mix(in srgb,var(--mut) 35%,transparent)"}" ${hit?'stroke="#058a8e" stroke-width="2"':""}/>`}}
   for(let j=0;j<n;j++)g+=`<text x="${12+j*cw+cw/2}" y="${H-4}" font-size="8" text-anchor="middle" fill="${j+1===+b?"var(--org)":"var(--mut)"}" font-weight="${j+1===+b?700:400}" font-family="Barlow">${j+1}</text>`;
   f.innerHTML=g;$("fh").textContent=`${r.ad} rafı · önden`;
   $("fn").textContent=`Alttaki sayılar bölme, sağdakiler kat. Turuncu kutu: ${b}. bölme, ${k}. kat (alttan sayılır).`;

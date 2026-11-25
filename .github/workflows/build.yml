@@ -29,7 +29,7 @@ jobs:
         run: npx cap add android
       - name: Uygulama simgesi
         continue-on-error: true
-        run: npx @capacitor/assets generate --android --iconBackgroundColor '#17191c' --splashBackgroundColor '#17191c'
+        run: npx @capacitor/assets generate --android --iconBackgroundColor '#058a8e' --splashBackgroundColor '#058a8e'
       - name: Kopyala
         run: npx cap sync android
       - name: APK derle
