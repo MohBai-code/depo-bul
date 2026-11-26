@@ -127,10 +127,12 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
 @keyframes tikc{to{stroke-dashoffset:0}}.res{position:relative}
 .konf{position:fixed;z-index:58;width:8px;height:12px;border-radius:2px;pointer-events:none}
 .mapw{position:relative;touch-action:pan-y}.mapw.zoomed{touch-action:none}
-.zbtn{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:6px;z-index:2}
-.zbtn button{width:44px;height:44px;border-radius:12px;border:0;background:var(--panel);color:var(--ink);font:700 24px/1 Barlow,sans-serif;box-shadow:0 3px 10px #0003;cursor:pointer}
+.zbtn{display:flex;gap:8px;margin:10px 4px 0}
+.zbtn button{width:52px;height:44px;border-radius:12px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font:700 24px/1 Barlow,sans-serif;box-shadow:0 3px 10px #0003;cursor:pointer}
 .zbtn button:focus-visible{outline:3px solid var(--org);outline-offset:2px}
-@media(max-width:600px){.mapc{margin-inline:calc(-1 * max(4vw,12px));border-radius:0;padding:10px 0 12px}.mapc>h2,.mapc .mapnote{padding-inline:16px}.mapc .mapw{max-height:none}.zbtn{right:10px}}
+@media(max-width:600px){.mapc{margin-inline:calc(-1 * max(4vw,12px));border-radius:0;padding:10px 0 12px}.mapc>h2,.mapc .mapnote{padding-inline:16px}.mapc .mapw{max-height:none}.zbtn{margin-inline:16px}}
+.zbtn .d3b{font:800 17px/1 "Barlow Condensed",Barlow,sans-serif;color:var(--yel);border:2px solid var(--yel)}
+.zbtn .d3b[aria-pressed=true]{background:var(--yel);color:#fff}.d3b:focus-visible{outline:3px solid var(--org);outline-offset:2px}
 #zout:focus-visible{outline:3px solid var(--org);outline-offset:2px}
 </style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script></head>
 <body>
@@ -147,7 +149,7 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
 <main>
   <div class="res" id="res"><div><div class="big">Ne arıyorsun?</div><p>Ürünü yaz, depodaki yerini girişten başlayarak göstereyim.</p></div></div>
   <div class="grid">
-    <div class="card mapc"><h2>Depo planı</h2><button id="zout" type="button" hidden>Tüm depoyu göster</button><div id="phint" hidden><span>Paleti koymak istediğin yere dokun</span><button class="btn" type="button" id="p_cancel">Vazgeç</button></div><div class="mapw"><svg id="map" role="img" aria-label="Depo kuşbakışı plan"></svg><div class="zbtn"><button type="button" id="zin" aria-label="Yakınlaştır">+</button><button type="button" id="zoutb" aria-label="Uzaklaştır">−</button></div></div><p class="mapnote">Rafa ya da palete dokun, içini gör. İki parmakla büyütüp kaydırabilir, çift dokunarak yakınlaşabilirsin.</p></div>
+    <div class="card mapc"><h2>Depo planı</h2><button id="zout" type="button" hidden>Tüm depoyu göster</button><div id="phint" hidden><span>Paleti koymak istediğin yere dokun</span><button class="btn" type="button" id="p_cancel">Vazgeç</button></div><div class="mapw"><svg id="map" role="img" aria-label="Depo kuşbakışı plan"></svg></div><div class="zbtn"><button type="button" id="d3btn" class="d3b" aria-pressed="false" aria-label="3D görünüm">3D</button><button type="button" id="zin" aria-label="Yakınlaştır">+</button><button type="button" id="zoutb" aria-label="Uzaklaştır">−</button></div><p class="mapnote">Rafa ya da palete dokun, içini gör. İki parmakla büyütüp kaydırabilir, çift dokunarak yakınlaşabilirsin.</p></div>
     <div class="card"><h2 id="fh">Raf önü</h2><svg id="front" role="img" aria-label="Rafın önden görünümü"></svg><p class="note" id="fn">Bir ürün seçince rafın hangi katında ve bölmesinde olduğu burada yanıp söner.</p></div>
   </div>
 
@@ -293,7 +295,7 @@ function route(r,b,t){
 /* ---------- çizim ---------- */
 function drawMap(hl){
   const S=10,W=plan.cols*S,H=plan.rows*S,m=$("map");
-  const vanR=(plan.kapilar||[]).some(d=>d.kenar==="r")?28:0;VB=[-4,-12,W+8+vanR,H+22];cancelAnimationFrame(zanim);setVB(VB);$("zout").hidden=true;document.querySelector(".mapw").classList.remove("zoomed");document.querySelector(".mapw").style.aspectRatio=`${W+8+vanR}/${H+22}`;
+  const vanR=(plan.kapilar||[]).some(d=>d.kenar==="r")?28:0,K=K3(),E=D3?EX/K:0;VB=D3?[-4,-12*K-EX-4,W+8+vanR,(H+22)*K+EX+4]:[-4,-12,W+8+vanR,H+22];cancelAnimationFrame(zanim);setVB(VB);$("zout").hidden=true;document.querySelector(".mapw").classList.remove("zoomed");document.querySelector(".mapw").style.aspectRatio=`${VB[2]}/${VB[3]}`;$("d3btn").setAttribute("aria-pressed",D3?"true":"false");
   const occ=new Set();for(const q of prods){const rr=rafBy(q.raf);if(rr&&!isPal(rr))for(const [cx,cy] of segCells(rr,+q.bolme||1,tOf(q,rr)))occ.add(cx+","+cy)}
   let g=`<defs><pattern id="hz" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="6" fill="#058a8e"/><rect x="3" width="3" height="6" fill="#04585b"/></pattern>
   <pattern id="tl" width="${S}" height="${S}" patternUnits="userSpaceOnUse"><path d="M${S} 0V${S}H0" fill="none" stroke="var(--line)" stroke-width=".3"/></pattern></defs>
@@ -307,7 +309,18 @@ function drawMap(hl){
   for(const w of plan.hduvar||[])wl+=`M${w.x0*S} ${w.y*S}H${w.x1*S}`;
   g+=`<path d="${fl}" fill="var(--floor)"/><path d="${fl}" fill="url(#tl)"/><path d="${wl}" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="square" fill="none"/>`;
   for(const r of plan.raflar)if(!isPal(r))g+=`<rect x="${r.x*S-1.4}" y="${r.y*S-1.4}" width="${r.w*S+2.8}" height="${r.h*S+2.8}" rx="1.5" fill="none" stroke="#f2c200" stroke-width=".55" opacity=".85"/>`;
-  for(const r of plan.raflar){const x=r.x*S,y=r.y*S,w=r.w*S,h=r.h*S,act=hl&&hl.r===r,n=len(r),L=cells(r);
+  for(const r of D3?[...plan.raflar].sort((a,b)=>(a.y+a.h)-(b.y+b.h)):plan.raflar){const x=r.x*S,y=r.y*S,w=r.w*S,h=r.h*S,act=hl&&hl.r===r,n=len(r),L=cells(r);
+    if(D3&&isPal(r)){const e1=2.2/K,e2=7/K;g+=`<g class="pal"><rect x="${x+.7}" y="${y+h-.7-e1}" width="${w-1.4}" height="${e1}" fill="#7a4f1f"/><rect x="${x+.7}" y="${y+.7-e1}" width="${w-1.4}" height="${h-1.4}" fill="#b07a3c" stroke="${act?"#058a8e":"#7a4f1f"}" stroke-width="${act?1.4:.4}"/>
+      <rect x="${x+1.6}" y="${y+h-1.6-e2}" width="${w-3.2}" height="${e2-e1}" fill="#c8995c" stroke="#8d6533" stroke-width=".3"/><rect x="${x+1.6}" y="${y+1.6-e2}" width="${w-3.2}" height="${h-3.2}" fill="#e3bf8c" stroke="#8d6533" stroke-width=".3"/>
+      <line x1="${x+w/2}" x2="${x+w/2}" y1="${y+1.6-e2}" y2="${y+h-1.6-e1}" stroke="#f5e6c8" stroke-width=".7"/>
+      <text x="${x+w/2}" y="${y+h/2+2.2-e2}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="5.2" fill="#fff" stroke="#3b250c" stroke-width=".5" paint-order="stroke">${esc(r.ad)}</text></g>`;continue}
+    if(D3){const kt=r.kat||4;g+=`<rect x="${x+.6}" y="${y+h-.6-E}" width="${w-1.2}" height="${E}" fill="#2a2f37"/>`;
+      for(let i=1;i<kt;i++)g+=`<line x1="${x+.6}" x2="${x+w-.6}" y1="${y+h-.6-i*E/kt}" y2="${y+h-.6-i*E/kt}" stroke="#f28c28" stroke-width="1.1"/>`;
+      g+=`<rect x="${x+.6}" y="${y+h-.6-E}" width="1.1" height="${E}" fill="#2c4f9a"/><rect x="${x+w-1.7}" y="${y+h-.6-E}" width="1.1" height="${E}" fill="#2c4f9a"/>
+      <rect x="${x+.6}" y="${y+.6-E}" width="${w-1.2}" height="${h-1.2}" rx="1" fill="#59616d" stroke="${act?"#058a8e":"#3b424c"}" stroke-width="${act?1.4:.4}"/>`;
+      if(cift(r))g+=vert(r)?`<line x1="${x+w/2}" x2="${x+w/2}" y1="${y+1.5-E}" y2="${y+h-1.5-E}" stroke="#ffffff66" stroke-width=".6" stroke-dasharray="2 1.2"/>`:`<line y1="${y+h/2-E}" y2="${y+h/2-E}" x1="${x+1.5}" x2="${x+w-1.5}" stroke="#ffffff66" stroke-width=".6" stroke-dasharray="2 1.2"/>`;
+      for(let i=1;i<n;i++){const o=Math.floor(i*L/n)*S;g+=vert(r)?`<line x1="${x+1}" x2="${x+w-1}" y1="${y+o-E}" y2="${y+o-E}" stroke="#fff4" stroke-width=".5"/>`:`<line y1="${y+1-E}" y2="${y+h-1-E}" x1="${x+o}" x2="${x+o}" stroke="#fff4" stroke-width=".5"/>`}
+      g+=`<text x="${x+w/2}" y="${y+h/2+2.6-E}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="#fff" stroke="#0008" stroke-width=".4" paint-order="stroke">${esc(r.ad)}</text>`;continue}
     if(isPal(r)){g+=`<g class="pal"><rect x="${x+1.3}" y="${y+1.9}" width="${w-1.8}" height="${h-1.8}" rx=".8" fill="#0003"/>
       <rect x="${x+.7}" y="${y+.7}" width="${w-1.4}" height="${h-1.4}" rx=".6" fill="#b07a3c" stroke="${act?"#058a8e":"#7a4f1f"}" stroke-width="${act?1.4:.4}"/>
       ${[2.2,4.6,7].map(o=>`<line x1="${x+1}" x2="${x+w-1}" y1="${y+o*h/S}" y2="${y+o*h/S}" stroke="#7a4f1f" stroke-width=".35"/>`).join("")}
@@ -331,9 +344,9 @@ function drawMap(hl){
   const gx=plan.giris.x*S,gy=plan.giris.y*S;
   g+=`<line x1="${gx-S}" x2="${gx+2*S}" y1="${gy+S}" y2="${gy+S}" stroke="#04585b" stroke-width="3"/><line class="kayan" x1="${gx-S}" x2="${gx+2*S}" y1="${gy+S}" y2="${gy+S}" stroke="#7fd3d6" stroke-width="3" stroke-dasharray="3 3"/><text x="${gx+S/2}" y="${gy+S+8}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="var(--ink)">GİRİŞ</text>`;
   if(hl){if(hl.full&&hl.full.length>1)g+=`<path d="${hl.full.map(([x,y],i)=>(i?"L":"M")+(x*S+S/2)+" "+(y*S+S/2)).join(" ")}" fill="none" stroke="#058a8e" stroke-width="1.3" stroke-dasharray="1.2 2.6" stroke-linecap="round" opacity=".6"/>`;
-    if(hl.all){for(const q of rackItems(hl.r)){const t=tOf(q,hl.r);for(const [cx,cy] of segCells(hl.r,+q.bolme||1,t))g+=`<rect x="${cx*S+1.6}" y="${cy*S+1.6}" width="${S-3.2}" height="${S-3.2}" rx="1" fill="#058a8e" opacity=".7"/>`}}
-    else if(hl.r)for(const [cx,cy] of segCells(hl.r,hl.b,hl.t))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#ff6a13"/>`;
-    for(const st of hl.stops||[]){const c=segCells(st.r,st.b,st.t);let sx=0,sy=0;for(const [x,y] of c){sx+=x*S+S/2;sy+=y*S+S/2}sx/=c.length;sy/=c.length;
+    if(hl.all){for(const q of rackItems(hl.r)){const t=tOf(q,hl.r);for(const [cx,cy] of segCells(hl.r,+q.bolme||1,t))g+=`<rect x="${cx*S+1.6}" y="${cy*S+1.6-(D3&&!isPal(hl.r)?E:0)}" width="${S-3.2}" height="${S-3.2}" rx="1" fill="#058a8e" opacity=".7"/>`}}
+    else if(hl.r)for(const [cx,cy] of segCells(hl.r,hl.b,hl.t))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8-(D3?(isPal(hl.r)?7/K:E):0)}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#ff6a13"/>`;
+    for(const st of hl.stops||[]){const c=segCells(st.r,st.b,st.t);let sx=0,sy=0;for(const [x,y] of c){sx+=x*S+S/2;sy+=y*S+S/2}sx/=c.length;sy/=c.length;if(D3)sy-=isPal(st.r)?7/K:E;
       g+=`<g><circle cx="${sx}" cy="${sy}" r="4.4" fill="${st.state==="done"?"#6b8f71":st.state==="skip"?"#8a8f96":st.state==="now"?"#ff6a13":"#058a8e"}" stroke="#fff" stroke-width=".9"/><text x="${sx}" y="${sy+2.1}" text-anchor="middle" font-family="Barlow Condensed,Barlow,sans-serif" font-weight="800" font-size="5.6" fill="#fff">${st.state==="done"?"✓":st.n}</text></g>`}
     if(hl.pts){const d=hl.pts.map(([x,y],i)=>(i?"L":"M")+(x*S+S/2)+" "+(y*S+S/2)).join(" ");
       g+=`<path id="rt" d="${d}" fill="none" stroke="none"/><g id="fs"></g>
@@ -354,7 +367,8 @@ function drawMap(hl){
           <rect x="3" y="-2.1" width="13" height="1" rx=".4" fill="#ff6a13" stroke="#7a2e04" stroke-width=".25"/><circle cx="4" cy="-.7" r=".9" fill="#1f2937"/><circle cx="15" cy="-.6" r=".6" fill="#1f2937"/>
           <g id="cload">${Array.from({length:Math.min(hl.load||0,6)},(_,i)=>{const c=i%3,rw=Math.floor(i/3);return `<rect x="${5+c*3.6}" y="${-2.1-2.8*(rw+1)}" width="3.4" height="2.7" rx=".3" fill="${["#d9b07a","#e3bf8c","#cfa268"][i%3]}" stroke="#8d6533" stroke-width=".25"/>`}).join("")}</g></g>`:""}
       </g></g>
-      <g id="bb" opacity="0"><rect x="0" y="0" width="30" height="11" rx="5.5" fill="#fff" stroke="#058a8e" stroke-width=".8"/><text x="15" y="7.8" text-anchor="middle" font-family="Barlow Condensed,Barlow,sans-serif" font-weight="800" font-size="7" fill="#058a8e">Burada!</text></g>`}}
+      <g id="bb" opacity="0"><rect x="0" y="0" width="30" height="11" rx="5.5" fill="#fff" stroke="#058a8e" stroke-width=".8"/><text data-b="1" x="15" y="7.8" text-anchor="middle" font-family="Barlow Condensed,Barlow,sans-serif" font-weight="800" font-size="7" fill="#058a8e">Burada!</text></g>`}}
+  if(D3){g=g.replace(/<text x="([-\d.]+)" y="([-\d.]+)"/g,(_,a,b)=>`<text transform="scale(1 ${(1/K).toFixed(4)})" x="${a}" y="${(+b*K).toFixed(2)}"`);g=`<g id="world" transform="matrix(1 0 0 ${K} 0 0)">${g}</g>`}
   m.innerHTML=g;if(hl&&hl.vanIn)setTimeout(()=>vanAnim(true),350);
   if(hl&&hl.pts){const p=$("rt"),wk=$("wk"),wf=$("wkf"),fs=$("fs"),bb=$("bb"),L=p.getTotalLength(),t0=performance.now(),dur=RM?0:Math.max(1200,Math.min(6500,L/70*1000));cancelAnimationFrame(anim);
     const R=a=>`rotate(${a.toFixed(1)} 0 -6)`,A=a=>`rotate(${a.toFixed(1)} 0 -11.4)`,cx=hl.r?(hl.r.x+hl.r.w/2)*S:null;let face=1,lastF=0,side=1;
@@ -365,15 +379,15 @@ function drawMap(hl){
     const pose=(ph,moving)=>{const sw=moving?Math.sin(ph)*28:0;$("lgf").setAttribute("transform",R(sw));$("lgb").setAttribute("transform",R(-sw));
       if(hl.cart){$("amf").setAttribute("transform",A(-72));$("amb").setAttribute("transform",A(-64))}else{$("amf").setAttribute("transform",A(-sw*.9));$("amb").setAttribute("transform",A(sw*.9))}
       $("bdy").setAttribute("transform",`translate(0 ${moving?(-Math.abs(Math.cos(ph))*.6).toFixed(2):0})`)};
-    follow=isPhone()&&!RM&&dur>0;if(follow){const z=2.3,w=VB[2]/z,h=VB[3]/z,p0=p.getPointAtLength(0);setVB(clampVB([p0.x-w/2,p0.y-h/2,w,h]));zState()}
+    follow=isPhone()&&!RM&&dur>0;if(follow){const z=2.3,w=VB[2]/z,h=VB[3]/z,p0=p.getPointAtLength(0);setVB(clampVB([p0.x-w/2,p0.y*K3()-h/2,w,h]));zState()}
     const step=t=>{const k=dur?Math.min(1,(t-t0)/dur):1,e=k<.08?k*k/.16:(k>.92?1-(1-k)*(1-k)/.16:k*1.0869-.0435),dist=L*Math.min(1,Math.max(0,e)),pt=p.getPointAtLength(dist),ah=p.getPointAtLength(Math.min(L,dist+2));
       if(Math.abs(ah.x-pt.x)>.3)face=ah.x>pt.x?1:-1;
       while(lastF+4.6<dist){lastF+=4.6;foot(lastF)}
       if(k>=1&&cx!==null)face=cx>=pt.x?1:-1;
-      if(follow){const v=curVB();setVB(clampVB([pt.x-v[2]/2,pt.y-v[3]*.55,v[2],v[3]]))}
-      wk.setAttribute("transform",`translate(${pt.x.toFixed(2)} ${pt.y.toFixed(2)})`);wf.setAttribute("transform",`scale(${1.35*face} 1.35)`);pose(dist/2.6,k<1);
+      if(follow){const v=curVB();setVB(clampVB([pt.x-v[2]/2,pt.y*K3()-v[3]*.55,v[2],v[3]]))}
+      wk.setAttribute("transform",`translate(${pt.x.toFixed(2)} ${pt.y.toFixed(2)})`);wf.setAttribute("transform",`scale(${1.35*face} ${1.35/K3()})`);pose(dist/2.6,k<1);
       if(k<1)anim=requestAnimationFrame(step);
-      else if(!hl.r){if(hl.onArrive)hl.onArrive()}else{if(hl.onArrive)hl.onArrive();bb.setAttribute("transform",`translate(${(pt.x+4).toFixed(1)} ${Math.max(-8,pt.y-31).toFixed(1)})`);bb.setAttribute("opacity","1");if(!RM)bb.animate([{opacity:0},{opacity:1}],{duration:300});setTimeout(()=>zoomOn(hl,pt),RM?0:350)}};
+      else if(!hl.r){if(hl.onArrive)hl.onArrive()}else{if(hl.onArrive)hl.onArrive();bb.setAttribute("transform",`translate(${(pt.x+4).toFixed(1)} ${(pt.y-31/K3()).toFixed(1)}) scale(1 ${1/K3()})`);bb.setAttribute("opacity","1");if(!RM)bb.animate([{opacity:0},{opacity:1}],{duration:300});setTimeout(()=>zoomOn(hl,pt),RM?0:350)}};
     anim=requestAnimationFrame(step)}
 }
 function rackSvg(r,cell,hiK){const n=len(r),K=r.kat||4,cw=30,kh=30,x0=12,uTop=6,bTop=uTop+Math.round(kh*.45),floor=bTop+(K-1)*kh,W=x0+n*cw+30,H=floor+18,f=$("front");
@@ -403,12 +417,13 @@ function drawFront(r,b,k,t){if(isPal(r))return drawPal(r);
   $("fn").textContent=`Alttaki sayılar bölme, sağdakiler kat. Turuncu kutu: ${b}. bölme, ${+k===1?"1. kat (yerde)":k+". kat"}. Katlar alttan sayılır, 1. kat yer.`;
 }
 
-let VB=[0,0,1,1],zanim=0;
+let VB=[0,0,1,1],zanim=0,D3=false;try{D3=localStorage.getItem("rafta-3d")==="1"}catch(e){}
+const K3=()=>D3?.62:1,EX=10*1.3;
 const setVB=v=>$("map").setAttribute("viewBox",v.map(n=>(+n).toFixed(2)).join(" "));
 function zoomTo(t,ms){const f=$("map").getAttribute("viewBox").split(/[\s,]+/).map(Number),t0=performance.now();cancelAnimationFrame(zanim);
   const st=now=>{const k=ms?Math.min(1,(now-t0)/ms):1,e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;setVB(f.map((a,i)=>a+(t[i]-a)*e));if(k<1)zanim=requestAnimationFrame(st);else zState()};zanim=requestAnimationFrame(st)}
 function zoomOn(hl,pt){const S=10,c=segCells(hl.r,hl.b,hl.t);let sx=0,sy=0;for(const [x,y] of c){sx+=x*S+S/2;sy+=y*S+S/2}sx/=c.length;sy/=c.length;
-  const z=matchMedia("(max-width:760px)").matches?3:2.4,w=VB[2]/z,h=VB[3]/z,cx=(sx+pt.x)/2,cy=(sy+pt.y)/2-6,
+  const z=matchMedia("(max-width:760px)").matches?3:2.4,w=VB[2]/z,h=VB[3]/z,cx=(sx+pt.x)/2,cy=((sy+pt.y)/2-6)*K3()-(D3?EX/2:0),
   cl=(v,a,b)=>Math.max(a,Math.min(b,v));zoomTo([cl(cx-w/2,VB[0],VB[0]+VB[2]-w),cl(cy-h/2,VB[1],VB[1]+VB[3]-h),w,h],RM?0:1000);$("zout").hidden=false}
 $("zout").addEventListener("click",()=>{follow=false;zoomTo(VB,RM?0:700);$("zout").hidden=true});
 let follow=false,dragged=false;const isPhone=()=>matchMedia("(max-width:760px)").matches;
@@ -418,6 +433,9 @@ function clampVB(v){let [x,y,w,h]=v;const mw=VB[2]/6;if(w<mw){h*=mw/w;w=mw}if(w>
 function zState(){const z=curVB()[2]<VB[2]*.98;$("zout").hidden=!z;document.querySelector(".mapw").classList.toggle("zoomed",z)}
 function zoomBy(f,cx,cy,ms){const v=curVB();cx=cx??v[0]+v[2]/2;cy=cy??v[1]+v[3]/2;const w=v[2]/f,h=v[3]/f;const t=clampVB([cx-(cx-v[0])/f,cy-(cy-v[1])/f,w,h]);
   if(ms){zoomTo(t,ms);setTimeout(zState,ms+20)}else{setVB(t);zState()}}
+$("d3btn").addEventListener("click",()=>{D3=!D3;try{localStorage.setItem("rafta-3d",D3?"1":"0")}catch(e){}follow=false;
+  if(PK&&!PK.fin){runStop()}else if(cur){show(cur,false)}else drawMap();
+  if(!RM)$("map").animate([{opacity:.3,transform:D3?"perspective(700px) rotateX(18deg)":"perspective(700px) rotateX(-12deg)"},{opacity:1,transform:"none"}],{duration:450,easing:"cubic-bezier(.2,.7,.2,1)"})});
 $("zin").addEventListener("click",()=>{follow=false;zoomBy(1.6,null,null,RM?0:250)});
 $("zoutb").addEventListener("click",()=>{follow=false;zoomBy(1/1.6,null,null,RM?0:250)});
 {const m=$("map"),P=new Map();let start=null,lastTap=0;
@@ -444,7 +462,7 @@ $("zoutb").addEventListener("click",()=>{follow=false;zoomBy(1/1.6,null,null,RM?
 
 /* ---------- rafa dokun, içini gör ---------- */
 const rackItems=r=>prods.filter(p=>rafBy(p.raf)===r);
-function zoomRack(r){const S=10,z0=matchMedia("(max-width:760px)").matches?3:2.4,z=Math.max(1,Math.min(z0,VB[2]/(r.w*S+70),VB[3]/(r.h*S+70))),w=VB[2]/z,h=VB[3]/z,cx=(r.x+r.w/2)*S,cy=(r.y+r.h/2)*S,
+function zoomRack(r){const S=10,z0=matchMedia("(max-width:760px)").matches?3:2.4,z=Math.max(1,Math.min(z0,VB[2]/(r.w*S+70),VB[3]/(r.h*S+70))),w=VB[2]/z,h=VB[3]/z,cx=(r.x+r.w/2)*S,cy=(r.y+r.h/2)*S*K3()-(D3?EX/2:0),
   cl=(v,a,b)=>Math.max(a,Math.min(b,v));if(z<=1.05)return;zoomTo([cl(cx-w/2,VB[0],VB[0]+VB[2]-w),cl(cy-h/2,VB[1],VB[1]+VB[3]-h),w,h],RM?0:800);$("zout").hidden=false}
 function showRack(r,t){cur=null;const its=rackItems(r),pal=isPal(r),sides=cift(r)?[1,2]:[undefined];t=cift(r)?(t||1):undefined;
   const row=p=>`<li><span><span class="w">${pal?"Palet üstü":`${Math.min(Math.max(1,+p.bolme||1),len(r))}. bölme · ${Math.min(Math.max(1,+p.kat||1),r.kat||1)}. kat`}</span><span class="nm">${esc(p.ad)}</span>${p.adet!==""&&p.adet!=null?` <span class="w" style="display:inline">· ${esc(p.adet)} adet</span>`:""}</span>
@@ -577,8 +595,8 @@ function nextStop(stat){if(PK.busy)return;const s=PK.stops[PK.i];const go=()=>{P
   if(stat==="done"){tick();if(!RM){PK.busy=true;return flyToCart(s,go)}}go()}
 function flyToCart(s,cb){const m=$("map"),wk=$("wk"),wf=$("wkf");if(!wk||!wf){cb();return}
   const tr=(wk.getAttribute("transform")||"").match(/translate\(([-\d.]+) ([-\d.]+)\)/),sc=(wf.getAttribute("transform")||"").match(/scale\(([-\d.]+)/);if(!tr){cb();return}
-  const face=sc&&+sc[1]<0?-1:1,tx=+tr[1]+face*9*1.35,ty=+tr[2]-6*1.35,c=segCells(s.r,s.b,s.t);let sx=0,sy=0;for(const [x,y] of c){sx+=x*10+5;sy+=y*10+5}sx/=c.length;sy/=c.length;
-  const n=s.items.length,boxes=[];for(let i=0;i<Math.min(n,3);i++){const e=document.createElementNS(NS,"g");e.innerHTML=`<rect x="-2.6" y="-2.1" width="5.2" height="4.2" rx=".4" fill="#d9b07a" stroke="#8d6533" stroke-width=".3"/><line x1="0" x2="0" y1="-2.1" y2="2.1" stroke="#f5e6c8" stroke-width=".7"/>`;m.appendChild(e);boxes.push(e)}
+  const face=sc&&+sc[1]<0?-1:1,tx=+tr[1]+face*9*1.35,ty=+tr[2]-6*1.35/K3(),c=segCells(s.r,s.b,s.t);let sx=0,sy=0;for(const [x,y] of c){sx+=x*10+5;sy+=y*10+5}sx/=c.length;sy/=c.length;if(D3)sy-=isPal(s.r)?7/K3():EX/K3();
+  const n=s.items.length,boxes=[];for(let i=0;i<Math.min(n,3);i++){const e=document.createElementNS(NS,"g");e.innerHTML=`<rect x="-2.6" y="-2.1" width="5.2" height="4.2" rx=".4" fill="#d9b07a" stroke="#8d6533" stroke-width=".3"/><line x1="0" x2="0" y1="-2.1" y2="2.1" stroke="#f5e6c8" stroke-width=".7"/>`;($("world")||m).appendChild(e);boxes.push(e)}
   const t0=performance.now(),D=520;const st=t=>{const k=Math.min(1,(t-t0)/D);boxes.forEach((e,i)=>{const kk=Math.max(0,Math.min(1,k*1.25-i*.12)),x=sx+(tx-sx)*kk,y=sy+(ty-sy)*kk-Math.sin(kk*Math.PI)*14;e.setAttribute("transform",`translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${(kk*200).toFixed(0)}) scale(${1-kk*.25})`)});
     if(k<1)requestAnimationFrame(st);else{boxes.forEach(e=>e.remove());cb()}};requestAnimationFrame(st)}
 function finishPick(){const done=Object.values(PK.state).filter(v=>v==="done").length,skip=Object.values(PK.state).filter(v=>v==="skip").length,pts=pathFrom(PK.pos,PK.end||[plan.giris.x,plan.giris.y]);
@@ -627,10 +645,10 @@ function reachAll(){for(const r of plan.raflar)for(let b=1;b<=len(r);b++)for(con
 function setPlacing(on){$("phint").hidden=!on;document.querySelector(".mapc").classList.toggle("placing",on);if(on){cur=null;drawMap();document.querySelector(".mapc").scrollIntoView({behavior:RM?"auto":"smooth",block:"center"})}}
 $("p_add").addEventListener("click",()=>{plan=readPlanForm();setPlacing(true)});
 $("p_cancel").addEventListener("click",()=>setPlacing(false));
-$("map").addEventListener("click",async e=>{if(dragged){dragged=false;return}const m=$("map"),pt=m.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(m.getScreenCTM().inverse()),x=Math.floor(q.x/10),y=Math.floor(q.y/10);
-  if($("phint").hidden){if(PK&&!PK.fin)return;const hit=r=>x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h;let r=plan.raflar.find(hit);
+$("map").addEventListener("click",async e=>{if(dragged){dragged=false;return}const m=$("map"),pt=m.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(($("world")||m).getScreenCTM().inverse()),x=Math.floor(q.x/10),y=Math.floor(q.y/10);
+  if($("phint").hidden){if(PK&&!PK.fin)return;const fy3=q.y/10,ex=D3?EX/K3()/10:0,hit=r=>x>=r.x&&x<r.x+r.w&&fy3>=r.y-(isPal(r)?ex*.55:ex)&&fy3<r.y+r.h;let r=plan.raflar.find(hit);
     if(!r){const fx=q.x/10,fy=q.y/10;let best=null,bd=.9;for(const c of plan.raflar){const dx=Math.max(c.x-fx,0,fx-(c.x+c.w)),dy=Math.max(c.y-fy,0,fy-(c.y+c.h)),d=Math.hypot(dx,dy);if(d<bd){bd=d;best=c}}r=best}
-    if(r){let t;if(cift(r))t=vert(r)?(q.x/10<r.x+r.w/2?1:2):(q.y/10<r.y+r.h/2?1:2);showRack(r,t)}return}
+    if(r){let t;if(cift(r))t=vert(r)?(q.x/10<r.x+r.w/2?1:2):(q.y/10+(D3?ex:0)<r.y+r.h/2?1:2);showRack(r,t)}return}
   const O=outside(),B=blocked();if(x<0||y<0||x>=plan.cols||y>=plan.rows||O.has(x+","+y)){$("st").textContent="Oraya palet konamaz: depo dışı";return}
   if(B.has(x+","+y)){$("st").textContent="Orada zaten raf ya da palet var";return}
   if(x===plan.giris.x&&y===plan.giris.y){$("st").textContent="Girişin önüne palet konamaz";return}
