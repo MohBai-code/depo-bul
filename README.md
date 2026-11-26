@@ -1,10 +1,10 @@
-# Depo Bul
+# Koray - Rafta
 
 Hırdavat deposu için ürün bulucu. Ürünü yazınca depo planında girişten rafa giden yolu ve rafın hangi bölme/katında olduğunu animasyonla gösterir. İnternetsiz çalışır.
 
 ## Android (APK)
 1. Telefondan bu reponun **Releases → son-surum** sayfasını açın.
-2. `DepoBul.apk` dosyasına dokunup indirin.
+2. `KorayRafta.apk` dosyasına dokunup indirin.
 3. Açın; "bilinmeyen kaynaklardan yükleme" izni sorulursa verin ve **Yükle**'ye basın.
 
 ## iPhone

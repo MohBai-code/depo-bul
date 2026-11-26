@@ -36,17 +36,17 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
       - name: APK adini duzelt
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk DepoBul.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk KorayRafta.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: DepoBul-apk
-          path: DepoBul.apk
+          name: KorayRafta-apk
+          path: KorayRafta.apk
       - name: Indirme sayfasina koy
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete son-surum --yes --cleanup-tag || true
-          gh release create son-surum DepoBul.apk --title "Depo Bul - son surum" --notes "Telefondan DepoBul.apk dosyasina dokunup indirin ve kurun."
+          gh release create son-surum KorayRafta.apk --title "Koray - Rafta son surum" --notes "Telefondan KorayRafta.apk dosyasina dokunup indirin ve kurun."
 
   web:
     name: iPhone icin web surumu (hazirla)
