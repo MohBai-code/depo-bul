@@ -56,8 +56,8 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{text-align:left;p
 th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-space:nowrap}
 .scroll{overflow-x:auto}.acts{display:flex;gap:6px;flex-wrap:wrap}.acts .btn{min-height:36px;padding:4px 10px;font-size:14px}
 .note{font-size:13px;color:var(--mut);margin:8px 0}
-.pulse{animation:pl 1s ease-in-out infinite alternate}@keyframes pl{from{opacity:1}to{opacity:.35}}
-@media(prefers-reduced-motion:reduce){.pulse{animation:none}}
+.pulse{animation:pl 1s ease-in-out infinite alternate}.kayan{animation:kay .9s linear infinite}@keyframes kay{to{stroke-dashoffset:-6}}@keyframes pl{from{opacity:1}to{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.pulse,.kayan{animation:none}}
 @media(max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;white-space:normal;color:var(--mut)}.stack td:empty{display:none}}
 #splash{position:fixed;inset:0;z-index:50;background:#058a8e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:#fff;transition:opacity .45s ease,transform .45s ease;cursor:pointer}
@@ -113,6 +113,14 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
 .seg input:focus-visible+span{outline:3px solid var(--org);outline-offset:2px}
 #ybar{max-width:1240px;margin:10px auto 0;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff3e6;color:#5a2a05;border-radius:12px;padding:8px 8px 8px 14px;font-size:15px;font-weight:600}
 #ybar .btn{background:#ff6a13;border-color:#ff6a13;color:#fff;min-height:40px;flex:none;white-space:nowrap;padding:6px 14px}
+.flyk{position:fixed;z-index:60;width:28px;height:24px;border-radius:3px;background:#d9b07a;border:1.5px solid #8d6533;pointer-events:none;box-shadow:0 4px 10px #0004}
+.flyk::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:4px;margin-left:-2px;background:#f5e6c8}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:55;background:#17191c;color:#fff;border-radius:14px;padding:10px 10px 10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 10px 30px #0005;max-width:calc(100vw - 24px);font-weight:600}
+#toast .btn{color:#fff;border-color:#ffffff88;min-height:38px;padding:4px 12px;white-space:nowrap}
+.tik{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;z-index:3}.tik svg{width:84px;height:84px;filter:drop-shadow(0 6px 14px #0003)}
+.tik circle{fill:#058a8e}.tik path{fill:none;stroke:#fff;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:tikc .35s .12s ease-out forwards}
+@keyframes tikc{to{stroke-dashoffset:0}}.res{position:relative}
+.konf{position:fixed;z-index:58;width:8px;height:12px;border-radius:2px;pointer-events:none}
 #zout:focus-visible{outline:3px solid var(--org);outline-offset:2px}
 </style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script></head>
 <body>
@@ -125,6 +133,7 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
     <ul id="sug" hidden></ul>
   </div>
 </header>
+<div id="toast" role="status" aria-live="polite" hidden></div>
 <main>
   <div class="res" id="res"><div><div class="big">Ne arıyorsun?</div><p>Ürünü yaz, depodaki yerini girişten başlayarak göstereyim.</p></div></div>
   <div class="grid">
@@ -274,7 +283,8 @@ function route(r,b,t){
 /* ---------- çizim ---------- */
 function drawMap(hl){
   const S=10,W=plan.cols*S,H=plan.rows*S,m=$("map");
-  VB=[-4,-12,W+8,H+22];cancelAnimationFrame(zanim);setVB(VB);$("zout").hidden=true;document.querySelector(".mapw").style.aspectRatio=`${W+8}/${H+22}`;
+  const vanR=(plan.kapilar||[]).some(d=>d.kenar==="r")?28:0;VB=[-4,-12,W+8+vanR,H+22];cancelAnimationFrame(zanim);setVB(VB);$("zout").hidden=true;document.querySelector(".mapw").style.aspectRatio=`${W+8+vanR}/${H+22}`;
+  const occ=new Set();for(const q of prods){const rr=rafBy(q.raf);if(rr&&!isPal(rr))for(const [cx,cy] of segCells(rr,+q.bolme||1,tOf(q,rr)))occ.add(cx+","+cy)}
   let g=`<defs><pattern id="hz" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="6" fill="#058a8e"/><rect x="3" width="3" height="6" fill="#04585b"/></pattern>
   <pattern id="tl" width="${S}" height="${S}" patternUnits="userSpaceOnUse"><path d="M${S} 0V${S}H0" fill="none" stroke="var(--line)" stroke-width=".3"/></pattern></defs>
 `;
@@ -286,6 +296,7 @@ function drawMap(hl){
     if(!ins(x-1,y)&&!kd("l"))wl+=`M${x*S} ${y*S}v${S}`;if(!ins(x+1,y)&&!kd("r"))wl+=`M${(x+1)*S} ${y*S}v${S}`}
   for(const w of plan.hduvar||[])wl+=`M${w.x0*S} ${w.y*S}H${w.x1*S}`;
   g+=`<path d="${fl}" fill="var(--floor)"/><path d="${fl}" fill="url(#tl)"/><path d="${wl}" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="square" fill="none"/>`;
+  for(const r of plan.raflar)if(!isPal(r))g+=`<rect x="${r.x*S-1.4}" y="${r.y*S-1.4}" width="${r.w*S+2.8}" height="${r.h*S+2.8}" rx="1.5" fill="none" stroke="#f2c200" stroke-width=".55" opacity=".85"/>`;
   for(const r of plan.raflar){const x=r.x*S,y=r.y*S,w=r.w*S,h=r.h*S,act=hl&&hl.r===r,n=len(r),L=cells(r);
     if(isPal(r)){g+=`<g class="pal"><rect x="${x+1.3}" y="${y+1.9}" width="${w-1.8}" height="${h-1.8}" rx=".8" fill="#0003"/>
       <rect x="${x+.7}" y="${y+.7}" width="${w-1.4}" height="${h-1.4}" rx=".6" fill="#b07a3c" stroke="${act?"#058a8e":"#7a4f1f"}" stroke-width="${act?1.4:.4}"/>
@@ -298,13 +309,21 @@ function drawMap(hl){
     <rect x="${x+.6}" y="${y+.6}" width="${w-1.2}" height="${h-1.2}" rx="1" fill="var(--rack)" stroke="${act?"#058a8e":"none"}" stroke-width="1.4"/>`;
     if(cift(r))g+=vert(r)?`<line x1="${x+w/2}" x2="${x+w/2}" y1="${y+1.5}" y2="${y+h-1.5}" stroke="#ffffff66" stroke-width=".6" stroke-dasharray="2 1.2"/>`:`<line y1="${y+h/2}" y2="${y+h/2}" x1="${x+1.5}" x2="${x+w-1.5}" stroke="#ffffff66" stroke-width=".6" stroke-dasharray="2 1.2"/>`;
     for(let i=1;i<n;i++){const o=Math.floor(i*L/n)*S;g+=vert(r)?`<line x1="${x+1}" x2="${x+w-1}" y1="${y+o}" y2="${y+o}" stroke="#fff4" stroke-width=".5"/>`:`<line y1="${y+1}" y2="${y+h-1}" x1="${x+o}" x2="${x+o}" stroke="#fff4" stroke-width=".5"/>`}
+    for(let i=0;i<r.w;i++)for(let j=0;j<r.h;j++){const cx=r.x+i,cy=r.y+j;if(!occ.has(cx+","+cy))continue;const bx=cx*S,by=cy*S,v=(cx*7+cy*3)%3;
+      g+=`<rect x="${bx+1.9}" y="${by+2}" width="${v?6.2:5.4}" height="${v===2?5.6:6.2}" rx=".5" fill="${["#d9b07a","#e3bf8c","#cfa268"][v]}" stroke="#8d6533" stroke-width=".3"/><line x1="${bx+1.9+(v?3.1:2.7)}" x2="${bx+1.9+(v?3.1:2.7)}" y1="${by+2}" y2="${by+(v===2?7.6:8.2)}" stroke="#f5e6c8" stroke-width=".6"/>`}
     g+=`<text x="${x+w/2}" y="${y+h/2+2.6}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="#fff" stroke="#0008" stroke-width=".4" paint-order="stroke">${esc(r.ad)}</text>`}
-  for(const d of plan.kapilar||[]){if(d.kenar==="r"){const x=(d.x+1)*S,y=d.y*S,h=(d.h||1)*S;g+=`<rect x="${x-1.5}" y="${y}" width="3" height="${h}" fill="url(#hz)"/><text transform="translate(${x-3} ${y+h/2}) rotate(-90)" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="5.5" fill="var(--ink)">${esc(d.ad)}</text>`}
+  for(const d of plan.kapilar||[]){if(d.kenar==="r"){const x=(d.x+1)*S,y=d.y*S,h=(d.h||1)*S,vy=y+h/2;
+      g+=`<line x1="${x}" x2="${x}" y1="${y}" y2="${y+h}" stroke="#04585b" stroke-width="3"/><line class="kayan" x1="${x}" x2="${x}" y1="${y}" y2="${y+h}" stroke="#7fd3d6" stroke-width="3" stroke-dasharray="3 3"/>
+      <g class="van"><rect x="${x+4.5}" y="${vy-6.4}" width="17" height="12.8" rx="1" fill="#0003"/><rect x="${x+3.5}" y="${vy-7}" width="16" height="12.4" rx="1" fill="#f4f6f7" stroke="#9aa3ab" stroke-width=".5"/>
+      <rect x="${x+3.5}" y="${vy-1.2}" width="16" height="2.2" fill="#058a8e"/><rect x="${x+19.5}" y="${vy-6.2}" width="6" height="10.8" rx="2" fill="#058a8e" stroke="#03494b" stroke-width=".5"/>
+      <rect x="${x+22.6}" y="${vy-5.2}" width="2.2" height="8.8" rx=".8" fill="#0d2b33"/>${[[x+6,vy-8],[x+15,vy-8],[x+6,vy+5.2],[x+21,vy+5.2],[x+21,vy-8],[x+15,vy+5.2]].map(([a,b])=>`<rect x="${a}" y="${b}" width="3.4" height="1.6" rx=".6" fill="#222"/>`).join("")}
+      <text x="${x+11.5}" y="${vy+9.8}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="4.6" fill="var(--mut)">Sevkiyat</text></g>`;
+      g+=`<rect x="${x-1.5}" y="${y}" width="0" height="0" fill="none"/><text transform="translate(${x-3} ${y+h/2}) rotate(-90)" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="5.5" fill="var(--ink)">${esc(d.ad)}</text>`}
     else if(d.kenar==="t"){g+=`<rect x="${d.x*S}" y="${d.y*S-1}" width="${(d.w||1)*S}" height="2" fill="#058a8e" opacity=".6"/>`}}
   const gx=plan.giris.x*S,gy=plan.giris.y*S;
-  g+=`<rect x="${gx-S}" y="${gy+S-1.5}" width="${S*3}" height="3" fill="url(#hz)"/><text x="${gx+S/2}" y="${gy+S+8}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="var(--ink)">GİRİŞ</text>`;
+  g+=`<line x1="${gx-S}" x2="${gx+2*S}" y1="${gy+S}" y2="${gy+S}" stroke="#04585b" stroke-width="3"/><line class="kayan" x1="${gx-S}" x2="${gx+2*S}" y1="${gy+S}" y2="${gy+S}" stroke="#7fd3d6" stroke-width="3" stroke-dasharray="3 3"/><text x="${gx+S/2}" y="${gy+S+8}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="var(--ink)">GİRİŞ</text>`;
   if(hl){if(hl.full&&hl.full.length>1)g+=`<path d="${hl.full.map(([x,y],i)=>(i?"L":"M")+(x*S+S/2)+" "+(y*S+S/2)).join(" ")}" fill="none" stroke="#058a8e" stroke-width="1.3" stroke-dasharray="1.2 2.6" stroke-linecap="round" opacity=".6"/>`;
-    if(hl.all){for(const q of rackItems(hl.r)){const t=tOf(q,hl.r);for(const [cx,cy] of segCells(hl.r,+q.bolme||1,t))g+=`<rect x="${cx*S+1.6}" y="${cy*S+1.6}" width="${S-3.2}" height="${S-3.2}" rx="1" fill="#058a8e" opacity=".85"/>`}}
+    if(hl.all){for(const q of rackItems(hl.r)){const t=tOf(q,hl.r);for(const [cx,cy] of segCells(hl.r,+q.bolme||1,t))g+=`<rect x="${cx*S+1.6}" y="${cy*S+1.6}" width="${S-3.2}" height="${S-3.2}" rx="1" fill="#058a8e" opacity=".7"/>`}}
     else if(hl.r)for(const [cx,cy] of segCells(hl.r,hl.b,hl.t))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#ff6a13"/>`;
     for(const st of hl.stops||[]){const c=segCells(st.r,st.b,st.t);let sx=0,sy=0;for(const [x,y] of c){sx+=x*S+S/2;sy+=y*S+S/2}sx/=c.length;sy/=c.length;
       g+=`<g><circle cx="${sx}" cy="${sy}" r="4.4" fill="${st.state==="done"?"#6b8f71":st.state==="skip"?"#8a8f96":st.state==="now"?"#ff6a13":"#058a8e"}" stroke="#fff" stroke-width=".9"/><text x="${sx}" y="${sy+2.1}" text-anchor="middle" font-family="Barlow Condensed,Barlow,sans-serif" font-weight="800" font-size="5.6" fill="#fff">${st.state==="done"?"✓":st.n}</text></g>`}
@@ -320,6 +339,12 @@ function drawMap(hl){
           <path d="M-2.7 -15.1a2.7 2.7 0 0 1 5.4 0z" fill="#058a8e" stroke="#03494b" stroke-width=".3"/><rect x="-1" y="-15.4" width="4.6" height=".8" rx=".4" fill="#03494b"/></g>
         <g id="lgf"><rect x="-1" y="-6.2" width="2.1" height="6.4" rx="1" fill="#2b4a5c"/><rect x="-1.2" y="-.9" width="3.2" height="1.4" rx=".6" fill="#111"/></g>
         <g id="amf"><rect x="-.9" y="-11.6" width="1.8" height="5.2" rx=".9" fill="#e85a0c"/></g>
+        ${hl.cart==="cart"?`<g id="cart"><rect x="3.4" y="-11" width="1.1" height="9.4" rx=".5" fill="#5b6470"/><rect x="2.9" y="-11.4" width="2.2" height="1.1" rx=".5" fill="#1f2937"/>
+          <rect x="3.4" y="-2.6" width="10.6" height="1.3" rx=".5" fill="#5b6470"/><circle cx="5.2" cy="-.8" r="1" fill="#1f2937"/><circle cx="12.2" cy="-.8" r="1" fill="#1f2937"/>
+          <g id="cload">${Array.from({length:Math.min(hl.load||0,6)},(_,i)=>{const c=i%2,rw=Math.floor(i/2);return `<rect x="${5.2+c*4.2}" y="${-2.6-3.2*(rw+1)}" width="4" height="3.1" rx=".3" fill="${["#d9b07a","#e3bf8c","#cfa268"][i%3]}" stroke="#8d6533" stroke-width=".25"/>`}).join("")}</g></g>`:""}
+        ${hl.cart==="jack"?`<g id="cart"><path d="M3.6 -1.4 L2 -11.2" stroke="#1f2937" stroke-width="1" stroke-linecap="round"/><rect x="1" y="-12" width="2.6" height="1" rx=".5" fill="#ff6a13"/>
+          <rect x="3" y="-2.1" width="13" height="1" rx=".4" fill="#ff6a13" stroke="#7a2e04" stroke-width=".25"/><circle cx="4" cy="-.7" r=".9" fill="#1f2937"/><circle cx="15" cy="-.6" r=".6" fill="#1f2937"/>
+          <g id="cload">${Array.from({length:Math.min(hl.load||0,6)},(_,i)=>{const c=i%3,rw=Math.floor(i/3);return `<rect x="${5+c*3.6}" y="${-2.1-2.8*(rw+1)}" width="3.4" height="2.7" rx=".3" fill="${["#d9b07a","#e3bf8c","#cfa268"][i%3]}" stroke="#8d6533" stroke-width=".25"/>`}).join("")}</g></g>`:""}
       </g></g>
       <g id="bb" opacity="0"><rect x="0" y="0" width="30" height="11" rx="5.5" fill="#fff" stroke="#058a8e" stroke-width=".8"/><text x="15" y="7.8" text-anchor="middle" font-family="Barlow Condensed,Barlow,sans-serif" font-weight="800" font-size="7" fill="#058a8e">Burada!</text></g>`}}
   m.innerHTML=g;
@@ -329,7 +354,8 @@ function drawMap(hl){
       side=-side;const ox=-Math.sin(ang)*1.3*side,oy=Math.cos(ang)*1.3*side,e=document.createElementNS(NS,"ellipse");
       e.setAttribute("cx",(q.x+ox).toFixed(2));e.setAttribute("cy",(q.y+oy).toFixed(2));e.setAttribute("rx","1.3");e.setAttribute("ry",".75");e.setAttribute("fill","#ff6a13");e.setAttribute("opacity",".55");
       e.setAttribute("transform",`rotate(${(ang*180/Math.PI).toFixed(0)} ${(q.x+ox).toFixed(2)} ${(q.y+oy).toFixed(2)})`);fs.appendChild(e)};
-    const pose=(ph,moving)=>{const sw=moving?Math.sin(ph)*28:0;$("lgf").setAttribute("transform",R(sw));$("lgb").setAttribute("transform",R(-sw));$("amf").setAttribute("transform",A(-sw*.9));$("amb").setAttribute("transform",A(sw*.9));
+    const pose=(ph,moving)=>{const sw=moving?Math.sin(ph)*28:0;$("lgf").setAttribute("transform",R(sw));$("lgb").setAttribute("transform",R(-sw));
+      if(hl.cart){$("amf").setAttribute("transform",A(-72));$("amb").setAttribute("transform",A(-64))}else{$("amf").setAttribute("transform",A(-sw*.9));$("amb").setAttribute("transform",A(sw*.9))}
       $("bdy").setAttribute("transform",`translate(0 ${moving?(-Math.abs(Math.cos(ph))*.6).toFixed(2):0})`)};
     const step=t=>{const k=dur?Math.min(1,(t-t0)/dur):1,e=k<.08?k*k/.16:(k>.92?1-(1-k)*(1-k)/.16:k*1.0869-.0435),dist=L*Math.min(1,Math.max(0,e)),pt=p.getPointAtLength(dist),ah=p.getPointAtLength(Math.min(L,dist+2));
       if(Math.abs(ah.x-pt.x)>.3)face=ah.x>pt.x?1:-1;
@@ -404,7 +430,7 @@ qi.addEventListener("input",()=>{const r=find(qi.value);if(!qi.value.trim()){sug
   sug.innerHTML=r.length?r.map(p=>`<li><button type="button" data-id="${esc(p.id)}"><span>${esc(p.ad)}</span><small>${esc(locTxt(p))}</small></button><button type="button" class="add" data-addid="${esc(p.id)}" aria-label="${esc(p.ad)} siparişe ekle">+ Sipariş</button></li>`).join(""):`<li><button type="button" disabled><span>Bulunamadı</span><small>Aşağıdan ekleyebilirsin</small></button></li>`;sug.hidden=false});
 qi.addEventListener("blur",()=>{setTimeout(()=>{window.scrollTo(window.scrollX?0:window.scrollX,window.scrollY)},60)});
 qi.addEventListener("keydown",e=>{if(e.key==="Enter"){const r=find(qi.value);if(r[0])pick(r[0])}if(e.key==="Escape")sug.hidden=true});
-sug.addEventListener("click",e=>{const a=e.target.closest("[data-addid]");if(a){addOrder(a.dataset.addid);a.textContent="Eklendi ✓";e.stopPropagation();return}const b=e.target.closest("button[data-id]");if(b)pick(prods.find(p=>String(p.id)===b.dataset.id))});
+sug.addEventListener("click",e=>{const a=e.target.closest("[data-addid]");if(a){addOrder(a.dataset.addid);a.textContent="Eklendi ✓";flyBox(a);e.stopPropagation();return}const b=e.target.closest("button[data-id]");if(b)pick(prods.find(p=>String(p.id)===b.dataset.id))});
 document.addEventListener("click",e=>{if(!e.target.closest(".srch"))sug.hidden=true});
 function pick(p){if(!p)return;sug.hidden=true;qi.value=p.ad;qi.blur();show(p,true)}
 function show(p,go){if(PK&&!PK.fin&&go){PK=null;renderOrd()}cur=p;const r=rafBy(p.raf);const res=$("res");
@@ -413,6 +439,26 @@ function show(p,go){if(PK&&!PK.fin&&go){PK=null;renderOrd()}cur=p;const r=rafBy(
   res.innerHTML=`<div class="big">${esc(p.ad)}</div><div class="loc">${isPal(r)?`${esc(r.ad)} paleti · yerde`:`${esc(r.ad)} rafı · ${b}. bölme${t?" · "+tarafAd(r,t):""} · ${k}. kat`}</div><p>${pts?`Girişten yaklaşık ${Math.max(0,pts.length-1)} adım kare. `:(isPal(r)?"Bu palete":"Bu rafa")+" giden yol bulunamadı, planı kontrol et. "}${p.adet!=null&&p.adet!==""?`Kayıtlı adet: ${esc(p.adet)}.`:""}${p.kod?` Kod: ${esc(p.kod)}.`:""}</p><div class="acts"><button class="btn" type="button" data-resadd="${esc(p.id)}">+ Siparişe ekle</button></div>`;
   drawMap({r,b,t,pts});drawFront(r,b,k,t);
   if(go&&matchMedia("(max-width:760px)").matches)res.scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})}
+
+/* ---------- geçiş animasyonları ---------- */
+function animIn(el){if(RM||!el.animate)return;el.animate([{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:240,easing:"cubic-bezier(.2,.8,.2,1)"})}
+new MutationObserver(()=>animIn($("res"))).observe($("res"),{childList:true});
+let toastT=0;function toast(msg,act){const t=$("toast");t.innerHTML="";const sp=document.createElement("span");sp.textContent=msg;t.appendChild(sp);
+  if(act){const b=document.createElement("button");b.className="btn";b.type="button";b.textContent=act.ad;b.onclick=()=>{t.hidden=true;act.fn()};t.appendChild(b)}
+  t.hidden=false;if(!RM)t.animate([{opacity:0,transform:"translate(-50%,16px)"},{opacity:1,transform:"translate(-50%,0)"}],{duration:220,easing:"ease-out"});clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},2600)}
+function flyBox(from){const ordN=ord.length,go=()=>toast(`Siparişe eklendi · ${ordN} ürün`,{ad:"Siparişe git",fn:()=>$("ord").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})});
+  if(RM||!from||!from.getBoundingClientRect)return go();const a=from.getBoundingClientRect(),h=$("ordt").getBoundingClientRect(),inView=h.top>0&&h.bottom<innerHeight,
+  tx=inView?h.left+40:innerWidth/2,ty=inView?h.top+10:innerHeight-40,el=document.createElement("div");el.className="flyk";el.style.left=(a.left+a.width/2-14)+"px";el.style.top=(a.top+a.height/2-12)+"px";document.body.appendChild(el);
+  const dx=tx-(a.left+a.width/2),dy=ty-(a.top+a.height/2);
+  el.animate([{transform:"translate(0,0) scale(1) rotate(0)"},{transform:`translate(${dx*.5}px,${dy*.5-70}px) scale(1.15) rotate(160deg)`,offset:.45},{transform:`translate(${dx}px,${dy}px) scale(.5) rotate(320deg)`,opacity:.9}],{duration:650,easing:"cubic-bezier(.3,.7,.4,1)"}).onfinish=()=>{el.remove();go();
+    if(inView)$("ordt").animate([{transform:"scale(1)"},{transform:"scale(1.06)"},{transform:"scale(1)"}],{duration:280})}}
+function tick(){try{navigator.vibrate&&navigator.vibrate(35)}catch(e){}if(RM)return;const r=$("res"),d=document.createElement("div");d.className="tik";
+  d.innerHTML='<svg viewBox="0 0 84 84"><circle cx="42" cy="42" r="40"/><path d="M24 43 L37 56 L61 30"/></svg>';r.appendChild(d);
+  d.animate([{opacity:0,transform:"scale(.6)"},{opacity:1,transform:"scale(1)",offset:.35},{opacity:1,offset:.75},{opacity:0,transform:"scale(1.05)"}],{duration:620,easing:"ease-out"}).onfinish=()=>d.remove()}
+function party(){try{navigator.vibrate&&navigator.vibrate([30,60,30])}catch(e){}if(RM)return;const r=$("res").getBoundingClientRect(),cx=r.left+r.width/2,cy=Math.max(40,r.top+40),C=["#058a8e","#ff6a13","#d9b07a","#7fd3d6","#f2c200"];
+  for(let i=0;i<46;i++){const e=document.createElement("div");e.className="konf";e.style.left=cx+"px";e.style.top=cy+"px";e.style.background=C[i%C.length];document.body.appendChild(e);
+    const ang=Math.random()*Math.PI*2,sp=90+Math.random()*170,dx=Math.cos(ang)*sp,dy=Math.sin(ang)*sp*.6-120,rot=Math.random()*720-360;
+    e.animate([{transform:"translate(0,0) rotate(0)",opacity:1},{transform:`translate(${dx}px,${dy}px) rotate(${rot/2}deg)`,opacity:1,offset:.45},{transform:`translate(${dx*1.2}px,${dy+260}px) rotate(${rot}deg)`,opacity:0}],{duration:1300+Math.random()*500,easing:"cubic-bezier(.2,.6,.4,1)"}).onfinish=()=>e.remove()}}
 
 /* ---------- sipariş toplama ---------- */
 const OK="rafta-siparis";let ord=[],PK=null,bitis="on";
@@ -439,7 +485,7 @@ $("ol").addEventListener("input",e=>{const q=e.target.dataset.q;if(!q)return;con
 $("ol").addEventListener("click",e=>{const b=e.target.closest("[data-rmo]");if(!b||PK)return;ord=ord.filter(x=>String(x.pid)!==b.dataset.rmo);saveOrd();renderOrd()});
 $("o_clr").addEventListener("click",e=>{const b=e.currentTarget;if(!ord.length)return;if(!b.dataset.sure){b.dataset.sure=1;b.textContent="Emin misin?";setTimeout(()=>{b.textContent="Temizle";delete b.dataset.sure},3000);return}
   delete b.dataset.sure;b.textContent="Temizle";ord=[];PK=null;saveOrd();renderOrd();drawMap()});
-$("res").addEventListener("click",e=>{const a=e.target.closest("[data-resadd]");if(a){addOrder(a.dataset.resadd);a.textContent="Siparişe eklendi ✓"}});
+$("res").addEventListener("click",e=>{const a=e.target.closest("[data-resadd]");if(a){addOrder(a.dataset.resadd);a.textContent=a.closest(".rk")?"Eklendi ✓":"Siparişe eklendi ✓";flyBox(a)}});
 
 /* WhatsApp metnini ayrıştır */
 const toks=t=>norm(t).replace(/(\d)([a-z])/g,"$1 $2").replace(/([a-z])(\d)/g,"$1 $2").replace(/[^a-z0-9.,]+/g," ").split(" ").filter(Boolean);
@@ -460,7 +506,7 @@ function bfs(sx,sy){const B=blocked(),C=plan.cols,Rw=plan.rows,s0=sx+","+sy,dist
   return{dist,prev}}
 function pathFrom(a,b){const {prev}=bfs(a[0],a[1]),pts=[];let k=b[0]+","+b[1];if(!(k in prev))return null;for(;k;k=prev[k])pts.unshift(k.split(",").map(Number));return pts}
 function access(r,b,t){const B=blocked(),E=bfs(plan.giris.x,plan.giris.y).dist;for(const rad of [1,2,3]){const out=[...ring(r,b,rad,B,t)].map(k=>k.split(",").map(Number)).filter(([x,y])=>(x+","+y) in E);if(out.length)return out}return[]}
-function buildPick(){const G=[plan.giris.x,plan.giris.y],E=bfs(...G).dist,map={},bad=[];
+function buildPick(){/* load: arabadaki koli sayısı */const G=[plan.giris.x,plan.giris.y],E=bfs(...G).dist,map={},bad=[];
   for(const o of ord){const p=prodById(o.pid);if(!p)continue;const r=rafBy(p.raf);if(!r){bad.push(p.ad);continue}
     const b=Math.min(Math.max(1,+p.bolme||1),len(r)),k=Math.min(Math.max(1,+p.kat||1),r.kat||1),t=tOf(p,r),key=r.ad+"|"+b+"|"+(t||0);
     if(!map[key]){let cell=null,bd=1e9;for(const c of access(r,b,t)){const d=E[c[0]+","+c[1]];if(d!=null&&d<bd){bd=d;cell=c}}if(!cell){bad.push(p.ad);continue}map[key]={r,b,t,k,cell,items:[]}}
@@ -477,14 +523,21 @@ function runStop(){renderOrd();if(PK.i>=PK.stops.length)return finishPick();cons
   $("res").innerHTML=`<div class="big">Durak ${PK.i+1} / ${PK.stops.length}</div><div class="loc">${isPal(s.r)?`${esc(s.r.ad)} paleti · yerde`:`${esc(s.r.ad)} rafı · ${s.b}. bölme${s.t?" · "+tarafAd(s.r,s.t):""}`}</div>
     <ul class="stopl">${s.items.map(it=>`<li>${esc(it.p.ad)} — <b>${esc(it.adet)} adet</b>${isPal(s.r)?"":` <span style="color:var(--mut)">(${it.k}. kat)</span>`}</li>`).join("")}</ul>
     <div class="acts"><button class="btn p" type="button" id="pk_ok">Aldım ✓ ${PK.i+1<PK.stops.length?"Sonraki durak":"Bitir"}</button><button class="btn" type="button" id="pk_skip">Bulamadım, atla</button><button class="btn" type="button" id="pk_end">Toplamayı bitir</button></div>`;
-  drawMap({r:s.r,b:s.b,t:s.t,pts,stops:mapStops(),full:PK.full});drawFront(s.r,s.b,s.items[0].k,s.t);
+  drawMap({r:s.r,b:s.b,t:s.t,pts,stops:mapStops(),full:PK.full,cart:isPal(s.r)?"jack":"cart",load:PK.load||0});drawFront(s.r,s.b,s.items[0].k,s.t);
   $("res").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})}
-function nextStop(stat){const s=PK.stops[PK.i];for(const it of s.items)PK.state[String(it.p.id)]=stat;PK.pos=s.cell;PK.i++;runStop()}
+function nextStop(stat){if(PK.busy)return;const s=PK.stops[PK.i];const go=()=>{PK.busy=false;for(const it of s.items)PK.state[String(it.p.id)]=stat;if(stat==="done")PK.load=(PK.load||0)+s.items.length;PK.pos=s.cell;PK.i++;runStop()};
+  if(stat==="done"){tick();if(!RM){PK.busy=true;return flyToCart(s,go)}}go()}
+function flyToCart(s,cb){const m=$("map"),wk=$("wk"),wf=$("wkf");if(!wk||!wf){cb();return}
+  const tr=(wk.getAttribute("transform")||"").match(/translate\(([-\d.]+) ([-\d.]+)\)/),sc=(wf.getAttribute("transform")||"").match(/scale\(([-\d.]+)/);if(!tr){cb();return}
+  const face=sc&&+sc[1]<0?-1:1,tx=+tr[1]+face*9*1.35,ty=+tr[2]-6*1.35,c=segCells(s.r,s.b,s.t);let sx=0,sy=0;for(const [x,y] of c){sx+=x*10+5;sy+=y*10+5}sx/=c.length;sy/=c.length;
+  const n=s.items.length,boxes=[];for(let i=0;i<Math.min(n,3);i++){const e=document.createElementNS(NS,"g");e.innerHTML=`<rect x="-2.6" y="-2.1" width="5.2" height="4.2" rx=".4" fill="#d9b07a" stroke="#8d6533" stroke-width=".3"/><line x1="0" x2="0" y1="-2.1" y2="2.1" stroke="#f5e6c8" stroke-width=".7"/>`;m.appendChild(e);boxes.push(e)}
+  const t0=performance.now(),D=520;const st=t=>{const k=Math.min(1,(t-t0)/D);boxes.forEach((e,i)=>{const kk=Math.max(0,Math.min(1,k*1.25-i*.12)),x=sx+(tx-sx)*kk,y=sy+(ty-sy)*kk-Math.sin(kk*Math.PI)*14;e.setAttribute("transform",`translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${(kk*200).toFixed(0)}) scale(${1-kk*.25})`)});
+    if(k<1)requestAnimationFrame(st);else{boxes.forEach(e=>e.remove());cb()}};requestAnimationFrame(st)}
 function finishPick(){const done=Object.values(PK.state).filter(v=>v==="done").length,skip=Object.values(PK.state).filter(v=>v==="skip").length,pts=pathFrom(PK.pos,PK.end||[plan.giris.x,plan.giris.y]);
   const stops=PK.stops.map(s=>({r:s.r,b:s.b,t:s.t,n:s.n,state:s.items.every(x=>PK.state[String(x.p.id)]==="done")?"done":"skip"}));
   $("res").innerHTML=`<div class="big">Sipariş toplandı</div><div class="loc">${done} ürün alındı${skip?` · ${skip} atlandı`:""}</div><p>${PK.endAd==="araç kapısında"?"Ürünleri araç kapısına götür, yolu haritada.":"Giriş kapısına dönüş yolu haritada."}${skip?" Atlanan ürünler listede çizgisiz duruyor.":""}</p>
     <div class="acts"><button class="btn p" type="button" id="pk_new">Yeni sipariş</button><button class="btn" type="button" id="pk_keep">Listeyi koru</button></div>`;
-  drawMap({pts:pts&&pts.length>1?pts:null,stops,full:PK.full});PK.fin=true;renderOrd()}
+  drawMap({pts:pts&&pts.length>1?pts:null,stops,full:PK.full,cart:"cart",load:PK.load||0});PK.fin=true;renderOrd();if(done)party()}
 $("o_go").addEventListener("click",()=>{if(!ord.length)return;PK=buildPick();
   if(!PK.stops.length){$("res").innerHTML=`<div class="big">Rota çıkmadı</div><p>Siparişteki ürünlerin rafı planda yok: ${esc(PK.bad.join(", "))}</p>`;PK=null;return}
   if(PK.bad.length)$("st").textContent=`Yeri bulunamayan: ${PK.bad.join(", ")}`;window.scrollTo({top:0,behavior:RM?"auto":"smooth"});runStop()});
