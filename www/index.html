@@ -36,7 +36,7 @@ h1{font-size:clamp(28px,6vw,44px)}h1 b{color:#fff;font-weight:600}
 #sug small{color:var(--mut);white-space:nowrap}
 main{max-width:1240px;margin:0 auto;padding:16px max(4vw,12px) 40px}
 .res{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;background:var(--panel);border-radius:14px;padding:14px 18px;margin-bottom:14px;border-left:8px solid var(--yel)}
-.res .big{font-size:clamp(28px,5vw,40px)}.res .loc{font:800 22px "Barlow Condensed",sans-serif;color:var(--org);white-space:nowrap}
+.res .big{font-size:clamp(28px,5vw,40px)}.res .loc{font:800 22px/1.15 "Barlow Condensed",sans-serif;color:var(--org);text-wrap:balance}
 .res p{margin:0;color:var(--mut);flex-basis:100%}
 .grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px}
 .card{background:var(--panel);border-radius:14px;padding:12px}
@@ -139,6 +139,7 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
         <label>Kod / barkod<input id="f_kod"></label>
         <label>Raf<select id="f_raf"></select></label>
         <label>Bölme<input id="f_bol" type="number" min="1" value="1"></label>
+        <label>Taraf<select id="f_taraf"><option value="1">Sol taraf</option><option value="2">Sağ taraf</option></select></label>
         <label>Kat (alttan)<input id="f_kat" type="number" min="1" value="1"></label>
         <label>Adet<input id="f_adet" type="number" min="0"></label>
       </div>
@@ -162,7 +163,7 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
   </details>
   <details>
     <summary>Listeyi paylaş / içe al</summary>
-    <p class="note">Listeyi diğer telefonlara göndermek için <b>Paylaş</b>'a bas ve WhatsApp'ı seç. Karşı taraf mesajın tamamını kopyalayıp aşağıdaki kutuya yapıştırır, sonra <b>İçe al</b>'a basar. Excel'den kaydedilmiş bir .csv dosyası da yükleyebilirsin (sütun sırası: ad;kod;raf;bölme;kat;adet).</p>
+    <p class="note">Listeyi diğer telefonlara göndermek için <b>Paylaş</b>'a bas ve WhatsApp'ı seç. Karşı taraf mesajın tamamını kopyalayıp aşağıdaki kutuya yapıştırır, sonra <b>İçe al</b>'a basar. Excel'den kaydedilmiş bir .csv dosyası da yükleyebilirsin (sütun sırası: ad;kod;raf;bölme;kat;adet;taraf; taraf boş = sol/üst, 2 = sağ/alt).</p>
     <div class="acts" style="margin-bottom:10px"><button class="btn p" type="button" id="x_share">Paylaş</button><button class="btn" type="button" id="x_copy">Kopyala</button><label class="btn" style="flex-direction:row;align-items:center;color:var(--ink);font-size:16px">CSV dosyası seç<input id="x_file" type="file" accept=".csv,.txt,text/csv,text/plain" hidden></label></div>
     <textarea id="x_txt" rows="5" style="width:100%;font:14px/1.4 Barlow,sans-serif;padding:10px;border-radius:8px;border:2px solid var(--line);background:var(--bg);color:var(--ink)" placeholder="Gelen listeyi buraya yapıştır"></textarea>
     <div class="acts" style="margin:10px 0 14px"><button class="btn p" type="button" id="x_imp">İçe al (listeyi değiştirir)</button><span class="note" id="x_msg" aria-live="polite"></span></div>
@@ -187,8 +188,8 @@ const SAMPLE_PLAN={surum:2,cols:45,rows:46,giris:{x:35,y:36},
  {ad:"P7",tip:"palet",x:1,y:14,w:1,h:1,kat:1,bol:1},{ad:"P8",tip:"palet",x:18,y:10,w:1,h:1,kat:1,bol:1},{ad:"P9",tip:"palet",x:18,y:17,w:1,h:1,kat:1,bol:1},
  {ad:"P10",tip:"palet",x:40,y:17,w:1,h:1,kat:1,bol:1},{ad:"P11",tip:"palet",x:20,y:36,w:1,h:1,kat:1,bol:1}]};
 const SAMPLE_PRODS=[["Sunta vidası 4x40","VD440","A",3,2,500],["Dübel 8 mm","DB08","A",5,3,1200],["Matkap ucu seti","MU10","B",2,4,18],
- ["Silikon şeffaf","SL01","C",7,2,64],["Boya fırçası 2 inç","BF02","D",4,3,40],["Su terazisi 60 cm","ST60","B",8,5,9],["Çekiç 500 g","CK50","B",1,2,22],
- ["Pense","PN01","B",1,3,30],["PPR boru 20 mm","PP20","E",2,1,80],["Musluk bataryası","MB01","F",2,3,12],["Kablo 2x1,5","KB15","C",2,1,25],
+ ["Silikon şeffaf","SL01","C",5,2,64,2],["Boya fırçası 2 inç","BF02","K",3,3,40,1],["Su terazisi 60 cm","ST60","B",8,5,9],["Çekiç 500 g","CK50","B",1,2,22],
+ ["Pense","PN01","B",1,3,30],["PPR boru 20 mm","PP20","E",2,1,80],["Musluk bataryası","MB01","F",2,3,12],["Kablo 2x1,5","KB15","K",3,2,25,2],
  ["Sıva altı priz","PR01","C",3,4,150],["LED ampul 9 W","LD09","D",8,4,200],["İzole bant","IB01","A",7,4,300],["Zımpara 120","ZM12","D",6,2,90],
  ["Menteşe","MN01","A",9,1,140],["Barel kilit","BK01","C",9,3,15],["Bahçe hortumu","BH01","F",3,1,7],["Alçı 25 kg","AL25","P1",1,1,40],["Su bazlı boya 18 L","BY18","P2",1,1,24]];
 const NS="http://www.w3.org/2000/svg",$=id=>document.getElementById(id);
@@ -204,7 +205,7 @@ const LS="depobul-v1";
 let planNote="";
 function lsLoad(){try{const o=JSON.parse(localStorage.getItem(LS));if(o&&o.plan){plan=o.plan;prods=o.prods||[];if((+plan.surum||0)<SAMPLE_PLAN.surum){plan=JSON.parse(JSON.stringify(SAMPLE_PLAN));planNote="Depo planı yeni krokiyle güncellendi";lsSave()}return true}}catch(e){}return false}
 function lsSave(){try{localStorage.setItem(LS,JSON.stringify({plan,prods}))}catch(e){}}
-function sampleProds(){return SAMPLE_PRODS.map((p,i)=>({id:"s"+i,ad:p[0],kod:p[1],raf:p[2],bolme:p[3],kat:p[4],adet:p[5]}))}
+function sampleProds(){return SAMPLE_PRODS.map((p,i)=>({id:"s"+i,ad:p[0],kod:p[1],raf:p[2],bolme:p[3],kat:p[4],adet:p[5],taraf:p[6]||""}))}
 async function saveProd(p){
   if(db){const id=p.id||("u"+Date.now().toString(36));const {id:_,...body}=p;await db.collection("urunler").doc(id).set(body);if(!hasSnap){p.id=id;upsert(p)}}
   else{p.id=p.id||("u"+Date.now().toString(36));upsert(p);lsSave()}
@@ -229,18 +230,20 @@ function offline(){if(db)return;if(!lsLoad()){prods=sampleProds()}$("st").textCo
 
 /* ---------- geometri ---------- */
 const rafBy=ad=>plan.raflar.find(r=>norm(r.ad)===norm(ad));
-const isPal=r=>!!r&&r.tip==="palet",locTxt=(p,r)=>isPal(r||rafBy(p.raf))?`${p.raf} paleti`:`${p.raf} · ${p.bolme}. bölme · ${p.kat}. kat`;
+const isPal=r=>!!r&&r.tip==="palet",cift=r=>!!r&&!isPal(r)&&!r.tek&&Math.min(r.w,r.h)>=2,tarafAd=(r,t)=>(r.h>=r.w?(+t===2?"sağ":"sol"):(+t===2?"alt":"üst"))+" taraf",
+  tOf=(p,r)=>cift(r)?(+p.taraf===2?2:1):undefined,
+  locTxt=(p,r)=>{r=r||rafBy(p.raf);return isPal(r)?`${p.raf} paleti`:`${p.raf} · ${p.bolme}. bölme${cift(r)?" · "+tarafAd(r,tOf(p,r)):""} · ${p.kat}. kat`};
 const cells=r=>Math.max(r.w,r.h),len=r=>Math.max(1,Math.min(+r.bol||cells(r),cells(r))),vert=r=>r.h>=r.w;
-function segCells(r,b){const n=len(r),L=cells(r);b=Math.min(Math.max(1,+b||1),n);const a=Math.floor((b-1)*L/n),z=Math.max(a,Math.ceil(b*L/n)-1),c=[];
-  for(let s=a;s<=z;s++){if(vert(r))for(let i=0;i<r.w;i++)c.push([r.x+i,r.y+s]);else for(let j=0;j<r.h;j++)c.push([r.x+s,r.y+j])}return c}
+function segCells(r,b,t){const n=len(r),L=cells(r);b=Math.min(Math.max(1,+b||1),n);const a=Math.floor((b-1)*L/n),z=Math.max(a,Math.ceil(b*L/n)-1),c=[],sd=cift(r)&&t?(+t===2?"z":"a"):"";
+  for(let s=a;s<=z;s++){if(vert(r)){for(let i=0;i<r.w;i++)if(!sd||(sd==="a"?i===0:i===r.w-1))c.push([r.x+i,r.y+s])}else for(let j=0;j<r.h;j++)if(!sd||(sd==="a"?j===0:j===r.h-1))c.push([r.x+s,r.y+j])}return c}
 function cross(x,y,nx,ny){if(x!==nx)return false;const yy=Math.max(y,ny);for(const w of plan.hduvar||[])if(w.y===yy&&x>=w.x0&&x<w.x1)return true;return false}
-function ring(r,b,rad,B){const T=new Set(),seg=segCells(r,b);for(const [x,y] of seg)for(let dx=-rad;dx<=rad;dx++)for(let dy=-rad;dy<=rad;dy++){if(rad===1&&Math.abs(dx)+Math.abs(dy)!==1)continue;const nx=x+dx,ny=y+dy;
+function ring(r,b,rad,B,t){const T=new Set(),seg=segCells(r,b,t);for(const [x,y] of seg)for(let dx=-rad;dx<=rad;dx++)for(let dy=-rad;dy<=rad;dy++){if(rad===1&&Math.abs(dx)+Math.abs(dy)!==1)continue;const nx=x+dx,ny=y+dy;
   if(nx<0||ny<0||nx>=plan.cols||ny>=plan.rows||B.has(nx+","+ny))continue;if(rad===1&&cross(x,y,nx,ny))continue;T.add(nx+","+ny)}return T}
 function outside(){const O=new Set();for(const d of plan.disari||[])for(let i=0;i<d.w;i++)for(let j=0;j<d.h;j++)O.add((d.x+i)+","+(d.y+j));return O}
 function blocked(){const B=outside();for(const r of plan.raflar)for(let i=0;i<r.w;i++)for(let j=0;j<r.h;j++)B.add((r.x+i)+","+(r.y+j));return B}
-function route(r,b){
+function route(r,b,t){
   const B=blocked(),C=plan.cols,R=plan.rows;
-  for(const rad of [1,2,3]){const T=ring(r,b,rad,B),s=plan.giris.x+","+plan.giris.y,prev={[s]:null},q=[[plan.giris.x,plan.giris.y]];let end=null;
+  for(const rad of [1,2,3]){const T=ring(r,b,rad,B,t),s=plan.giris.x+","+plan.giris.y,prev={[s]:null},q=[[plan.giris.x,plan.giris.y]];let end=null;
     while(q.length){const [x,y]=q.shift(),k=x+","+y;if(T.has(k)){end=k;break}
       for(const [dx,dy] of [[0,-1],[1,0],[-1,0],[0,1]]){const nx=x+dx,ny=y+dy,nk=nx+","+ny;if(nx<0||ny<0||nx>=C||ny>=R||B.has(nk)||nk in prev||cross(x,y,nx,ny))continue;prev[nk]=k;q.push([nx,ny])}}
     if(end){const pts=[];for(let k=end;k;k=prev[k])pts.unshift(k.split(",").map(Number));return pts}}
@@ -272,6 +275,7 @@ function drawMap(hl){
       <text x="${x+w/2}" y="${y+h/2+2.2}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="5.2" fill="#fff" stroke="#3b250c" stroke-width=".5" paint-order="stroke">${esc(r.ad)}</text></g>`;continue}
     g+=`<rect x="${x+1.2}" y="${y+1.8}" width="${w-1.6}" height="${h-1.6}" rx="1" fill="#0003"/>
     <rect x="${x+.6}" y="${y+.6}" width="${w-1.2}" height="${h-1.2}" rx="1" fill="var(--rack)" stroke="${act?"#058a8e":"none"}" stroke-width="1.4"/>`;
+    if(cift(r))g+=vert(r)?`<line x1="${x+w/2}" x2="${x+w/2}" y1="${y+1.5}" y2="${y+h-1.5}" stroke="#ffffff66" stroke-width=".6" stroke-dasharray="2 1.2"/>`:`<line y1="${y+h/2}" y2="${y+h/2}" x1="${x+1.5}" x2="${x+w-1.5}" stroke="#ffffff66" stroke-width=".6" stroke-dasharray="2 1.2"/>`;
     for(let i=1;i<n;i++){const o=Math.floor(i*L/n)*S;g+=vert(r)?`<line x1="${x+1}" x2="${x+w-1}" y1="${y+o}" y2="${y+o}" stroke="#fff4" stroke-width=".5"/>`:`<line y1="${y+1}" y2="${y+h-1}" x1="${x+o}" x2="${x+o}" stroke="#fff4" stroke-width=".5"/>`}
     g+=`<text x="${x+w/2}" y="${y+h/2+2.6}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="#fff" stroke="#0008" stroke-width=".4" paint-order="stroke">${esc(r.ad)}</text>`}
   for(const d of plan.kapilar||[]){if(d.kenar==="r"){const x=(d.x+1)*S,y=d.y*S,h=(d.h||1)*S;g+=`<rect x="${x-1.5}" y="${y}" width="3" height="${h}" fill="url(#hz)"/><text transform="translate(${x-3} ${y+h/2}) rotate(-90)" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="5.5" fill="var(--ink)">${esc(d.ad)}</text>`}
@@ -279,8 +283,8 @@ function drawMap(hl){
   const gx=plan.giris.x*S,gy=plan.giris.y*S;
   g+=`<rect x="${gx-S}" y="${gy+S-1.5}" width="${S*3}" height="3" fill="url(#hz)"/><text x="${gx+S/2}" y="${gy+S+8}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="var(--ink)">GİRİŞ</text>`;
   if(hl){if(hl.full&&hl.full.length>1)g+=`<path d="${hl.full.map(([x,y],i)=>(i?"L":"M")+(x*S+S/2)+" "+(y*S+S/2)).join(" ")}" fill="none" stroke="#058a8e" stroke-width="1.3" stroke-dasharray="1.2 2.6" stroke-linecap="round" opacity=".6"/>`;
-    if(hl.r)for(const [cx,cy] of segCells(hl.r,hl.b))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#ff6a13"/>`;
-    for(const st of hl.stops||[]){const c=segCells(st.r,st.b);let sx=0,sy=0;for(const [x,y] of c){sx+=x*S+S/2;sy+=y*S+S/2}sx/=c.length;sy/=c.length;
+    if(hl.r)for(const [cx,cy] of segCells(hl.r,hl.b,hl.t))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#ff6a13"/>`;
+    for(const st of hl.stops||[]){const c=segCells(st.r,st.b,st.t);let sx=0,sy=0;for(const [x,y] of c){sx+=x*S+S/2;sy+=y*S+S/2}sx/=c.length;sy/=c.length;
       g+=`<g><circle cx="${sx}" cy="${sy}" r="4.4" fill="${st.state==="done"?"#6b8f71":st.state==="skip"?"#8a8f96":st.state==="now"?"#ff6a13":"#058a8e"}" stroke="#fff" stroke-width=".9"/><text x="${sx}" y="${sy+2.1}" text-anchor="middle" font-family="Barlow Condensed,Barlow,sans-serif" font-weight="800" font-size="5.6" fill="#fff">${st.state==="done"?"✓":st.n}</text></g>`}
     if(hl.pts){const d=hl.pts.map(([x,y],i)=>(i?"L":"M")+(x*S+S/2)+" "+(y*S+S/2)).join(" ");
       g+=`<path id="rt" d="${d}" fill="none" stroke="none"/><g id="fs"></g>
@@ -319,7 +323,7 @@ function drawPal(r){const f=$("front");f.setAttribute("viewBox","0 0 220 150");
   const B=[[26,96,54,32],[83,96,54,32],[140,96,54,32],[34,62,50,34],[87,62,50,34],[140,66,46,30],[52,30,58,32],[113,34,52,28]];
   g+=B.map(([x,y,w,h],i)=>`<rect class="pulse" x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${i%2?"#ff7f33":"#ff6a13"}" stroke="#058a8e" stroke-width="1.6"/><line x1="${x+w/2}" x2="${x+w/2}" y1="${y}" y2="${y+h}" stroke="#ffffff88" stroke-width="2.5"/>`).join("");
   f.innerHTML=g;$("fh").textContent=`${r.ad} paleti · yandan`;$("fn").textContent=`Ürün ${r.ad} paletinin üzerinde, yerde duruyor. Kat ve bölme yok.`}
-function drawFront(r,b,k){if(isPal(r))return drawPal(r);
+function drawFront(r,b,k,t){if(isPal(r))return drawPal(r);
   const n=len(r),K=r.kat||4,cw=28,kh=30,W=n*cw+24,H=K*kh+34,f=$("front");f.setAttribute("viewBox",`0 0 ${W} ${H}`);
   let g=`<rect x="6" y="6" width="5" height="${H-14}" fill="var(--rack)"/><rect x="${W-11}" y="6" width="5" height="${H-14}" fill="var(--rack)"/>`;
   for(let i=0;i<K;i++){const y=6+(K-1-i)*kh;
@@ -327,7 +331,7 @@ function drawFront(r,b,k){if(isPal(r))return drawPal(r);
     for(let j=0;j<n;j++){const x=12+j*cw,hit=i+1===+k&&j+1===+b;const bh=hit?kh-9:10+((i*7+j*5)%9);
       g+=`<rect ${hit?'class="pulse"':""} x="${x+3}" y="${y+kh-4-bh}" width="${cw-6}" height="${bh}" rx="1.5" fill="${hit?"#ff6a13":"color-mix(in srgb,var(--mut) 35%,transparent)"}" ${hit?'stroke="#058a8e" stroke-width="2"':""}/>`}}
   for(let j=0;j<n;j++)g+=`<text x="${12+j*cw+cw/2}" y="${H-4}" font-size="8" text-anchor="middle" fill="${j+1===+b?"var(--org)":"var(--mut)"}" font-weight="${j+1===+b?700:400}" font-family="Barlow">${j+1}</text>`;
-  f.innerHTML=g;$("fh").textContent=`${r.ad} rafı · önden`;
+  f.innerHTML=g;$("fh").textContent=t?`${r.ad} rafı · ${tarafAd(r,t)}`:`${r.ad} rafı · önden`;
   $("fn").textContent=`Alttaki sayılar bölme, sağdakiler kat. Turuncu kutu: ${b}. bölme, ${k}. kat (alttan sayılır).`;
 }
 
@@ -335,7 +339,7 @@ let VB=[0,0,1,1],zanim=0;
 const setVB=v=>$("map").setAttribute("viewBox",v.map(n=>(+n).toFixed(2)).join(" "));
 function zoomTo(t,ms){const f=$("map").getAttribute("viewBox").split(/[\s,]+/).map(Number),t0=performance.now();cancelAnimationFrame(zanim);
   const st=now=>{const k=ms?Math.min(1,(now-t0)/ms):1,e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;setVB(f.map((a,i)=>a+(t[i]-a)*e));if(k<1)zanim=requestAnimationFrame(st)};zanim=requestAnimationFrame(st)}
-function zoomOn(hl,pt){const S=10,c=segCells(hl.r,hl.b);let sx=0,sy=0;for(const [x,y] of c){sx+=x*S+S/2;sy+=y*S+S/2}sx/=c.length;sy/=c.length;
+function zoomOn(hl,pt){const S=10,c=segCells(hl.r,hl.b,hl.t);let sx=0,sy=0;for(const [x,y] of c){sx+=x*S+S/2;sy+=y*S+S/2}sx/=c.length;sy/=c.length;
   const z=matchMedia("(max-width:760px)").matches?3:2.4,w=VB[2]/z,h=VB[3]/z,cx=(sx+pt.x)/2,cy=(sy+pt.y)/2-6,
   cl=(v,a,b)=>Math.max(a,Math.min(b,v));zoomTo([cl(cx-w/2,VB[0],VB[0]+VB[2]-w),cl(cy-h/2,VB[1],VB[1]+VB[3]-h),w,h],RM?0:1000);$("zout").hidden=false}
 $("zout").addEventListener("click",()=>{zoomTo(VB,RM?0:700);$("zout").hidden=true});
@@ -355,9 +359,9 @@ document.addEventListener("click",e=>{if(!e.target.closest(".srch"))sug.hidden=t
 function pick(p){if(!p)return;sug.hidden=true;qi.value=p.ad;qi.blur();show(p,true)}
 function show(p,go){if(PK&&!PK.fin&&go){PK=null;renderOrd()}cur=p;const r=rafBy(p.raf);const res=$("res");
   if(!r){res.innerHTML=`<div><div class="big">${esc(p.ad)}</div><p>“${esc(p.raf)}” adlı raf planda yok. Ürünün rafını düzelt ya da planı güncelle.</p></div>`;drawMap();return}
-  const b=Math.min(Math.max(1,+p.bolme||1),len(r)),k=Math.min(Math.max(1,+p.kat||1),r.kat||1),pts=route(r,b);
-  res.innerHTML=`<div class="big">${esc(p.ad)}</div><div class="loc">${isPal(r)?`${esc(r.ad)} paleti · yerde`:`${esc(r.ad)} rafı · ${b}. bölme · ${k}. kat`}</div><p>${pts?`Girişten yaklaşık ${Math.max(0,pts.length-1)} adım kare. `:(isPal(r)?"Bu palete":"Bu rafa")+" giden yol bulunamadı, planı kontrol et. "}${p.adet!=null&&p.adet!==""?`Kayıtlı adet: ${esc(p.adet)}.`:""}${p.kod?` Kod: ${esc(p.kod)}.`:""}</p><div class="acts"><button class="btn" type="button" data-resadd="${esc(p.id)}">+ Siparişe ekle</button></div>`;
-  drawMap({r,b,pts:go?pts:pts});drawFront(r,b,k);
+  const b=Math.min(Math.max(1,+p.bolme||1),len(r)),k=Math.min(Math.max(1,+p.kat||1),r.kat||1),t=tOf(p,r),pts=route(r,b,t);
+  res.innerHTML=`<div class="big">${esc(p.ad)}</div><div class="loc">${isPal(r)?`${esc(r.ad)} paleti · yerde`:`${esc(r.ad)} rafı · ${b}. bölme${t?" · "+tarafAd(r,t):""} · ${k}. kat`}</div><p>${pts?`Girişten yaklaşık ${Math.max(0,pts.length-1)} adım kare. `:(isPal(r)?"Bu palete":"Bu rafa")+" giden yol bulunamadı, planı kontrol et. "}${p.adet!=null&&p.adet!==""?`Kayıtlı adet: ${esc(p.adet)}.`:""}${p.kod?` Kod: ${esc(p.kod)}.`:""}</p><div class="acts"><button class="btn" type="button" data-resadd="${esc(p.id)}">+ Siparişe ekle</button></div>`;
+  drawMap({r,b,t,pts});drawFront(r,b,k,t);
   if(go&&matchMedia("(max-width:760px)").matches)res.scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})}
 
 /* ---------- sipariş toplama ---------- */
@@ -403,11 +407,11 @@ function bfs(sx,sy){const B=blocked(),C=plan.cols,Rw=plan.rows,s0=sx+","+sy,dist
   while(q.length){const [x,y]=q.shift(),k=x+","+y;for(const [dx,dy] of [[0,-1],[1,0],[-1,0],[0,1]]){const nx=x+dx,ny=y+dy,nk=nx+","+ny;if(nx<0||ny<0||nx>=C||ny>=Rw||B.has(nk)||nk in dist||cross(x,y,nx,ny))continue;dist[nk]=dist[k]+1;prev[nk]=k;q.push([nx,ny])}}
   return{dist,prev}}
 function pathFrom(a,b){const {prev}=bfs(a[0],a[1]),pts=[];let k=b[0]+","+b[1];if(!(k in prev))return null;for(;k;k=prev[k])pts.unshift(k.split(",").map(Number));return pts}
-function access(r,b){const B=blocked(),E=bfs(plan.giris.x,plan.giris.y).dist;for(const rad of [1,2,3]){const out=[...ring(r,b,rad,B)].map(k=>k.split(",").map(Number)).filter(([x,y])=>(x+","+y) in E);if(out.length)return out}return[]}
+function access(r,b,t){const B=blocked(),E=bfs(plan.giris.x,plan.giris.y).dist;for(const rad of [1,2,3]){const out=[...ring(r,b,rad,B,t)].map(k=>k.split(",").map(Number)).filter(([x,y])=>(x+","+y) in E);if(out.length)return out}return[]}
 function buildPick(){const G=[plan.giris.x,plan.giris.y],E=bfs(...G).dist,map={},bad=[];
   for(const o of ord){const p=prodById(o.pid);if(!p)continue;const r=rafBy(p.raf);if(!r){bad.push(p.ad);continue}
-    const b=Math.min(Math.max(1,+p.bolme||1),len(r)),k=Math.min(Math.max(1,+p.kat||1),r.kat||1),key=r.ad+"|"+b;
-    if(!map[key]){let cell=null,bd=1e9;for(const c of access(r,b)){const d=E[c[0]+","+c[1]];if(d!=null&&d<bd){bd=d;cell=c}}if(!cell){bad.push(p.ad);continue}map[key]={r,b,k,cell,items:[]}}
+    const b=Math.min(Math.max(1,+p.bolme||1),len(r)),k=Math.min(Math.max(1,+p.kat||1),r.kat||1),t=tOf(p,r),key=r.ad+"|"+b+"|"+(t||0);
+    if(!map[key]){let cell=null,bd=1e9;for(const c of access(r,b,t)){const d=E[c[0]+","+c[1]];if(d!=null&&d<bd){bd=d;cell=c}}if(!cell){bad.push(p.ad);continue}map[key]={r,b,t,k,cell,items:[]}}
     map[key].items.push({p,adet:o.adet,k})}
   const S=Object.values(map),nodes=[G,...S.map(s=>s.cell)],D=nodes.map(n=>{const d=bfs(n[0],n[1]).dist;return nodes.map(m=>d[m[0]+","+m[1]]??1e6)});
   let left=S.map((_,i)=>i+1),cur=0,tour=[];while(left.length){left.sort((a,b)=>D[cur][a]-D[cur][b]);cur=left.shift();tour.push(cur)}
@@ -415,17 +419,17 @@ function buildPick(){const G=[plan.giris.x,plan.giris.y],E=bfs(...G).dist,map={}
   while(imp){imp=false;for(let i=0;i<tour.length-1;i++)for(let j=i+1;j<tour.length;j++){const t=[...tour.slice(0,i),...tour.slice(i,j+1).reverse(),...tour.slice(j+1)];if(cost(t)<cost(tour)-1e-9){tour=t;imp=true}}}
   const stops=tour.map((v,i)=>({...S[v-1],n:i+1}));let full=[],pos=G;for(const st of [...stops,{cell:G}]){const seg=pathFrom(pos,st.cell)||[];full=full.concat(full.length?seg.slice(1):seg);pos=st.cell}
   return{stops,i:0,pos:G,full,state:{},bad,steps:cost(tour)}}
-function mapStops(){return PK.stops.map((s,i)=>({r:s.r,b:s.b,n:s.n,state:i<PK.i?(s.items.every(x=>PK.state[String(x.p.id)]==="skip")?"skip":"done"):i===PK.i?"now":""}))}
+function mapStops(){return PK.stops.map((s,i)=>({r:s.r,b:s.b,t:s.t,n:s.n,state:i<PK.i?(s.items.every(x=>PK.state[String(x.p.id)]==="skip")?"skip":"done"):i===PK.i?"now":""}))}
 function runStop(){renderOrd();if(PK.i>=PK.stops.length)return finishPick();const s=PK.stops[PK.i],pts=pathFrom(PK.pos,s.cell);
   for(const it of s.items)PK.state[String(it.p.id)]="now";renderOrd();
-  $("res").innerHTML=`<div class="big">Durak ${PK.i+1} / ${PK.stops.length}</div><div class="loc">${isPal(s.r)?`${esc(s.r.ad)} paleti · yerde`:`${esc(s.r.ad)} rafı · ${s.b}. bölme`}</div>
+  $("res").innerHTML=`<div class="big">Durak ${PK.i+1} / ${PK.stops.length}</div><div class="loc">${isPal(s.r)?`${esc(s.r.ad)} paleti · yerde`:`${esc(s.r.ad)} rafı · ${s.b}. bölme${s.t?" · "+tarafAd(s.r,s.t):""}`}</div>
     <ul class="stopl">${s.items.map(it=>`<li>${esc(it.p.ad)} — <b>${esc(it.adet)} adet</b>${isPal(s.r)?"":` <span style="color:var(--mut)">(${it.k}. kat)</span>`}</li>`).join("")}</ul>
     <div class="acts"><button class="btn p" type="button" id="pk_ok">Aldım ✓ ${PK.i+1<PK.stops.length?"Sonraki durak":"Bitir"}</button><button class="btn" type="button" id="pk_skip">Bulamadım, atla</button><button class="btn" type="button" id="pk_end">Toplamayı bitir</button></div>`;
-  drawMap({r:s.r,b:s.b,pts,stops:mapStops(),full:PK.full});drawFront(s.r,s.b,s.items[0].k);
+  drawMap({r:s.r,b:s.b,t:s.t,pts,stops:mapStops(),full:PK.full});drawFront(s.r,s.b,s.items[0].k,s.t);
   $("res").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})}
 function nextStop(stat){const s=PK.stops[PK.i];for(const it of s.items)PK.state[String(it.p.id)]=stat;PK.pos=s.cell;PK.i++;runStop()}
 function finishPick(){const done=Object.values(PK.state).filter(v=>v==="done").length,skip=Object.values(PK.state).filter(v=>v==="skip").length,pts=pathFrom(PK.pos,[plan.giris.x,plan.giris.y]);
-  const stops=PK.stops.map(s=>({r:s.r,b:s.b,n:s.n,state:s.items.every(x=>PK.state[String(x.p.id)]==="done")?"done":"skip"}));
+  const stops=PK.stops.map(s=>({r:s.r,b:s.b,t:s.t,n:s.n,state:s.items.every(x=>PK.state[String(x.p.id)]==="done")?"done":"skip"}));
   $("res").innerHTML=`<div class="big">Sipariş toplandı</div><div class="loc">${done} ürün alındı${skip?` · ${skip} atlandı`:""}</div><p>Girişe dönüş yolu haritada.${skip?" Atlanan ürünler listede çizgisiz duruyor.":""}</p>
     <div class="acts"><button class="btn p" type="button" id="pk_new">Yeni sipariş</button><button class="btn" type="button" id="pk_keep">Listeyi koru</button></div>`;
   drawMap({pts:pts&&pts.length>1?pts:null,stops,full:PK.full});PK.fin=true;renderOrd()}
@@ -440,18 +444,19 @@ $("res").addEventListener("click",e=>{const t=e.target.closest("button");if(!t||
 /* ---------- ürün listesi ---------- */
 function rafOpts(){const v=$("f_raf").value,o=a=>a.map(r=>`<option value="${esc(r.ad)}">${esc(r.ad)}${isPal(r)?" paleti":" rafı"}</option>`).join(""),pl=plan.raflar.filter(isPal);
   $("f_raf").innerHTML=`<optgroup label="Raflar">${o(plan.raflar.filter(r=>!isPal(r)))}</optgroup>`+(pl.length?`<optgroup label="Paletler">${o(pl)}</optgroup>`:"");if(v)$("f_raf").value=v;palForm()}
-function palForm(){const pal=isPal(rafBy($("f_raf").value));for(const id of ["f_bol","f_kat"])$(id).closest("label").hidden=pal}
+function palForm(){const r=rafBy($("f_raf").value),pal=isPal(r);for(const id of ["f_bol","f_kat"])$(id).closest("label").hidden=pal;$("f_taraf").closest("label").hidden=!cift(r);
+  if(cift(r)){const o=$("f_taraf").options;o[0].text=tarafAd(r,1).replace(/^./,c=>c.toLocaleUpperCase("tr"));o[1].text=tarafAd(r,2).replace(/^./,c=>c.toLocaleUpperCase("tr"))}}
 $("f_raf").addEventListener("change",palForm);
 function renderList(){rafOpts();if(typeof renderOrd==="function")try{sortOrd();renderOrd()}catch(e){}const L=[...prods].sort((a,b)=>String(a.ad).localeCompare(String(b.ad),"tr"));
-  $("pl").innerHTML=L.length?L.map(p=>`<tr><td>${esc(p.ad)}</td><td>${esc(p.kod)}</td><td>${isPal(rafBy(p.raf))?esc(p.raf)+" paleti":`${esc(p.raf)} / ${esc(p.bolme)} / ${esc(p.kat)}`}</td><td class="n">${esc(p.adet)}</td><td><div class="acts"><button class="btn" data-go="${esc(p.id)}">Göster</button><button class="btn" data-ed="${esc(p.id)}">Düzenle</button><button class="btn" data-del="${esc(p.id)}">Sil</button></div></td></tr>`).join(""):`<tr><td colspan="5">Henüz ürün yok. Yukarıdaki formdan ilk ürünü ekle.</td></tr>`;
+  $("pl").innerHTML=L.length?L.map(p=>`<tr><td>${esc(p.ad)}</td><td>${esc(p.kod)}</td><td>${esc(locTxt(p))}</td><td class="n">${esc(p.adet)}</td><td><div class="acts"><button class="btn" data-go="${esc(p.id)}">Göster</button><button class="btn" data-ed="${esc(p.id)}">Düzenle</button><button class="btn" data-del="${esc(p.id)}">Sil</button></div></td></tr>`).join(""):`<tr><td colspan="5">Henüz ürün yok. Yukarıdaki formdan ilk ürünü ekle.</td></tr>`;
   $("st").textContent=(db?"Ortak depo kaydı":"Bu cihazda kayıtlı")+` · ${prods.length} ürün`}
 $("pl").addEventListener("click",async e=>{const t=e.target.closest("button");if(!t)return;const id=t.dataset.go||t.dataset.ed||t.dataset.del,p=prods.find(x=>String(x.id)===id);if(!p)return;
   if(t.dataset.go){pick(p);window.scrollTo({top:0,behavior:RM?"auto":"smooth"})}
-  if(t.dataset.ed){editId=p.id;$("f_ad").value=p.ad;$("f_kod").value=p.kod||"";$("f_raf").value=p.raf;$("f_bol").value=p.bolme;$("f_kat").value=p.kat;$("f_adet").value=p.adet??"";$("f_ok").textContent="Güncelle";palForm();$("f_ad").focus()}
+  if(t.dataset.ed){editId=p.id;$("f_ad").value=p.ad;$("f_kod").value=p.kod||"";$("f_raf").value=p.raf;$("f_bol").value=p.bolme;$("f_kat").value=p.kat;$("f_taraf").value=+p.taraf===2?"2":"1";$("f_adet").value=p.adet??"";$("f_ok").textContent="Güncelle";palForm();$("f_ad").focus()}
   if(t.dataset.del){if(t.dataset.sure){try{await delProd(p.id)}catch(err){$("st").textContent="Silinemedi, tekrar dene"}}else{t.dataset.sure=1;t.textContent="Emin misin?";setTimeout(()=>{t.textContent="Sil";delete t.dataset.sure},3000)}}});
 function clearForm(){editId=null;$("pf").reset();$("f_ok").textContent="Kaydet";palForm()}
 $("f_new").addEventListener("click",clearForm);
-$("pf").addEventListener("submit",async e=>{e.preventDefault();const p={id:editId||undefined,ad:$("f_ad").value.trim(),kod:$("f_kod").value.trim(),raf:$("f_raf").value,bolme:+$("f_bol").value||1,kat:+$("f_kat").value||1,adet:$("f_adet").value===""?"":+$("f_adet").value};
+$("pf").addEventListener("submit",async e=>{e.preventDefault();const p={id:editId||undefined,ad:$("f_ad").value.trim(),kod:$("f_kod").value.trim(),raf:$("f_raf").value,bolme:+$("f_bol").value||1,kat:+$("f_kat").value||1,taraf:cift(rafBy($("f_raf").value))?+$("f_taraf").value:"",adet:$("f_adet").value===""?"":+$("f_adet").value};
   if(!p.ad)return;try{await saveProd(p);clearForm();$("st").textContent="Kaydedildi ✓"}catch(err){$("st").textContent="Kaydedilemedi, tekrar dene"}});
 
 /* ---------- plan düzenleme ---------- */
@@ -465,7 +470,7 @@ for(const id of ["g_c","g_r","g_x","g_y"])$(id).addEventListener("input",()=>{pl
 $("r_add").addEventListener("click",()=>{plan=readPlanForm();const used=new Set(plan.raflar.map(r=>r.ad));let c=65;while(used.has(String.fromCharCode(c))&&c<90)c++;plan.raflar.push({ad:String.fromCharCode(c),x:0,y:0,w:1,h:3,kat:4,bol:3});fillPlanForm();drawMap()});
 $("r_save").addEventListener("click",async()=>{plan=readPlanForm();try{await savePlan();$("st").textContent="Plan kaydedildi ✓";renderList();drawMap();if(cur)show(cur,false)}catch(e){$("st").textContent="Plan kaydedilemedi"}});
 
-function reachAll(){for(const r of plan.raflar)for(let b=1;b<=len(r);b++)if(!route(r,b))return r.ad;return null}
+function reachAll(){for(const r of plan.raflar)for(let b=1;b<=len(r);b++)for(const t of cift(r)?[1,2]:[undefined])if(!route(r,b,t))return r.ad;return null}
 function setPlacing(on){$("phint").hidden=!on;document.querySelector(".mapc").classList.toggle("placing",on);if(on){cur=null;drawMap();document.querySelector(".mapc").scrollIntoView({behavior:RM?"auto":"smooth",block:"center"})}}
 $("p_add").addEventListener("click",()=>{plan=readPlanForm();setPlacing(true)});
 $("p_cancel").addEventListener("click",()=>setPlacing(false));
@@ -479,11 +484,11 @@ $("map").addEventListener("click",async e=>{if($("phint").hidden)return;const m=
 
 /* ---------- paylaş / içe al ---------- */
 const clean=v=>String(v??"").replace(/[;\r\n]/g,",").trim();
-function exportText(){return ["DEPOBUL1","#PLAN "+JSON.stringify(plan),"ad;kod;raf;bolme;kat;adet",...[...prods].sort((a,b)=>String(a.ad).localeCompare(String(b.ad),"tr")).map(p=>[p.ad,p.kod,p.raf,p.bolme,p.kat,p.adet].map(clean).join(";"))].join("\n")}
+function exportText(){return ["DEPOBUL1","#PLAN "+JSON.stringify(plan),"ad;kod;raf;bolme;kat;adet;taraf",...[...prods].sort((a,b)=>String(a.ad).localeCompare(String(b.ad),"tr")).map(p=>[p.ad,p.kod,p.raf,p.bolme,p.kat,p.adet,p.taraf].map(clean).join(";"))].join("\n")}
 function parseText(t){let np=null;const out=[];for(const raw of String(t).split(/\r?\n/)){const l=raw.trim();if(!l||l==="DEPOBUL1")continue;
   if(l.startsWith("#PLAN ")){try{const o=JSON.parse(l.slice(6));if(o&&Array.isArray(o.raflar)&&o.cols&&o.rows&&o.giris)np=o}catch(e){}continue}
   const f=l.split(l.includes(";")?";":(l.includes("\t")?"\t":","));if(f.length<3||norm(f[0])==="ad")continue;
-  out.push({ad:f[0].trim(),kod:(f[1]||"").trim(),raf:(f[2]||"").trim(),bolme:+f[3]||1,kat:+f[4]||1,adet:f[5]===undefined||f[5].trim()===""?"":+f[5]||0})}
+  out.push({ad:f[0].trim(),kod:(f[1]||"").trim(),raf:(f[2]||"").trim(),bolme:+f[3]||1,kat:+f[4]||1,adet:f[5]===undefined||f[5].trim()===""?"":+f[5]||0,taraf:/^\s*(2|sa[gğ]|alt)/i.test(f[6]||"")?2:""})}
   return{np,out:out.filter(p=>p.ad)}}
 const xm=m=>{$("x_msg").textContent=m};
 async function copyText(t){try{await navigator.clipboard.writeText(t);xm("Kopyalandı ✓ WhatsApp'a yapıştırabilirsin.");return}catch(e){}
