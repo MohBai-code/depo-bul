@@ -760,7 +760,7 @@ for(const d of document.querySelectorAll("details[data-kilit]"))d.querySelector(
 kilitDurum();
 
 /* ---------- bulut eşitleme (Google E-Tablo) ---------- */
-const BULUT_VARSAYILAN="";
+const BULUT_VARSAYILAN="https://script.google.com/macros/s/AKfycbzTREFg5mLeRb6umCsXLTcFqazXe0bPTYppwfNM6gK6l-L8uCtqKEUSNNSRcJf7tA73EA/exec";
 const bulutUrl=()=>{if(db)return"";try{return localStorage.getItem("rafta-bulut")??BULUT_VARSAYILAN}catch(e){return BULUT_VARSAYILAN}};
 let bulutVer=(()=>{try{return localStorage.getItem("rafta-bulut-ver")||""}catch(e){return""}})(),bulutMesgul=false,bulutSon=0,bulutHata="",bulutT=0;
 const kuyrukOku=()=>{try{return JSON.parse(localStorage.getItem("rafta-kuyruk"))||[]}catch(e){return[]}};
