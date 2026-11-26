@@ -121,6 +121,7 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
   <section class="card ord" id="ord" aria-labelledby="ordt">
     <div class="ordh"><h2 id="ordt">Sipariş toplama <span id="ordn" style="color:var(--mut);font-weight:600"></span></h2>
       <div class="acts"><button class="btn p" type="button" id="o_go">Toplamaya başla</button><button class="btn" type="button" id="o_clr">Temizle</button></div></div>
+    <p class="note" id="o_sort" style="margin:-4px 4px 8px" hidden>Liste en kısa toplama sırasına göre dizildi. Girişten başlayıp girişe dönüyor.</p>
     <ol id="ol"></ol>
     <details id="o_pd" style="margin:6px 0 0;padding:0 4px;background:none">
       <summary style="font-size:19px">WhatsApp siparişini yapıştır</summary>
@@ -347,9 +348,12 @@ const OK="rafta-siparis";let ord=[],PK=null;
 try{ord=JSON.parse(localStorage.getItem(OK))||[]}catch(e){ord=[]}
 const saveOrd=()=>{try{localStorage.setItem(OK,JSON.stringify(ord))}catch(e){}};
 const prodById=id=>prods.find(p=>String(p.id)===String(id));
-function addOrder(id,adet){const p=prodById(id);if(!p)return;const o=ord.find(x=>String(x.pid)===String(id));if(o)o.adet=(+o.adet||1)+(adet||1);else ord.push({pid:p.id,adet:adet||1});saveOrd();renderOrd()}
+function addOrder(id,adet){const p=prodById(id);if(!p)return;const o=ord.find(x=>String(x.pid)===String(id));if(o)o.adet=(+o.adet||1)+(adet||1);else ord.push({pid:p.id,adet:adet||1});if(!bulk)sortOrd();saveOrd();renderOrd()}
+let bulk=false;
+function sortOrd(){if(PK&&!PK.fin)return;try{const P=buildPick(),seq=[];for(const st of P.stops)for(const it of st.items)seq.push(String(it.p.id));
+  const pos=id=>{const i=seq.indexOf(String(id));return i<0?1e6:i};ord.sort((a,b)=>pos(a.pid)-pos(b.pid))}catch(e){}}
 function renderOrd(){const L=ord.map(o=>({o,p:prodById(o.pid)})).filter(x=>x.p);
-  $("ordn").textContent=L.length?`· ${L.length} ürün`:"";$("o_go").disabled=!L.length||(!!PK&&!PK.fin);
+  $("ordn").textContent=L.length?`· ${L.length} ürün`:"";$("o_sort").hidden=L.length<2;$("o_go").disabled=!L.length||(!!PK&&!PK.fin);
   $("ol").innerHTML=L.length?L.map(({o,p},i)=>{const st=PK?PK.state[String(o.pid)]||"":"";
     return `<li class="${st}"><span class="n">${st==="done"?"✓":st==="skip"?"–":i+1}</span><span class="nm">${esc(p.ad)}<small>${esc(locTxt(p))}</small></span><input type="number" min="1" inputmode="numeric" aria-label="${esc(p.ad)} adet" data-q="${esc(o.pid)}" value="${esc(o.adet)}"><button class="x" type="button" data-rmo="${esc(o.pid)}" aria-label="${esc(p.ad)} siparişten çıkar">×</button></li>`}).join("")
     :`<li style="display:block"><p class="oempty">Sipariş boş. Ürün ararken <b>+ Sipariş</b>'e bas ya da aşağıdan WhatsApp mesajını yapıştır.</p></li>`}
@@ -373,7 +377,7 @@ function parseLine(line){let t=" "+norm(line)+" ",q=1,m;
   return best?{p:best.p,q:Math.max(1,q||1)}:null}
 $("o_parse").addEventListener("click",()=>{const lines=$("o_txt").value.split(/\r?\n/).map(l=>l.replace(/^\s*(?:[-•*·]+|\d+[.)])\s+/,"").trim()).filter(l=>l.length>1);
   if(!lines.length){$("o_msg").textContent="Önce sipariş mesajını yapıştır.";return}
-  let ok=0;const miss=[];for(const l of lines){const r=parseLine(l);if(r){addOrder(r.p.id,r.q);ok++}else miss.push(l)}
+  let ok=0;const miss=[];bulk=true;for(const l of lines){const r=parseLine(l);if(r){addOrder(r.p.id,r.q);ok++}else miss.push(l)}bulk=false;sortOrd();saveOrd();renderOrd();
   $("o_msg").textContent=`${ok} satır eklendi.`+(miss.length?` Bulunamayan: ${miss.slice(0,5).join(" | ")}${miss.length>5?"…":""}`:"");if(!miss.length)$("o_txt").value="";
   $("ord").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})});
 
@@ -421,7 +425,7 @@ function rafOpts(){const v=$("f_raf").value,o=a=>a.map(r=>`<option value="${esc(
   $("f_raf").innerHTML=`<optgroup label="Raflar">${o(plan.raflar.filter(r=>!isPal(r)))}</optgroup>`+(pl.length?`<optgroup label="Paletler">${o(pl)}</optgroup>`:"");if(v)$("f_raf").value=v;palForm()}
 function palForm(){const pal=isPal(rafBy($("f_raf").value));for(const id of ["f_bol","f_kat"])$(id).closest("label").hidden=pal}
 $("f_raf").addEventListener("change",palForm);
-function renderList(){rafOpts();if(typeof renderOrd==="function")try{renderOrd()}catch(e){}const L=[...prods].sort((a,b)=>String(a.ad).localeCompare(String(b.ad),"tr"));
+function renderList(){rafOpts();if(typeof renderOrd==="function")try{sortOrd();renderOrd()}catch(e){}const L=[...prods].sort((a,b)=>String(a.ad).localeCompare(String(b.ad),"tr"));
   $("pl").innerHTML=L.length?L.map(p=>`<tr><td>${esc(p.ad)}</td><td>${esc(p.kod)}</td><td>${isPal(rafBy(p.raf))?esc(p.raf)+" paleti":`${esc(p.raf)} / ${esc(p.bolme)} / ${esc(p.kat)}`}</td><td class="n">${esc(p.adet)}</td><td><div class="acts"><button class="btn" data-go="${esc(p.id)}">Göster</button><button class="btn" data-ed="${esc(p.id)}">Düzenle</button><button class="btn" data-del="${esc(p.id)}">Sil</button></div></td></tr>`).join(""):`<tr><td colspan="5">Henüz ürün yok. Yukarıdaki formdan ilk ürünü ekle.</td></tr>`;
   $("st").textContent=(db?"Ortak depo kaydı":"Bu cihazda kayıtlı")+` · ${prods.length} ürün`}
 $("pl").addEventListener("click",async e=>{const t=e.target.closest("button");if(!t)return;const id=t.dataset.go||t.dataset.ed||t.dataset.del,p=prods.find(x=>String(x.id)===id);if(!p)return;
