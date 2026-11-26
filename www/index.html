@@ -56,12 +56,17 @@ table{width:100%;border-collapse:collapse;font-size:15px}td,th{text-align:left;p
 th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-space:nowrap}
 .scroll{overflow-x:auto}.acts{display:flex;gap:6px;flex-wrap:wrap}.acts .btn{min-height:36px;padding:4px 10px;font-size:14px}
 .note{font-size:13px;color:var(--mut);margin:8px 0}
-.pulse{animation:pl 1s ease-in-out infinite alternate}.kayan{animation:kay .9s linear infinite}@keyframes kay{to{stroke-dashoffset:-6}}@keyframes pl{from{opacity:1}to{opacity:.35}}
+.pulse{animation:pl 1s ease-in-out infinite alternate}.kayan{animation:kay .9s linear infinite}.geriL{opacity:.2}#van.geri .geriL{animation:gl .45s steps(1) infinite}@keyframes gl{50%{opacity:1}}@keyframes kay{to{stroke-dashoffset:-6}}@keyframes pl{from{opacity:1}to{opacity:.35}}
 @media(prefers-reduced-motion:reduce){.pulse,.kayan{animation:none}}
 @media(max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;white-space:normal;color:var(--mut)}.stack td:empty{display:none}}
 #splash{position:fixed;inset:0;z-index:50;background:#058a8e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:#fff;transition:opacity .45s ease,transform .45s ease;cursor:pointer}
 #splash.out{opacity:0;transform:translateY(-24px);pointer-events:none}
+#splash.kepenk::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,#f4f5f7 0 15px,#c3c9d1 15px 17px,#e4e7eb 17px 19px);mix-blend-mode:multiply;opacity:0;animation:kp .35s ease-out forwards}
+#splash.kepenk::after{content:"";position:absolute;left:0;right:0;bottom:14px;height:12px;background:linear-gradient(#8a929c,#5b636d);box-shadow:0 -1px 0 #ffffff55 inset;opacity:0;animation:kp .35s ease-out forwards}
+#splash.kepenk{animation:tit .32s .3s ease-in-out}
+#splash.kalk{transform:translateY(-104%);transition:transform 1s cubic-bezier(.55,0,.2,1);pointer-events:none}
+@keyframes kp{to{opacity:1}}@keyframes tit{30%{transform:translateY(3px)}60%{transform:translateY(-2px)}}
 #splash svg{width:min(46vw,190px);height:auto;overflow:visible}
 #splash .t1{font:800 clamp(34px,9vw,54px)/1 "Barlow Condensed",Barlow,sans-serif;opacity:0;animation:up .5s 1.05s ease-out forwards}
 #splash .t2{font:600 clamp(18px,4.5vw,24px)/1 Barlow,sans-serif;opacity:0;animation:up .5s 1.25s ease-out forwards;color:#d7f0f0}
@@ -319,7 +324,7 @@ function drawMap(hl){
     g+=`<text x="${x+w/2}" y="${y+h/2+2.6}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="#fff" stroke="#0008" stroke-width=".4" paint-order="stroke">${esc(r.ad)}</text>`}
   for(const d of plan.kapilar||[]){if(d.kenar==="r"){const x=(d.x+1)*S,y=d.y*S,h=(d.h||1)*S,vy=y+h/2;
       g+=`<line x1="${x}" x2="${x}" y1="${y}" y2="${y+h}" stroke="#04585b" stroke-width="3"/><line class="kayan" x1="${x}" x2="${x}" y1="${y}" y2="${y+h}" stroke="#7fd3d6" stroke-width="3" stroke-dasharray="3 3"/>
-      <g class="van"><rect x="${x+4.5}" y="${vy-6.4}" width="17" height="12.8" rx="1" fill="#0003"/><rect x="${x+3.5}" y="${vy-7}" width="16" height="12.4" rx="1" fill="#f4f6f7" stroke="#9aa3ab" stroke-width=".5"/>
+      <g id="van" class="van" transform="translate(${hl&&hl.vanIn||bitis!=="sevk"?60:0} 0)" opacity="${hl&&hl.vanIn||bitis!=="sevk"?0:1}"><rect class="geriL" x="${x+2.6}" y="${vy-6.6}" width="1.4" height="2.2" rx=".4" fill="#ffb020"/><rect class="geriL" x="${x+2.6}" y="${vy+3.3}" width="1.4" height="2.2" rx=".4" fill="#ffb020"/><rect x="${x+4.5}" y="${vy-6.4}" width="17" height="12.8" rx="1" fill="#0003"/><rect x="${x+3.5}" y="${vy-7}" width="16" height="12.4" rx="1" fill="#f4f6f7" stroke="#9aa3ab" stroke-width=".5"/>
       <rect x="${x+3.5}" y="${vy-1.2}" width="16" height="2.2" fill="#058a8e"/><rect x="${x+19.5}" y="${vy-6.2}" width="6" height="10.8" rx="2" fill="#058a8e" stroke="#03494b" stroke-width=".5"/>
       <rect x="${x+22.6}" y="${vy-5.2}" width="2.2" height="8.8" rx=".8" fill="#0d2b33"/>${[[x+6,vy-8],[x+15,vy-8],[x+6,vy+5.2],[x+21,vy+5.2],[x+21,vy-8],[x+15,vy+5.2]].map(([a,b])=>`<rect x="${a}" y="${b}" width="3.4" height="1.6" rx=".6" fill="#222"/>`).join("")}
       <text x="${x+11.5}" y="${vy+9.8}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="4.6" fill="var(--mut)">Sevkiyat</text></g>`;
@@ -352,7 +357,7 @@ function drawMap(hl){
           <g id="cload">${Array.from({length:Math.min(hl.load||0,6)},(_,i)=>{const c=i%3,rw=Math.floor(i/3);return `<rect x="${5+c*3.6}" y="${-2.1-2.8*(rw+1)}" width="3.4" height="2.7" rx=".3" fill="${["#d9b07a","#e3bf8c","#cfa268"][i%3]}" stroke="#8d6533" stroke-width=".25"/>`}).join("")}</g></g>`:""}
       </g></g>
       <g id="bb" opacity="0"><rect x="0" y="0" width="30" height="11" rx="5.5" fill="#fff" stroke="#058a8e" stroke-width=".8"/><text x="15" y="7.8" text-anchor="middle" font-family="Barlow Condensed,Barlow,sans-serif" font-weight="800" font-size="7" fill="#058a8e">Burada!</text></g>`}}
-  m.innerHTML=g;
+  m.innerHTML=g;if(hl&&hl.vanIn)setTimeout(()=>vanAnim(true),350);
   if(hl&&hl.pts){const p=$("rt"),wk=$("wk"),wf=$("wkf"),fs=$("fs"),bb=$("bb"),L=p.getTotalLength(),t0=performance.now(),dur=RM?0:Math.max(1200,Math.min(6500,L/70*1000));cancelAnimationFrame(anim);
     const R=a=>`rotate(${a.toFixed(1)} 0 -6)`,A=a=>`rotate(${a.toFixed(1)} 0 -11.4)`,cx=hl.r?(hl.r.x+hl.r.w/2)*S:null;let face=1,lastF=0,side=1;
     const foot=(dist)=>{const a=p.getPointAtLength(Math.max(0,dist-.5)),b=p.getPointAtLength(Math.min(L,dist+.5)),ang=Math.atan2(b.y-a.y,b.x-a.x),q=p.getPointAtLength(dist);
@@ -433,9 +438,10 @@ $("zoutb").addEventListener("click",()=>{follow=false;zoomBy(1/1.6,null,null,RM?
   m.addEventListener("pointercancel",up);
   m.addEventListener("wheel",e=>{if(!e.ctrlKey&&curVB()[2]>=VB[2]*.98)return;e.preventDefault();const [x,y]=toSvg(e.clientX,e.clientY);follow=false;zoomBy(e.deltaY<0?1.15:1/1.15,x,y,0)},{passive:false});
   m.addEventListener("dblclick",e=>{const [x,y]=toSvg(e.clientX,e.clientY);zoomBy(2,x,y,RM?0:250)})}
-{const sp=$("splash"),bye=()=>{if(!sp||sp.classList.contains("out"))return;sp.classList.add("out");setTimeout(()=>sp.remove(),500)};
+{const sp=$("splash"),bye=()=>{if(!sp||sp.dataset.k)return;sp.dataset.k=1;if(RM){sp.classList.add("out");setTimeout(()=>sp.remove(),400);return}
+    sp.classList.add("kepenk");setTimeout(()=>{sp.style.pointerEvents="none";const an=sp.animate([{transform:"translateY(0)"},{transform:"translateY(2.5%)",offset:.12},{transform:"translateY(-104%)"}],{duration:1150,easing:"cubic-bezier(.5,0,.25,1)",fill:"forwards"});an.onfinish=()=>sp.remove()},650);setTimeout(()=>{if(sp.isConnected)sp.remove()},2600)};
   let seen=false;try{seen=sessionStorage.getItem("dbsplash")==="1";sessionStorage.setItem("dbsplash","1")}catch(e){}
-  if(sp){if(seen)sp.remove();else{sp.addEventListener("click",bye);setTimeout(bye,RM?600:2600)}}}
+  if(sp){if(seen)sp.remove();else{sp.addEventListener("click",bye);setTimeout(bye,RM?600:2300)}}}
 
 /* ---------- rafa dokun, içini gör ---------- */
 const rackItems=r=>prods.filter(p=>rafBy(p.raf)===r);
@@ -492,6 +498,16 @@ function party(){try{navigator.vibrate&&navigator.vibrate([30,60,30])}catch(e){}
     const ang=Math.random()*Math.PI*2,sp=90+Math.random()*170,dx=Math.cos(ang)*sp,dy=Math.sin(ang)*sp*.6-120,rot=Math.random()*720-360;
     e.animate([{transform:"translate(0,0) rotate(0)",opacity:1},{transform:`translate(${dx}px,${dy}px) rotate(${rot/2}deg)`,opacity:1,offset:.45},{transform:`translate(${dx*1.2}px,${dy+260}px) rotate(${rot}deg)`,opacity:0}],{duration:1300+Math.random()*500,easing:"cubic-bezier(.2,.6,.4,1)"}).onfinish=()=>e.remove()}}
 
+/* ---------- kamyonet ---------- */
+let vanA=0;
+function vanAnim(dock){const v=document.getElementById("van");if(!v)return;cancelAnimationFrame(vanA);const cur=+((v.getAttribute("transform")||"").match(/translate\(([-\d.]+)/)||[0,60])[1];
+  const from=dock?(+v.getAttribute("opacity")>0?cur:60):cur,to=dock?0:60;if(Math.abs(from-to)<.5&&(+v.getAttribute("opacity")>0)===dock)return;
+  if(RM){v.setAttribute("transform",`translate(${to} 0)`);v.setAttribute("opacity",dock?"1":"0");return}
+  const D=dock?1800:1200,t0=performance.now();v.setAttribute("opacity","1");v.classList.toggle("geri",dock);
+  const st=t=>{const k=Math.min(1,(t-t0)/D);let x;if(dock){const e=1-Math.pow(1-k,3);x=from+(to-from)*e;if(k>.88)x-=Math.sin((k-.88)/.12*Math.PI)*.9}else{x=from+(to-from)*k*k;v.setAttribute("opacity",String(Math.max(0,1-Math.max(0,(k-.55)/.45))))}
+    v.setAttribute("transform",`translate(${x.toFixed(2)} 0)`);if(k<1)vanA=requestAnimationFrame(st);else{v.classList.remove("geri");if(!dock)v.setAttribute("opacity","0")}};vanA=requestAnimationFrame(st)}
+function mapInView(){const r=$("map").getBoundingClientRect();return r.bottom>60&&r.top<innerHeight-60}
+
 /* ---------- sipariş toplama ---------- */
 const OK="rafta-siparis";let ord=[],PK=null,bitis="on";
 try{bitis=localStorage.getItem("rafta-bitis")==="sevk"?"sevk":"on"}catch(e){}
@@ -512,7 +528,8 @@ function renderOrd(){const L=ord.map(o=>({o,p:prodById(o.pid)})).filter(x=>x.p);
     return `<li class="${st}"><span class="n">${st==="done"?"✓":st==="skip"?"–":i+1}</span><span class="nm">${esc(p.ad)}<small>${esc(locTxt(p))}</small></span><input type="number" min="1" inputmode="numeric" aria-label="${esc(p.ad)} adet" data-q="${esc(o.pid)}" value="${esc(o.adet)}"><button class="x" type="button" data-rmo="${esc(o.pid)}" aria-label="${esc(p.ad)} siparişten çıkar">×</button></li>`}).join("")
     :`<li style="display:block"><p class="oempty">Sipariş boş. Ürün ararken çıkan listede <b>+ Sipariş</b>'e ya da ürün kartındaki <b>+ Siparişe ekle</b>'ye bas.</p></li>`}
 for(const i of document.querySelectorAll("[name=bitis]"))i.addEventListener("change",()=>{if(!i.checked)return;bitis=i.value;try{localStorage.setItem("rafta-bitis",bitis)}catch(e){}
-  if(bitis==="sevk"&&!sevkCell())$("st").textContent="Planda araç kapısı yok, toplama girişte bitecek";sortOrd();saveOrd();renderOrd()});
+  if(bitis==="sevk"&&!sevkCell())$("st").textContent="Planda araç kapısı yok, toplama girişte bitecek";sortOrd();saveOrd();renderOrd();
+  if(mapInView()&&!follow)vanAnim(bitis==="sevk");else{const v=document.getElementById("van");if(v){v.setAttribute("transform",`translate(${bitis==="sevk"?0:60} 0)`);v.setAttribute("opacity",bitis==="sevk"?"1":"0")}}});
 $("ol").addEventListener("input",e=>{const q=e.target.dataset.q;if(!q)return;const o=ord.find(x=>String(x.pid)===q);if(o){o.adet=Math.max(1,+e.target.value||1);saveOrd()}});
 $("ol").addEventListener("click",e=>{const b=e.target.closest("[data-rmo]");if(!b||PK)return;ord=ord.filter(x=>String(x.pid)!==b.dataset.rmo);saveOrd();renderOrd()});
 $("o_clr").addEventListener("click",e=>{const b=e.currentTarget;if(!ord.length)return;if(!b.dataset.sure){b.dataset.sure=1;b.textContent="Emin misin?";setTimeout(()=>{b.textContent="Temizle";delete b.dataset.sure},3000);return}
@@ -555,7 +572,7 @@ function runStop(){renderOrd();if(PK.i>=PK.stops.length)return finishPick();cons
   $("res").innerHTML=`<div class="big">Durak ${PK.i+1} / ${PK.stops.length}</div><div class="loc">${isPal(s.r)?`${esc(s.r.ad)} paleti · yerde`:`${esc(s.r.ad)} rafı · ${s.b}. bölme${s.t?" · "+tarafAd(s.r,s.t):""}`}</div>
     <ul class="stopl">${s.items.map(it=>`<li>${esc(it.p.ad)} — <b>${esc(it.adet)} adet</b>${isPal(s.r)?"":` <span style="color:var(--mut)">(${it.k}. kat)</span>`}</li>`).join("")}</ul>
     <div class="acts"><button class="btn p" type="button" id="pk_ok">Aldım ✓ ${PK.i+1<PK.stops.length?"Sonraki durak":"Bitir"}</button><button class="btn" type="button" id="pk_skip">Bulamadım, atla</button><button class="btn" type="button" id="pk_end">Toplamayı bitir</button></div>`;
-  drawMap({r:s.r,b:s.b,t:s.t,pts,stops:mapStops(),full:PK.full,cart:isPal(s.r)?"jack":"cart",load:PK.load||0});drawFront(s.r,s.b,s.items[0].k,s.t);
+  drawMap({r:s.r,b:s.b,t:s.t,pts,stops:mapStops(),full:PK.full,cart:isPal(s.r)?"jack":"cart",load:PK.load||0,vanIn:PK.i===0&&bitis==="sevk"});drawFront(s.r,s.b,s.items[0].k,s.t);
   $("res").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})}
 function nextStop(stat){if(PK.busy)return;const s=PK.stops[PK.i];const go=()=>{PK.busy=false;for(const it of s.items)PK.state[String(it.p.id)]=stat;if(stat==="done")PK.load=(PK.load||0)+s.items.length;PK.pos=s.cell;PK.i++;runStop()};
   if(stat==="done"){tick();if(!RM){PK.busy=true;return flyToCart(s,go)}}go()}
