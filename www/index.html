@@ -166,6 +166,7 @@ summary .lk svg{width:12px;height:12px}.acik summary .lk{background:color-mix(in
 .uchips button[aria-pressed=true]{border-color:var(--yel);background:var(--yel);color:#fff}
 .pinb .lbl{font-size:13px;color:var(--mut);text-align:left;margin:0 0 4px}
 .pinf{all:unset;cursor:pointer;color:var(--mut);font-size:13px;margin-top:10px;padding:6px;text-decoration:underline}
+.bulk{border-top:1px solid var(--line);margin-top:6px;padding-top:6px}.bulk h3{font:800 19px "Barlow Condensed",Barlow,sans-serif;margin:8px 0 2px}
 #zout:focus-visible{outline:3px solid var(--org);outline-offset:2px}
 </style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script></head>
 <body>
@@ -235,6 +236,9 @@ summary .lk svg{width:12px;height:12px}.acik summary .lk{background:color-mix(in
     </div>
     <div class="scroll"><table><thead><tr><th>Raf</th><th>X</th><th>Y</th><th>Gen.</th><th>Uzun.</th><th>Kat</th><th>Bölme</th><th>Tür</th><th></th></tr></thead><tbody id="rl"></tbody></table></div>
     <div class="acts" style="margin:12px 0"><button class="btn" id="r_add" type="button">Raf ekle</button><button class="btn" id="p_add" type="button">Palet ekle</button><button class="btn p" id="r_save" type="button">Planı kaydet</button></div>
+    <div class="bulk"><h3>Bulut eşitleme</h3><p class="note">Google E-Tablo web uygulaması adresi. Bu adres girilince ürünler ve depo planı internet olan tüm telefonlarda kendiliğinden aynı olur.</p>
+      <div class="row" style="display:grid;grid-template-columns:minmax(0,1fr);gap:8px"><label>Adres<input id="b_url" type="url" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec"></label></div>
+      <div class="acts" style="margin:4px 0 12px"><button class="btn p" type="button" id="b_kaydet">Bağlan</button><button class="btn" type="button" id="b_simdi">Şimdi eşitle</button><span class="note" id="b_msg" aria-live="polite"></span></div></div>
   </details>
   <details>
     <summary><span class="si"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="19" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.3 10.8l7.4-4.4M8.3 13.2l7.4 4.4" stroke="currentColor" stroke-width="2"/></svg></span>Listeyi paylaş / içe al</summary>
@@ -286,17 +290,17 @@ function renameByPos(pl){const mp={};for(const r of pl.raflar){if(r.tip==="palet
 function lsSave(){try{localStorage.setItem(LS,JSON.stringify({plan,prods}));const y=yGet();y.dirty=(y.dirty||0)+1;localStorage.setItem("rafta-yedek",JSON.stringify(y))}catch(e){}showY()}
 function yGet(){try{return JSON.parse(localStorage.getItem("rafta-yedek"))||{}}catch(e){return{}}}
 function showY(){const b=document.getElementById("ybar");if(!b)return;const y=yGet(),d=y.dirty||0,old=!y.last||Date.now()-y.last>864e5;
-  const on=!db&&d>0&&(d>=5||old);b.hidden=!on;if(on)document.getElementById("ytxt").textContent=y.last?`${d} değişiklik yedeklenmedi. Son yedek: ${new Date(y.last).toLocaleDateString("tr-TR")}`:`Ürün listen sadece bu telefonda. Kaybolmasın diye yedekle.`}
+  const on=!db&&!bulutUrl()&&d>0&&(d>=5||old);b.hidden=!on;if(on)document.getElementById("ytxt").textContent=y.last?`${d} değişiklik yedeklenmedi. Son yedek: ${new Date(y.last).toLocaleDateString("tr-TR")}`:`Ürün listen sadece bu telefonda. Kaybolmasın diye yedekle.`}
 function yDone(){try{localStorage.setItem("rafta-yedek",JSON.stringify({dirty:0,last:Date.now()}))}catch(e){}showY()}
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 function sampleProds(){return SAMPLE_PRODS.map((p,i)=>({id:"s"+i,ad:p[0],kod:p[1],raf:p[2],bolme:p[3],kat:p[4],adet:p[5],taraf:p[6]||""}))}
 async function saveProd(p){
   if(db){const id=p.id||("u"+Date.now().toString(36));const {id:_,...body}=p;await db.collection("urunler").doc(id).set(body);if(!hasSnap){p.id=id;upsert(p)}}
-  else{p.id=p.id||("u"+Date.now().toString(36));upsert(p);lsSave()}
+  else{p.id=p.id||("u"+Date.now().toString(36));upsert(p);lsSave();bulutEkle({t:"urun",p})}
 }
 function upsert(p){const i=prods.findIndex(x=>x.id===p.id);if(i>=0)prods[i]=p;else prods.push(p);renderList()}
-async function delProd(id){if(db){await db.collection("urunler").doc(id).delete();if(!hasSnap){prods=prods.filter(p=>p.id!==id);renderList()}}else{prods=prods.filter(p=>p.id!==id);lsSave();renderList()}}
-async function savePlan(){if(db)await db.doc("ayar/depo").set(plan);else lsSave()}
+async function delProd(id){if(db){await db.collection("urunler").doc(id).delete();if(!hasSnap){prods=prods.filter(p=>p.id!==id);renderList()}}else{prods=prods.filter(p=>p.id!==id);lsSave();renderList();bulutEkle({t:"sil",id})}}
+async function savePlan(){if(db)await db.doc("ayar/depo").set(plan);else{lsSave();bulutEkle({t:"plan",plan})}}
 let hasSnap=false;
 (async()=>{
   await null;
@@ -663,7 +667,7 @@ function palForm(){const r=rafBy($("f_raf").value),pal=isPal(r);for(const id of 
 $("f_raf").addEventListener("change",palForm);
 function renderList(){rafOpts();if(typeof renderOrd==="function")try{sortOrd();renderOrd()}catch(e){}const L=[...prods].sort((a,b)=>String(a.ad).localeCompare(String(b.ad),"tr"));
   $("pl").innerHTML=L.length?L.map(p=>`<tr><td>${esc(p.ad)}</td><td>${esc(p.kod)}</td><td>${esc(locTxt(p))}</td><td class="n">${esc(p.adet)}</td><td><div class="acts"><button class="btn" data-go="${esc(p.id)}">Göster</button><button class="btn" data-ed="${esc(p.id)}">Düzenle</button><button class="btn" data-del="${esc(p.id)}">Sil</button></div></td></tr>`).join(""):`<tr><td colspan="5">Henüz ürün yok. Yukarıdaki formdan ilk ürünü ekle.</td></tr>`;
-  $("st").textContent=(db?"Ortak depo kaydı":"Bu cihazda kayıtlı")+` · ${prods.length} ürün`}
+  $("st").textContent=(db?"Ortak depo kaydı":bulutUrl()?"Bulut":"Bu cihazda kayıtlı")+` · ${prods.length} ürün`+(bulutUrl()&&!db?bulutDurumYazi():"")}
 $("pl").addEventListener("click",async e=>{const t=e.target.closest("button");if(!t)return;const id=t.dataset.go||t.dataset.ed||t.dataset.del,p=prods.find(x=>String(x.id)===id);if(!p)return;
   if(t.dataset.go){pick(p);window.scrollTo({top:0,behavior:RM?"auto":"smooth"})}
   if(t.dataset.ed){editId=p.id;$("f_ad").value=p.ad;$("f_kod").value=p.kod||"";$("f_raf").value=p.raf;$("f_bol").value=p.bolme;$("f_kat").value=p.kat;$("f_taraf").value=+p.taraf===2?"2":"1";$("f_adet").value=p.adet??"";$("f_ok").textContent="Güncelle";palForm();$("f_ad").focus()}
@@ -709,7 +713,7 @@ const pinVar=()=>kullanicilar().length>0;
 function kilitDurum(){const k=!aktif;for(const d of document.querySelectorAll("details[data-kilit]")){d.classList.toggle("acik",!k);const i=d.querySelector(".lk i");if(i)i.textContent=k?"Kilitli":aktif;if(k)d.open=false}
   $("abar").hidden=k;if(!k){$("atxt").textContent="";const b=document.createElement("b");b.textContent=aktif;$("atxt").append(b," olarak giriş yapıldı")}}
 function kilitle(){aktif=null;clearTimeout(acikT);kilitDurum()}
-function ac(ad){aktif=ad;clearTimeout(acikT);acikT=setTimeout(()=>{kilitle();toast("Güvenlik için oturum kapatıldı")},15*60*1000);kilitDurum()}
+function ac(ad){aktif=ad;setTimeout(()=>bulutEsitle(),300);clearTimeout(acikT);acikT=setTimeout(()=>{kilitle();toast("Güvenlik için oturum kapatıldı")},15*60*1000);kilitDurum()}
 $("akilit").addEventListener("click",()=>{kilitle();toast("Çıkış yapıldı")});
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&aktif){acikT2=setTimeout(kilitle,2*60*1000)}else clearTimeout(acikT2)});
 let pinCb=null;const PB=()=>$("pinb");
@@ -731,7 +735,7 @@ function kurulum(duzenle){const u=kullanicilar();
       if(!ad)return hata(`${i+1}. satıra ad yaz.`);if(adlar.has(norm(ad)))return hata("Aynı ad iki kez yazılmış.");adlar.add(norm(ad));
       const eski=u.find(x=>norm(x.ad)===norm(ad))||(duzenle&&u[i]);if(!sf&&!eski)return hata(`${ad} için şifre yaz.`);if(sf&&sf.length<4)return hata("Şifre en az 4 karakter olmalı.");
       yeni.push({ad,h:sf?hsh(sf):eski.h})}
-    if(!yeni.length)return hata("En az bir kullanıcı tanımla.");kulKaydet(yeni);const cb=pinCb;
+    if(!yeni.length)return hata("En az bir kullanıcı tanımla.");kulKaydet(yeni);bulutEkle({t:"users",users:yeni},duzenle?null:{ad:yeni[0].ad,h:yeni[0].h});const cb=pinCb;
     if(duzenle){pinKapat();if(aktif&&!yeni.some(x=>x.ad===aktif))kilitle();else kilitDurum();toast("Kullanıcılar kaydedildi");return}
     const kod=String(Math.floor(100000+Math.random()*900000));try{localStorage.setItem(PK_R,hsh("k"+kod))}catch(e){}ac(yeni[0].ad);
     pencere(`<h3 id="pint">Kaydedildi</h3><p>Şifreler unutulursa bu kurtarma koduyla kullanıcıları yeniden tanımlayabilirsin. Bir yere not et:</p><b style="display:block;font:800 34px Barlow,sans-serif;letter-spacing:.12em;margin:4px 0 14px">${kod}</b><div class="acts"><button class="btn p" type="button">Not aldım</button></div>`);
@@ -754,6 +758,54 @@ $("akul").addEventListener("click",()=>{if(aktif){pinCb=null;kurulum(true)}});
 const izinli=cb=>{if(aktif){cb();return true}pinSor(cb);return false};
 for(const d of document.querySelectorAll("details[data-kilit]"))d.querySelector("summary").addEventListener("click",e=>{if(d.open||aktif)return;e.preventDefault();izinli(()=>{d.open=true;d.scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})})});
 kilitDurum();
+
+/* ---------- bulut eşitleme (Google E-Tablo) ---------- */
+const BULUT_VARSAYILAN="";
+const bulutUrl=()=>{if(db)return"";try{return localStorage.getItem("rafta-bulut")??BULUT_VARSAYILAN}catch(e){return BULUT_VARSAYILAN}};
+let bulutVer=(()=>{try{return localStorage.getItem("rafta-bulut-ver")||""}catch(e){return""}})(),bulutMesgul=false,bulutSon=0,bulutHata="",bulutT=0;
+const kuyrukOku=()=>{try{return JSON.parse(localStorage.getItem("rafta-kuyruk"))||[]}catch(e){return[]}};
+const kuyrukYaz=k=>{try{localStorage.setItem("rafta-kuyruk",JSON.stringify(k))}catch(e){}};
+function aktifKimlik(){if(!aktif)return null;const u=kullanicilar().find(x=>x.ad===aktif);return u?{ad:u.ad,h:u.h}:null}
+function bulutEkle(op,kim){if(!bulutUrl())return;const k=kuyrukOku();if(op.t==="hepsi")for(let i=k.length-1;i>=0;i--)if(k[i].op.t==="urun"||k[i].op.t==="sil"||k[i].op.t==="hepsi")k.splice(i,1);
+  if(op.t==="plan"||op.t==="users")for(let i=k.length-1;i>=0;i--)if(k[i].op.t===op.t)k.splice(i,1);
+  k.push({op:JSON.parse(JSON.stringify(op)),k:kim||aktifKimlik()});kuyrukYaz(k);renderList();clearTimeout(bulutT);bulutT=setTimeout(bulutEsitle,700)}
+function bulutDurumYazi(){const n=kuyrukOku().length;if(bulutMesgul)return" · ⟳ eşitleniyor";if(bulutHata)return` · ${bulutHata}${n?`, ${n} değişiklik bekliyor`:""}`;
+  if(n)return` · ${n} değişiklik bekliyor`;return bulutSon?` · ✓ ${new Date(bulutSon).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})}`:""}
+function lsSessiz(){try{localStorage.setItem(LS,JSON.stringify({plan,prods}))}catch(e){}}
+function kuyrukYerel(){for(const x of kuyrukOku()){const o=x.op;if(o.t==="urun"&&o.p){const i=prods.findIndex(q=>String(q.id)===String(o.p.id));if(i>=0)prods[i]=o.p;else prods.push(o.p)}
+  else if(o.t==="sil")prods=prods.filter(q=>String(q.id)!==String(o.id));else if(o.t==="hepsi")prods=o.prods.map(q=>({...q}));else if(o.t==="plan"&&o.plan)plan=o.plan}}
+function bulutUygula(d){if(!d||!d.ok)return;
+  if(!(d.prods||[]).length&&!d.plan&&(prods.length||plan)){if(Array.isArray(d.users)&&d.users.length){kulKaydet(d.users);kilitDurum()}
+    const k=kuyrukOku();if(aktif&&!k.some(x=>x.op.t==="hepsi")){bulutEkle({t:"plan",plan});bulutEkle({t:"hepsi",prods})}else if(!aktif)bulutHata="bulut boş, göndermek için giriş yap";renderList();return}
+  const plan0=JSON.stringify(plan),ilk=!bulutVer,eski=prods;
+  if(d.plan&&d.plan.raflar)plan=d.plan;prods=(d.prods||[]).map(p=>({...p,id:String(p.id)}));
+  if(ilk&&prods.length){const ids=new Set(prods.map(p=>p.id));for(const p of eski)if(!/^s\d+$/.test(String(p.id))&&!ids.has(String(p.id)))bulutEkle({t:"urun",p})}
+  kuyrukYerel();
+  if(Array.isArray(d.users)&&d.users.length){kulKaydet(d.users);if(aktif&&!d.users.some(x=>x.ad===aktif))kilitle();else kilitDurum()}
+  bulutVer=d.ver||"";try{localStorage.setItem("rafta-bulut-ver",bulutVer)}catch(e){}lsSessiz();
+  const bos=!(PK&&!PK.fin)&&!cur;renderList();if(JSON.stringify(plan)!==plan0){fillPlanForm();if(bos)drawMap()}else if(bos&&!document.getElementById("wk"))drawMap()}
+async function bulutEsitle(){const url=bulutUrl();if(!url||bulutMesgul)return;if(navigator.onLine===false){bulutHata="internet yok";renderList();return}
+  bulutMesgul=true;renderList();
+  try{let k=kuyrukOku(),d;
+    if(k.length){const kim=[...k].reverse().find(x=>x.k)?.k||aktifKimlik()||{};
+      const r=await fetch(url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({kullanici:kim.ad||"",h:kim.h||"",ops:k.map(x=>x.op)})});d=await r.json();
+      if(d&&d.ok===false&&d.hata==="yetki"){try{const r2=await fetch(url+(url.includes("?")?"&":"?")+"t="+Date.now());const d2=await r2.json();if(d2.ver!==bulutVer)bulutUygula(d2)}catch(e){}bulutHata="göndermek için giriş yap";bulutMesgul=false;renderList();return}
+      const kalan=kuyrukOku();kuyrukYaz(kalan.slice(k.length))}
+    else{const r=await fetch(url+(url.includes("?")?"&":"?")+"t="+Date.now());d=await r.json();
+      if(d.ok&&!d.prods.length&&!d.plan&&!(d.users||[]).length&&(prods.length||plan)){
+        if(aktif){bulutMesgul=false;bulutEkle({t:"users",users:kullanicilar()});bulutEkle({t:"plan",plan});bulutEkle({t:"hepsi",prods});return}
+        bulutHata="bulut boş, göndermek için giriş yap";bulutMesgul=false;renderList();return}
+      if(d.ver===bulutVer){bulutHata="";bulutSon=Date.now();bulutMesgul=false;renderList();return}}
+    bulutHata="";bulutSon=Date.now();bulutMesgul=false;bulutUygula(d);if(kuyrukOku().length)bulutEsitle()}
+  catch(er){bulutHata="bağlantı yok";bulutMesgul=false;renderList()}}
+setInterval(()=>{if(!document.hidden)bulutEsitle()},45000);
+addEventListener("online",()=>bulutEsitle());
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)bulutEsitle()});
+setTimeout(()=>bulutEsitle(),1500);
+$("b_url").value=bulutUrl();
+$("b_kaydet").addEventListener("click",async()=>{const u=$("b_url").value.trim();if(u&&!/^https:\/\/script\.google(usercontent)?\.com\//.test(u)){$("b_msg").textContent="Adres https://script.google.com/… ile başlamalı.";return}
+  try{localStorage.setItem("rafta-bulut",u);localStorage.removeItem("rafta-bulut-ver")}catch(e){}bulutVer="";$("b_msg").textContent=u?"Bağlanıyor…":"Bulut kapatıldı.";renderList();showY();if(u){await bulutEsitle();$("b_msg").textContent=bulutHata?("Sorun: "+bulutHata):"Bağlandı ✓"}});
+$("b_simdi").addEventListener("click",async()=>{$("b_msg").textContent="Eşitleniyor…";await bulutEsitle();$("b_msg").textContent=bulutHata?("Sorun: "+bulutHata):"Eşitlendi ✓"});
 
 /* ---------- paylaş / içe al ---------- */
 const clean=v=>String(v??"").replace(/[;\r\n]/g,",").trim();
@@ -781,6 +833,7 @@ $("x_imp").addEventListener("click",async e=>{const b=e.currentTarget,{np,kh,out
     if(np){plan=np;await savePlan();fillPlanForm()}
     if(out.length){if(db){for(const p of [...prods])await db.collection("urunler").doc(p.id).delete();for(const [i,p] of out.entries())await db.collection("urunler").doc("i"+Date.now().toString(36)+i).set(p)}
       else{prods=out.map((p,i)=>({id:"i"+i+Date.now().toString(36),...p}));lsSave()}}
+    if(out.length)bulutEkle({t:"hepsi",prods});if(np)bulutEkle({t:"plan",plan});if(kh&&kh.length)bulutEkle({t:"users",users:kh});
     renderList();drawMap();cur=null;xm(`İçe alındı ✓ ${out.length} ürün${np?" ve depo planı":""}.`);$("x_txt").value=""}catch(er){xm("İçe alınamadı, tekrar dene.")}});
 if("serviceWorker" in navigator&&location.protocol==="https:"&&!location.hostname.endsWith("claude.ai")&&location.hostname!=="localhost"){navigator.serviceWorker.register("sw.js").catch(()=>{})}
 
