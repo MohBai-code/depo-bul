@@ -25,11 +25,15 @@ function ayarYaz_(k, val) {
 }
 function sayi_(x, d) { const n = Number(x); return isFinite(n) && x !== '' ? n : d; }
 function urunler_() {
-  const v = sayfa_(SH_U, COLS).getDataRange().getValues(), out = [];
+  const s = sayfa_(SH_U, COLS), v = s.getDataRange().getValues(), out = [], gorulen = {};
   for (let i = 1; i < v.length; i++) {
     const r = v[i]; if (!String(r[1] || '').trim()) continue;
+    let id = String(r[0] || '').trim();
+    // id boşsa ya da tekrar ediyorsa kalıcı bir kimlik yaz
+    if (!id || gorulen[id]) { id = 'g' + Utilities.getUuid().replace(/-/g, '').slice(0, 10); s.getRange(i + 1, 1).setValue(id); }
+    gorulen[id] = 1;
     out.push({
-      id: String(r[0] || ('g' + i)), ad: String(r[1]).trim(), kod: String(r[2] || ''), raf: String(r[3] || '').trim(),
+      id: id, ad: String(r[1]).trim(), kod: String(r[2] || ''), raf: String(r[3] || '').trim(),
       bolme: sayi_(r[4], 1), kat: sayi_(r[5], 1), taraf: String(r[6]) === '2' ? 2 : '', adet: r[7] === '' ? '' : sayi_(r[7], '')
     });
   }
@@ -45,7 +49,10 @@ function durum_() {
 }
 function cevap_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
 
-function doGet() { return cevap_(durum_()); }
+function doGet() {
+  const kilit = LockService.getScriptLock(); kilit.waitLock(20000);
+  try { return cevap_(durum_()); } finally { kilit.releaseLock(); }
+}
 
 function doPost(e) {
   const kilit = LockService.getScriptLock(); kilit.waitLock(20000);
