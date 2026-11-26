@@ -59,8 +59,27 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
 @media(prefers-reduced-motion:reduce){.pulse{animation:none}}
 @media(max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;white-space:normal;color:var(--mut)}.stack td:empty{display:none}}
+#splash{position:fixed;inset:0;z-index:50;background:#058a8e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:#fff;transition:opacity .45s ease,transform .45s ease;cursor:pointer}
+#splash.out{opacity:0;transform:translateY(-24px);pointer-events:none}
+#splash svg{width:min(46vw,190px);height:auto;overflow:visible}
+#splash .t1{font:800 clamp(34px,9vw,54px)/1 "Barlow Condensed",Barlow,sans-serif;opacity:0;animation:up .5s 1.05s ease-out forwards}
+#splash .t2{font:600 clamp(18px,4.5vw,24px)/1 Barlow,sans-serif;opacity:0;animation:up .5s 1.25s ease-out forwards;color:#d7f0f0}
+#splash .bar{position:absolute;left:0;right:0;bottom:0;height:14px;background:repeating-linear-gradient(-45deg,#fff 0 16px,#04585b 16px 32px);background-size:45px 45px;animation:slide 1s linear infinite}
+.sp-post{transform-box:fill-box;transform-origin:bottom;transform:scaleY(0);animation:grow .35s ease-out forwards}
+.sp-plank{transform-box:fill-box;transform-origin:left;transform:scaleX(0);animation:wide .3s ease-out forwards}
+.sp-box{opacity:0;animation:drop .42s cubic-bezier(.3,1.5,.6,1) forwards}
+.sp-hot{animation:drop .42s cubic-bezier(.3,1.5,.6,1) forwards,glow .7s 1.4s ease-in-out infinite alternate}
+@keyframes grow{to{transform:scaleY(1)}}@keyframes wide{to{transform:scaleX(1)}}
+@keyframes drop{from{opacity:0;transform:translateY(-60px)}to{opacity:1;transform:none}}
+@keyframes glow{to{filter:brightness(1.35)}}@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes slide{to{background-position:45px 0}}
+@media(prefers-reduced-motion:reduce){#splash *{animation-duration:.01s!important;animation-delay:0s!important;animation-iteration-count:1!important}}
+.mapc{position:relative}
+#zout{position:absolute;top:10px;right:12px;min-height:40px;padding:6px 14px;font:600 15px Barlow,sans-serif;border-radius:999px;border:0;background:var(--yel);color:#fff;cursor:pointer;box-shadow:0 4px 12px #0003}
+#zout:focus-visible{outline:3px solid var(--org);outline-offset:2px}
 </style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script></head>
 <body>
+<div id="splash" role="presentation"><svg viewBox="0 0 200 170" aria-hidden="true"><rect class="sp-post" style="animation-delay:.05s" x="20" y="10" width="9" height="150" rx="2" fill="#04585b"/><rect class="sp-post" style="animation-delay:.12s" x="171" y="10" width="9" height="150" rx="2" fill="#04585b"/><rect class="sp-plank" style="animation-delay:0.25s" x="20" y="60" width="160" height="7" rx="2" fill="#04585b"/><rect class="sp-plank" style="animation-delay:0.33s" x="20" y="105" width="160" height="7" rx="2" fill="#04585b"/><rect class="sp-plank" style="animation-delay:0.41s" x="20" y="150" width="160" height="7" rx="2" fill="#04585b"/><rect class="sp-box" style="animation-delay:0.55s" x="35" y="29" width="28" height="30" rx="3" fill="#e3f4f4"/><rect class="sp-box" style="animation-delay:0.59s" x="71" y="35" width="28" height="24" rx="3" fill="#e3f4f4"/><rect class="sp-box" style="animation-delay:0.63s" x="107" y="25" width="28" height="34" rx="3" fill="#e3f4f4"/><rect class="sp-box" style="animation-delay:0.67s" x="143" y="31" width="28" height="28" rx="3" fill="#e3f4f4"/><rect class="sp-box" style="animation-delay:0.71s" x="35" y="80" width="28" height="24" rx="3" fill="#e3f4f4"/><rect class="sp-box" style="animation-delay:0.75s" x="71" y="70" width="28" height="34" rx="3" fill="#e3f4f4"/><rect class="sp-hot" style="animation-delay:1.00s" x="107" y="70" width="28" height="34" rx="3" fill="#ff6a13" stroke="#fff" stroke-width="2.5"/><rect class="sp-box" style="animation-delay:0.83s" x="143" y="74" width="28" height="30" rx="3" fill="#e3f4f4"/><rect class="sp-box" style="animation-delay:0.87s" x="35" y="115" width="28" height="34" rx="3" fill="#e3f4f4"/><rect class="sp-box" style="animation-delay:0.91s" x="71" y="121" width="28" height="28" rx="3" fill="#e3f4f4"/><rect class="sp-box" style="animation-delay:0.95s" x="107" y="119" width="28" height="30" rx="3" fill="#e3f4f4"/><rect class="sp-box" style="animation-delay:0.99s" x="143" y="125" width="28" height="24" rx="3" fill="#e3f4f4"/></svg><div class="t1">Koray Teknik</div><div class="t2">Hırdavat · Depo Bul</div><div class="bar"></div></div>
 <header>
   <div class="top"><h1>Koray Teknik <b>Hırdavat</b></h1><span class="st" id="st">Yükleniyor…</span></div>
   <div class="srch">
@@ -71,7 +90,7 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
 <main>
   <div class="res" id="res"><div><div class="big">Ne arıyorsun?</div><p>Ürünü yaz, depodaki yerini girişten başlayarak göstereyim.</p></div></div>
   <div class="grid">
-    <div class="card"><h2>Depo planı</h2><div class="mapw"><svg id="map" role="img" aria-label="Depo kuşbakışı plan"></svg></div></div>
+    <div class="card mapc"><h2>Depo planı</h2><button id="zout" type="button" hidden>Tüm depoyu göster</button><div class="mapw"><svg id="map" role="img" aria-label="Depo kuşbakışı plan"></svg></div></div>
     <div class="card"><h2 id="fh">Raf önü</h2><svg id="front" role="img" aria-label="Rafın önden görünümü"></svg><p class="note" id="fn">Bir ürün seçince rafın hangi katında ve bölmesinde olduğu burada yanıp söner.</p></div>
   </div>
 
@@ -179,7 +198,7 @@ function route(r,b){
 /* ---------- çizim ---------- */
 function drawMap(hl){
   const S=10,W=plan.cols*S,H=plan.rows*S,m=$("map");
-  m.setAttribute("viewBox",`-4 -12 ${W+8} ${H+22}`);document.querySelector(".mapw").style.aspectRatio=`${W+8}/${H+22}`;
+  VB=[-4,-12,W+8,H+22];cancelAnimationFrame(zanim);setVB(VB);$("zout").hidden=true;document.querySelector(".mapw").style.aspectRatio=`${W+8}/${H+22}`;
   let g=`<defs><pattern id="hz" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="6" fill="#058a8e"/><rect x="3" width="3" height="6" fill="#04585b"/></pattern>
   <pattern id="tl" width="${S}" height="${S}" patternUnits="userSpaceOnUse"><path d="M${S} 0V${S}H0" fill="none" stroke="var(--line)" stroke-width=".3"/></pattern></defs>
 `;
@@ -191,12 +210,12 @@ function drawMap(hl){
   g+=`<path d="${fl}" fill="var(--floor)"/><path d="${fl}" fill="url(#tl)"/><path d="${wl}" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="square" fill="none"/>`;
   for(const r of plan.raflar){const x=r.x*S,y=r.y*S,w=r.w*S,h=r.h*S,act=hl&&hl.r===r,n=len(r),L=cells(r);
     g+=`<rect x="${x+1.2}" y="${y+1.8}" width="${w-1.6}" height="${h-1.6}" rx="1" fill="#0003"/>
-    <rect x="${x+.6}" y="${y+.6}" width="${w-1.2}" height="${h-1.2}" rx="1" fill="${act?"#04585b":"var(--rack)"}" stroke="${act?"#058a8e":"none"}" stroke-width=".8"/>`;
+    <rect x="${x+.6}" y="${y+.6}" width="${w-1.2}" height="${h-1.2}" rx="1" fill="var(--rack)" stroke="${act?"#058a8e":"none"}" stroke-width="1.4"/>`;
     for(let i=1;i<n;i++){const o=Math.floor(i*L/n)*S;g+=vert(r)?`<line x1="${x+1}" x2="${x+w-1}" y1="${y+o}" y2="${y+o}" stroke="#fff4" stroke-width=".5"/>`:`<line y1="${y+1}" y2="${y+h-1}" x1="${x+o}" x2="${x+o}" stroke="#fff4" stroke-width=".5"/>`}
     g+=`<text x="${x+w/2}" y="${y+h/2+2.6}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="#fff" stroke="#0008" stroke-width=".4" paint-order="stroke">${esc(r.ad)}</text>`}
   const gx=plan.giris.x*S,gy=plan.giris.y*S;
   g+=`<rect x="${gx-S}" y="${gy+S-1.5}" width="${S*3}" height="3" fill="url(#hz)"/><text x="${gx+S/2}" y="${gy+S+8}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="var(--ink)">GİRİŞ</text>`;
-  if(hl){for(const [cx,cy] of segCells(hl.r,hl.b))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#058a8e"/>`;
+  if(hl){for(const [cx,cy] of segCells(hl.r,hl.b))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#ff6a13"/>`;
     if(hl.pts){const d=hl.pts.map(([x,y],i)=>(i?"L":"M")+(x*S+S/2)+" "+(y*S+S/2)).join(" ");
       g+=`<path id="rt" d="${d}" fill="none" stroke="none"/><g id="fs"></g>
       <g id="wk"><g id="wkf" transform="scale(1.35)">
@@ -226,7 +245,7 @@ function drawMap(hl){
       if(k>=1)face=cx>=pt.x?1:-1;
       wk.setAttribute("transform",`translate(${pt.x.toFixed(2)} ${pt.y.toFixed(2)})`);wf.setAttribute("transform",`scale(${1.35*face} 1.35)`);pose(dist/2.6,k<1);
       if(k<1)anim=requestAnimationFrame(step);
-      else{bb.setAttribute("transform",`translate(${(pt.x+4).toFixed(1)} ${Math.max(-8,pt.y-31).toFixed(1)})`);bb.setAttribute("opacity","1");if(!RM)bb.animate([{opacity:0},{opacity:1}],{duration:300})}};
+      else{bb.setAttribute("transform",`translate(${(pt.x+4).toFixed(1)} ${Math.max(-8,pt.y-31).toFixed(1)})`);bb.setAttribute("opacity","1");if(!RM)bb.animate([{opacity:0},{opacity:1}],{duration:300});setTimeout(()=>zoomOn(hl,pt),RM?0:350)}};
     anim=requestAnimationFrame(step)}
 }
 function drawFront(r,b,k){
@@ -240,6 +259,18 @@ function drawFront(r,b,k){
   f.innerHTML=g;$("fh").textContent=`${r.ad} rafı · önden`;
   $("fn").textContent=`Alttaki sayılar bölme, sağdakiler kat. Turuncu kutu: ${b}. bölme, ${k}. kat (alttan sayılır).`;
 }
+
+let VB=[0,0,1,1],zanim=0;
+const setVB=v=>$("map").setAttribute("viewBox",v.map(n=>(+n).toFixed(2)).join(" "));
+function zoomTo(t,ms){const f=$("map").getAttribute("viewBox").split(/[\s,]+/).map(Number),t0=performance.now();cancelAnimationFrame(zanim);
+  const st=now=>{const k=ms?Math.min(1,(now-t0)/ms):1,e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;setVB(f.map((a,i)=>a+(t[i]-a)*e));if(k<1)zanim=requestAnimationFrame(st)};zanim=requestAnimationFrame(st)}
+function zoomOn(hl,pt){const S=10,c=segCells(hl.r,hl.b);let sx=0,sy=0;for(const [x,y] of c){sx+=x*S+S/2;sy+=y*S+S/2}sx/=c.length;sy/=c.length;
+  const z=matchMedia("(max-width:760px)").matches?3:2.4,w=VB[2]/z,h=VB[3]/z,cx=(sx+pt.x)/2,cy=(sy+pt.y)/2-6,
+  cl=(v,a,b)=>Math.max(a,Math.min(b,v));zoomTo([cl(cx-w/2,VB[0],VB[0]+VB[2]-w),cl(cy-h/2,VB[1],VB[1]+VB[3]-h),w,h],RM?0:1000);$("zout").hidden=false}
+$("zout").addEventListener("click",()=>{zoomTo(VB,RM?0:700);$("zout").hidden=true});
+{const sp=$("splash"),bye=()=>{if(!sp||sp.classList.contains("out"))return;sp.classList.add("out");setTimeout(()=>sp.remove(),500)};
+  let seen=false;try{seen=sessionStorage.getItem("dbsplash")==="1";sessionStorage.setItem("dbsplash","1")}catch(e){}
+  if(sp){if(seen)sp.remove();else{sp.addEventListener("click",bye);setTimeout(bye,RM?600:2400)}}}
 
 /* ---------- arama ---------- */
 function find(q){const n=norm(q);if(!n)return[];const w=n.split(" ");
