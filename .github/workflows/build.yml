@@ -32,6 +32,8 @@ jobs:
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#058a8e' --splashBackgroundColor '#ffffff'
       - name: Kopyala
         run: npx cap sync android
+      - name: Sabit imzayi kullan (guncellemeler eskisinin uzerine kurulsun)
+        run: mkdir -p ~/.android && cp imza/debug.keystore ~/.android/debug.keystore
       - name: APK derle
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
