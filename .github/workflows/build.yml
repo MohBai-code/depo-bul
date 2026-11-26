@@ -49,16 +49,22 @@ jobs:
           gh release create son-surum DepoBul.apk --title "Depo Bul - son surum" --notes "Telefondan DepoBul.apk dosyasina dokunup indirin ve kurun."
 
   web:
-    name: iPhone icin web surumu
+    name: iPhone icin web surumu (hazirla)
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
           path: www
+
+  web-yayin:
+    name: iPhone icin web surumu (yayinla)
+    needs: web
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
       - id: deploy
         uses: actions/deploy-pages@v4
