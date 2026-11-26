@@ -183,27 +183,27 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
 </main>
 <script>
 {
-const SAMPLE_PLAN={surum:3,cols:45,rows:46,giris:{x:35,y:36},
+const SAMPLE_PLAN={surum:4,cols:45,rows:46,giris:{x:35,y:36},
  disari:[{x:18,y:0,w:27,h:10},{x:0,y:18,w:18,h:28},{x:28,y:37,w:17,h:9}],
  hduvar:[{y:37,x0:18,x1:24},{y:37,x0:26,x1:28}],
  kapilar:[{ad:"Araç kapısı",x:44,y:11,h:7,kenar:"r"},{ad:"Arka oda",x:24,y:37,w:2,kenar:"t"}],
  raflar:[
- {ad:"A",x:1,y:0,w:16,h:1,kat:4,bol:8},{ad:"B",x:0,y:0,w:1,h:18,kat:4,bol:9},
- {ad:"C",x:2,y:3,w:12,h:2,kat:4,bol:6},{ad:"D",x:2,y:8,w:12,h:2,kat:4,bol:6},{ad:"E",x:2,y:13,w:12,h:2,kat:4,bol:6},
- {ad:"F",x:1,y:17,w:16,h:1,kat:4,bol:8},{ad:"G",x:17,y:3,w:1,h:7,kat:4,bol:4},{ad:"H",x:20,y:10,w:23,h:1,kat:4,bol:11},
- {ad:"I",x:18,y:18,w:1,h:18,kat:4,bol:9},{ad:"J",x:22,y:18,w:2,h:17,kat:4,bol:8},{ad:"K",x:26,y:18,w:2,h:17,kat:4,bol:8},
- {ad:"L",x:29,y:18,w:2,h:17,kat:4,bol:8},{ad:"M",x:33,y:18,w:2,h:17,kat:4,bol:8},{ad:"N",x:37,y:18,w:2,h:17,kat:4,bol:8},
- {ad:"O",x:40,y:18,w:2,h:17,kat:4,bol:8},{ad:"R",x:44,y:18,w:1,h:18,kat:4,bol:9},
- {ad:"S",x:18,y:37,w:1,h:7,kat:4,bol:4},{ad:"T",x:19,y:37,w:4,h:1,kat:4,bol:2},{ad:"U",x:26,y:37,w:1,h:7,kat:4,bol:4},
+ {ad:"O",x:1,y:0,w:16,h:1,kat:4,bol:8},{ad:"R",x:0,y:0,w:1,h:18,kat:4,bol:9},
+ {ad:"N",x:2,y:3,w:12,h:2,kat:4,bol:6},{ad:"M",x:2,y:8,w:12,h:2,kat:4,bol:6},{ad:"L",x:2,y:13,w:12,h:2,kat:4,bol:6},
+ {ad:"K",x:1,y:17,w:16,h:1,kat:4,bol:8},{ad:"J",x:17,y:3,w:1,h:7,kat:4,bol:4},{ad:"I",x:20,y:10,w:23,h:1,kat:4,bol:11},
+ {ad:"H",x:18,y:18,w:1,h:18,kat:4,bol:9},{ad:"G",x:22,y:18,w:2,h:17,kat:4,bol:8},{ad:"F",x:26,y:18,w:2,h:17,kat:4,bol:8},
+ {ad:"E",x:29,y:18,w:2,h:17,kat:4,bol:8},{ad:"D",x:33,y:18,w:2,h:17,kat:4,bol:8},{ad:"C",x:37,y:18,w:2,h:17,kat:4,bol:8},
+ {ad:"B",x:40,y:18,w:2,h:17,kat:4,bol:8},{ad:"A",x:44,y:18,w:1,h:18,kat:4,bol:9},
+ {ad:"U",x:18,y:37,w:1,h:7,kat:4,bol:4},{ad:"T",x:19,y:37,w:4,h:1,kat:4,bol:2},{ad:"S",x:26,y:37,w:1,h:7,kat:4,bol:4},
  {ad:"P1",tip:"palet",x:1,y:3,w:1,h:1,kat:1,bol:1},{ad:"P2",tip:"palet",x:1,y:5,w:1,h:1,kat:1,bol:1},{ad:"P3",tip:"palet",x:1,y:7,w:1,h:1,kat:1,bol:1},
  {ad:"P4",tip:"palet",x:1,y:8,w:1,h:1,kat:1,bol:1},{ad:"P5",tip:"palet",x:1,y:10,w:1,h:1,kat:1,bol:1},{ad:"P6",tip:"palet",x:1,y:12,w:1,h:1,kat:1,bol:1},
  {ad:"P7",tip:"palet",x:1,y:14,w:1,h:1,kat:1,bol:1},{ad:"P8",tip:"palet",x:18,y:10,w:1,h:1,kat:1,bol:1},{ad:"P9",tip:"palet",x:18,y:17,w:1,h:1,kat:1,bol:1},
  {ad:"P10",tip:"palet",x:40,y:17,w:1,h:1,kat:1,bol:1},{ad:"P11",tip:"palet",x:20,y:36,w:1,h:1,kat:1,bol:1}]};
-const SAMPLE_PRODS=[["Sunta vidası 4x40","VD440","A",3,2,500],["Dübel 8 mm","DB08","A",5,3,1200],["Matkap ucu seti","MU10","B",2,4,18],
- ["Silikon şeffaf","SL01","C",5,2,64,2],["Boya fırçası 2 inç","BF02","K",3,3,40,1],["Su terazisi 60 cm","ST60","B",8,4,9],["Çekiç 500 g","CK50","B",1,2,22],
- ["Pense","PN01","B",1,3,30],["PPR boru 20 mm","PP20","E",2,1,80],["Musluk bataryası","MB01","F",2,3,12],["Kablo 2x1,5","KB15","K",3,2,25,2],
- ["Sıva altı priz","PR01","C",3,4,150],["LED ampul 9 W","LD09","D",8,4,200],["İzole bant","IB01","A",7,4,300],["Zımpara 120","ZM12","D",6,2,90],
- ["Menteşe","MN01","A",9,1,140],["Barel kilit","BK01","C",9,3,15],["Bahçe hortumu","BH01","F",3,1,7],["Alçı 25 kg","AL25","P1",1,1,40],["Su bazlı boya 18 L","BY18","P2",1,1,24]];
+const SAMPLE_PRODS=[["Sunta vidası 4x40","VD440","O",3,2,500],["Dübel 8 mm","DB08","O",5,3,1200],["Matkap ucu seti","MU10","R",2,4,18],
+ ["Silikon şeffaf","SL01","N",5,2,64,2],["Boya fırçası 2 inç","BF02","F",3,3,40,1],["Su terazisi 60 cm","ST60","R",8,4,9],["Çekiç 500 g","CK50","R",1,2,22],
+ ["Pense","PN01","R",1,3,30],["PPR boru 20 mm","PP20","L",2,1,80],["Musluk bataryası","MB01","K",2,3,12],["Kablo 2x1,5","KB15","F",3,2,25,2],
+ ["Sıva altı priz","PR01","N",3,4,150],["LED ampul 9 W","LD09","M",8,4,200],["İzole bant","IB01","O",7,4,300],["Zımpara 120","ZM12","M",6,2,90],
+ ["Menteşe","MN01","O",9,1,140],["Barel kilit","BK01","N",9,3,15],["Bahçe hortumu","BH01","K",3,1,7],["Alçı 25 kg","AL25","P1",1,1,40],["Su bazlı boya 18 L","BY18","P2",1,1,24]];
 const NS="http://www.w3.org/2000/svg",$=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
 const norm=s=>String(s||"").toLocaleLowerCase("tr").replace(/ı/g,"i").replace(/ğ/g,"g").replace(/ü/g,"u").replace(/ş/g,"s").replace(/ö/g,"o").replace(/ç/g,"c").replace(/\s+/g," ").trim();
@@ -215,8 +215,11 @@ const dataOf=d=>({id:d.id,...(typeof d.data==="function"?d.data():(d.data||{}))}
 const docsOf=s=>(s&&(s.docs||(Array.isArray(s)?s:[])))||[];
 const LS="depobul-v1";
 let planNote="";
-function lsLoad(){try{const o=JSON.parse(localStorage.getItem(LS));if(o&&o.plan){plan=o.plan;prods=o.prods||[];if((+plan.surum||0)===2){for(const r of plan.raflar)if(r.tip!=="palet"&&+r.kat===5)r.kat=4;plan.surum=3;planNote="Raflar 4 katlı yapıldı (yer + 3 tahta)";lsSave()}
+function lsLoad(){try{const o=JSON.parse(localStorage.getItem(LS));if(o&&o.plan){plan=o.plan;prods=o.prods||[];if((+plan.surum||0)===3){const mp=renameByPos(plan);for(const p of prods)if(mp[p.raf])p.raf=mp[p.raf];plan.surum=4;planNote="Raf harfleri yenilendi, ürünler yeni harflerine taşındı";lsSave()}
+  else if((+plan.surum||0)===2){for(const r of plan.raflar)if(r.tip!=="palet"&&+r.kat===5)r.kat=4;{const mp=renameByPos(plan);for(const p of prods)if(mp[p.raf])p.raf=mp[p.raf]}plan.surum=4;planNote="Raflar 4 katlı yapıldı (yer + 3 tahta)";lsSave()}
   else if((+plan.surum||0)<SAMPLE_PLAN.surum){plan=JSON.parse(JSON.stringify(SAMPLE_PLAN));planNote="Depo planı yeni krokiyle güncellendi";lsSave()}return true}}catch(e){}return false}
+function renameByPos(pl){const mp={};for(const r of pl.raflar){if(r.tip==="palet")continue;const n=SAMPLE_PLAN.raflar.find(q=>q.tip!=="palet"&&q.x===r.x&&q.y===r.y&&q.w===r.w&&q.h===r.h);if(n&&n.ad!==r.ad)mp[r.ad]=n.ad}
+  for(const r of pl.raflar)if(mp[r.ad])r.ad=mp[r.ad];return mp}
 function lsSave(){try{localStorage.setItem(LS,JSON.stringify({plan,prods}));const y=yGet();y.dirty=(y.dirty||0)+1;localStorage.setItem("rafta-yedek",JSON.stringify(y))}catch(e){}showY()}
 function yGet(){try{return JSON.parse(localStorage.getItem("rafta-yedek"))||{}}catch(e){return{}}}
 function showY(){const b=document.getElementById("ybar");if(!b)return;const y=yGet(),d=y.dirty||0,old=!y.last||Date.now()-y.last>864e5;
