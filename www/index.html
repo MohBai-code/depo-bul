@@ -336,7 +336,7 @@ function rackSvg(r,cell,hiK){const n=len(r),K=r.kat||4,cw=30,kh=30,x0=12,uTop=6,
     g+=`<text x="${x0+n*cw+6}" y="${yb-3}" font-size="8" fill="${i===+hiK?"var(--org)":"var(--mut)"}" font-weight="${i===+hiK?700:400}" font-family="Barlow">${i===1?"1 yer":i}</text>`;
     for(let j=0;j<n;j++){const c=cell(j+1,i)||{},x=x0+j*cw,bh=c.h?Math.min(cap,c.h):Math.min(cap,9+((i*7+j*5)%8));
       g+=`<rect ${c.cls?`class="${c.cls}"`:""} x="${x+4}" y="${yb-bh}" width="${cw-8}" height="${bh}" rx="1.5" fill="${c.fill||"color-mix(in srgb,var(--mut) 28%,transparent)"}" ${c.stroke?`stroke="${c.stroke}" stroke-width="2"`:""}/>`+(c.label?`<text x="${x+cw/2}" y="${yb-bh/2+3.5}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Barlow">${c.label}</text>`:"")}}
-  for(let j=0;j<=n;j++)g+=`<rect x="${x0+j*cw-2}" y="${uTop}" width="4" height="${floor-uTop+2}" rx="1" fill="#2c4f9a"/>`;
+  for(const j of [0,n])g+=`<rect x="${x0+j*cw-2}" y="${uTop}" width="4" height="${floor-uTop+2}" rx="1" fill="#2c4f9a"/>`;
   return{g,H,n,x0,cw}}
 function drawRackFront(r,t){if(isPal(r)){drawPal(r);$("fn").textContent=`${rackItems(r).length} ürün bu paletin üzerinde.`;return}
   const n=len(r),K=r.kat||4,its=rackItems(r).filter(p=>!cift(r)||tOf(p,r)===t),cnt={};
