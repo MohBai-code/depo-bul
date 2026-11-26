@@ -86,6 +86,20 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
 [hidden]{display:none!important}
 #phint{position:absolute;left:12px;right:12px;bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#04585b;color:#fff;border-radius:12px;padding:8px 12px;font-weight:600;z-index:2}#phint .btn{color:#fff;border-color:#fff;min-height:40px}
 .placing #map{cursor:crosshair;outline:3px dashed #058a8e;outline-offset:4px;border-radius:6px}
+#sug li{display:flex;border-bottom:1px solid var(--line)}#sug li>button:first-child{flex:1;border-bottom:0}
+#sug li .add{all:unset;box-sizing:border-box;min-width:64px;padding:0 12px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--yel);cursor:pointer;border-left:1px solid var(--line)}
+#sug li .add:hover,#sug li .add:focus-visible{background:color-mix(in srgb,var(--yel) 18%,transparent)}
+.ord{margin-top:14px}.ordh{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 14px;margin:2px 4px 10px}.ordh h2{margin:0}
+#ol{list-style:none;margin:0;padding:0}#ol li{display:grid;grid-template-columns:28px minmax(0,1fr) 84px 44px;align-items:center;gap:8px;padding:8px 4px;border-top:1px solid var(--line)}
+#ol li .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:800 14px "Barlow Condensed",sans-serif;background:var(--yel);color:#fff}
+#ol li.done .n{background:#6b8f71}#ol li.skip .n{background:var(--mut)}#ol li.now .n{background:var(--org)}#ol li.done .nm{text-decoration:line-through;color:var(--mut)}
+#ol li .nm small{display:block;color:var(--mut);font-size:13px}#ol li input{min-height:40px;padding:6px 8px;text-align:right}
+#ol li .x{all:unset;width:44px;height:40px;display:grid;place-items:center;font-size:22px;color:var(--mut);cursor:pointer;border-radius:8px}#ol li .x:focus-visible{outline:3px solid var(--org)}
+.oempty{color:var(--mut);padding:6px 4px 10px;margin:0}
+#o_txt{width:100%;font:15px/1.4 Barlow,sans-serif;padding:10px;border-radius:8px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.stopl{margin:6px 0 4px;padding:0;list-style:none;flex-basis:100%}.stopl li{font-size:18px;padding:2px 0}.stopl b{color:var(--org);white-space:nowrap}
+.res .acts{flex-basis:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
 #zout:focus-visible{outline:3px solid var(--org);outline-offset:2px}
 </style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script></head>
 <body>
@@ -103,6 +117,18 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
     <div class="card mapc"><h2>Depo planı</h2><button id="zout" type="button" hidden>Tüm depoyu göster</button><div id="phint" hidden><span>Paleti koymak istediğin yere dokun</span><button class="btn" type="button" id="p_cancel">Vazgeç</button></div><div class="mapw"><svg id="map" role="img" aria-label="Depo kuşbakışı plan"></svg></div></div>
     <div class="card"><h2 id="fh">Raf önü</h2><svg id="front" role="img" aria-label="Rafın önden görünümü"></svg><p class="note" id="fn">Bir ürün seçince rafın hangi katında ve bölmesinde olduğu burada yanıp söner.</p></div>
   </div>
+
+  <section class="card ord" id="ord" aria-labelledby="ordt">
+    <div class="ordh"><h2 id="ordt">Sipariş toplama <span id="ordn" style="color:var(--mut);font-weight:600"></span></h2>
+      <div class="acts"><button class="btn p" type="button" id="o_go">Toplamaya başla</button><button class="btn" type="button" id="o_clr">Temizle</button></div></div>
+    <ol id="ol"></ol>
+    <details id="o_pd" style="margin:6px 0 0;padding:0 4px;background:none">
+      <summary style="font-size:19px">WhatsApp siparişini yapıştır</summary>
+      <p class="note">Gelen sipariş mesajını olduğu gibi yapıştır. Her satır bir ürün: "dübel 8mm 50 adet", "3 x silikon şeffaf" gibi.</p>
+      <textarea id="o_txt" rows="5" placeholder="Sipariş mesajını buraya yapıştır"></textarea>
+      <div class="acts" style="margin:10px 0 12px"><button class="btn p" type="button" id="o_parse">Siparişe ekle</button><span class="note" id="o_msg" aria-live="polite"></span></div>
+    </details>
+  </section>
 
   <details id="pd">
     <summary>Ürün ekle / düzenle</summary>
@@ -234,7 +260,10 @@ function drawMap(hl){
     g+=`<text x="${x+w/2}" y="${y+h/2+2.6}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="#fff" stroke="#0008" stroke-width=".4" paint-order="stroke">${esc(r.ad)}</text>`}
   const gx=plan.giris.x*S,gy=plan.giris.y*S;
   g+=`<rect x="${gx-S}" y="${gy+S-1.5}" width="${S*3}" height="3" fill="url(#hz)"/><text x="${gx+S/2}" y="${gy+S+8}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="var(--ink)">GİRİŞ</text>`;
-  if(hl){for(const [cx,cy] of segCells(hl.r,hl.b))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#ff6a13"/>`;
+  if(hl){if(hl.full&&hl.full.length>1)g+=`<path d="${hl.full.map(([x,y],i)=>(i?"L":"M")+(x*S+S/2)+" "+(y*S+S/2)).join(" ")}" fill="none" stroke="#058a8e" stroke-width="1.3" stroke-dasharray="1.2 2.6" stroke-linecap="round" opacity=".6"/>`;
+    if(hl.r)for(const [cx,cy] of segCells(hl.r,hl.b))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#ff6a13"/>`;
+    for(const st of hl.stops||[]){const c=segCells(st.r,st.b);let sx=0,sy=0;for(const [x,y] of c){sx+=x*S+S/2;sy+=y*S+S/2}sx/=c.length;sy/=c.length;
+      g+=`<g><circle cx="${sx}" cy="${sy}" r="4.4" fill="${st.state==="done"?"#6b8f71":st.state==="skip"?"#8a8f96":st.state==="now"?"#ff6a13":"#058a8e"}" stroke="#fff" stroke-width=".9"/><text x="${sx}" y="${sy+2.1}" text-anchor="middle" font-family="Barlow Condensed,Barlow,sans-serif" font-weight="800" font-size="5.6" fill="#fff">${st.state==="done"?"✓":st.n}</text></g>`}
     if(hl.pts){const d=hl.pts.map(([x,y],i)=>(i?"L":"M")+(x*S+S/2)+" "+(y*S+S/2)).join(" ");
       g+=`<path id="rt" d="${d}" fill="none" stroke="none"/><g id="fs"></g>
       <g id="wk"><g id="wkf" transform="scale(1.35)">
@@ -251,7 +280,7 @@ function drawMap(hl){
       <g id="bb" opacity="0"><rect x="0" y="0" width="30" height="11" rx="5.5" fill="#fff" stroke="#058a8e" stroke-width=".8"/><text x="15" y="7.8" text-anchor="middle" font-family="Barlow Condensed,Barlow,sans-serif" font-weight="800" font-size="7" fill="#058a8e">Burada!</text></g>`}}
   m.innerHTML=g;
   if(hl&&hl.pts){const p=$("rt"),wk=$("wk"),wf=$("wkf"),fs=$("fs"),bb=$("bb"),L=p.getTotalLength(),t0=performance.now(),dur=RM?0:Math.max(1200,Math.min(6500,L/70*1000));cancelAnimationFrame(anim);
-    const R=a=>`rotate(${a.toFixed(1)} 0 -6)`,A=a=>`rotate(${a.toFixed(1)} 0 -11.4)`,cx=(hl.r.x+hl.r.w/2)*S;let face=1,lastF=0,side=1;
+    const R=a=>`rotate(${a.toFixed(1)} 0 -6)`,A=a=>`rotate(${a.toFixed(1)} 0 -11.4)`,cx=hl.r?(hl.r.x+hl.r.w/2)*S:null;let face=1,lastF=0,side=1;
     const foot=(dist)=>{const a=p.getPointAtLength(Math.max(0,dist-.5)),b=p.getPointAtLength(Math.min(L,dist+.5)),ang=Math.atan2(b.y-a.y,b.x-a.x),q=p.getPointAtLength(dist);
       side=-side;const ox=-Math.sin(ang)*1.3*side,oy=Math.cos(ang)*1.3*side,e=document.createElementNS(NS,"ellipse");
       e.setAttribute("cx",(q.x+ox).toFixed(2));e.setAttribute("cy",(q.y+oy).toFixed(2));e.setAttribute("rx","1.3");e.setAttribute("ry",".75");e.setAttribute("fill","#ff6a13");e.setAttribute("opacity",".55");
@@ -261,10 +290,10 @@ function drawMap(hl){
     const step=t=>{const k=dur?Math.min(1,(t-t0)/dur):1,e=k<.08?k*k/.16:(k>.92?1-(1-k)*(1-k)/.16:k*1.0869-.0435),dist=L*Math.min(1,Math.max(0,e)),pt=p.getPointAtLength(dist),ah=p.getPointAtLength(Math.min(L,dist+2));
       if(Math.abs(ah.x-pt.x)>.3)face=ah.x>pt.x?1:-1;
       while(lastF+4.6<dist){lastF+=4.6;foot(lastF)}
-      if(k>=1)face=cx>=pt.x?1:-1;
+      if(k>=1&&cx!==null)face=cx>=pt.x?1:-1;
       wk.setAttribute("transform",`translate(${pt.x.toFixed(2)} ${pt.y.toFixed(2)})`);wf.setAttribute("transform",`scale(${1.35*face} 1.35)`);pose(dist/2.6,k<1);
       if(k<1)anim=requestAnimationFrame(step);
-      else{bb.setAttribute("transform",`translate(${(pt.x+4).toFixed(1)} ${Math.max(-8,pt.y-31).toFixed(1)})`);bb.setAttribute("opacity","1");if(!RM)bb.animate([{opacity:0},{opacity:1}],{duration:300});setTimeout(()=>zoomOn(hl,pt),RM?0:350)}};
+      else if(!hl.r){if(hl.onArrive)hl.onArrive()}else{if(hl.onArrive)hl.onArrive();bb.setAttribute("transform",`translate(${(pt.x+4).toFixed(1)} ${Math.max(-8,pt.y-31).toFixed(1)})`);bb.setAttribute("opacity","1");if(!RM)bb.animate([{opacity:0},{opacity:1}],{duration:300});setTimeout(()=>zoomOn(hl,pt),RM?0:350)}};
     anim=requestAnimationFrame(step)}
 }
 function drawPal(r){const f=$("front");f.setAttribute("viewBox","0 0 220 150");
@@ -301,24 +330,98 @@ function find(q){const n=norm(q);if(!n)return[];const w=n.split(" ");
   return prods.map(p=>{const h=norm(p.ad+" "+(p.kod||""));let s=0;for(const t of w){if(!h.includes(t))return null;s+=h.startsWith(t)?3:(h.includes(" "+t)?2:1)}return[s,p]}).filter(Boolean).sort((a,b)=>b[0]-a[0]).slice(0,8).map(x=>x[1])}
 const qi=$("q"),sug=$("sug");
 qi.addEventListener("input",()=>{const r=find(qi.value);if(!qi.value.trim()){sug.hidden=true;return}
-  sug.innerHTML=r.length?r.map(p=>`<li><button type="button" data-id="${esc(p.id)}"><span>${esc(p.ad)}</span><small>${esc(locTxt(p))}</small></button></li>`).join(""):`<li><button type="button" disabled><span>Bulunamadı</span><small>Aşağıdan ekleyebilirsin</small></button></li>`;sug.hidden=false});
+  sug.innerHTML=r.length?r.map(p=>`<li><button type="button" data-id="${esc(p.id)}"><span>${esc(p.ad)}</span><small>${esc(locTxt(p))}</small></button><button type="button" class="add" data-addid="${esc(p.id)}" aria-label="${esc(p.ad)} siparişe ekle">+ Sipariş</button></li>`).join(""):`<li><button type="button" disabled><span>Bulunamadı</span><small>Aşağıdan ekleyebilirsin</small></button></li>`;sug.hidden=false});
 qi.addEventListener("keydown",e=>{if(e.key==="Enter"){const r=find(qi.value);if(r[0])pick(r[0])}if(e.key==="Escape")sug.hidden=true});
-sug.addEventListener("click",e=>{const b=e.target.closest("button[data-id]");if(b)pick(prods.find(p=>String(p.id)===b.dataset.id))});
+sug.addEventListener("click",e=>{const a=e.target.closest("[data-addid]");if(a){addOrder(a.dataset.addid);a.textContent="Eklendi ✓";e.stopPropagation();return}const b=e.target.closest("button[data-id]");if(b)pick(prods.find(p=>String(p.id)===b.dataset.id))});
 document.addEventListener("click",e=>{if(!e.target.closest(".srch"))sug.hidden=true});
 function pick(p){if(!p)return;sug.hidden=true;qi.value=p.ad;qi.blur();show(p,true)}
-function show(p,go){cur=p;const r=rafBy(p.raf);const res=$("res");
+function show(p,go){if(PK&&!PK.fin&&go){PK=null;renderOrd()}cur=p;const r=rafBy(p.raf);const res=$("res");
   if(!r){res.innerHTML=`<div><div class="big">${esc(p.ad)}</div><p>“${esc(p.raf)}” adlı raf planda yok. Ürünün rafını düzelt ya da planı güncelle.</p></div>`;drawMap();return}
   const b=Math.min(Math.max(1,+p.bolme||1),len(r)),k=Math.min(Math.max(1,+p.kat||1),r.kat||1),pts=route(r,b);
-  res.innerHTML=`<div class="big">${esc(p.ad)}</div><div class="loc">${isPal(r)?`${esc(r.ad)} paleti · yerde`:`${esc(r.ad)} rafı · ${b}. bölme · ${k}. kat`}</div><p>${pts?`Girişten yaklaşık ${Math.max(0,pts.length-1)} adım kare. `:(isPal(r)?"Bu palete":"Bu rafa")+" giden yol bulunamadı, planı kontrol et. "}${p.adet!=null&&p.adet!==""?`Kayıtlı adet: ${esc(p.adet)}.`:""}${p.kod?` Kod: ${esc(p.kod)}.`:""}</p>`;
+  res.innerHTML=`<div class="big">${esc(p.ad)}</div><div class="loc">${isPal(r)?`${esc(r.ad)} paleti · yerde`:`${esc(r.ad)} rafı · ${b}. bölme · ${k}. kat`}</div><p>${pts?`Girişten yaklaşık ${Math.max(0,pts.length-1)} adım kare. `:(isPal(r)?"Bu palete":"Bu rafa")+" giden yol bulunamadı, planı kontrol et. "}${p.adet!=null&&p.adet!==""?`Kayıtlı adet: ${esc(p.adet)}.`:""}${p.kod?` Kod: ${esc(p.kod)}.`:""}</p><div class="acts"><button class="btn" type="button" data-resadd="${esc(p.id)}">+ Siparişe ekle</button></div>`;
   drawMap({r,b,pts:go?pts:pts});drawFront(r,b,k);
   if(go&&matchMedia("(max-width:760px)").matches)res.scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})}
+
+/* ---------- sipariş toplama ---------- */
+const OK="rafta-siparis";let ord=[],PK=null;
+try{ord=JSON.parse(localStorage.getItem(OK))||[]}catch(e){ord=[]}
+const saveOrd=()=>{try{localStorage.setItem(OK,JSON.stringify(ord))}catch(e){}};
+const prodById=id=>prods.find(p=>String(p.id)===String(id));
+function addOrder(id,adet){const p=prodById(id);if(!p)return;const o=ord.find(x=>String(x.pid)===String(id));if(o)o.adet=(+o.adet||1)+(adet||1);else ord.push({pid:p.id,adet:adet||1});saveOrd();renderOrd()}
+function renderOrd(){const L=ord.map(o=>({o,p:prodById(o.pid)})).filter(x=>x.p);
+  $("ordn").textContent=L.length?`· ${L.length} ürün`:"";$("o_go").disabled=!L.length||(!!PK&&!PK.fin);
+  $("ol").innerHTML=L.length?L.map(({o,p},i)=>{const st=PK?PK.state[String(o.pid)]||"":"";
+    return `<li class="${st}"><span class="n">${st==="done"?"✓":st==="skip"?"–":i+1}</span><span class="nm">${esc(p.ad)}<small>${esc(locTxt(p))}</small></span><input type="number" min="1" inputmode="numeric" aria-label="${esc(p.ad)} adet" data-q="${esc(o.pid)}" value="${esc(o.adet)}"><button class="x" type="button" data-rmo="${esc(o.pid)}" aria-label="${esc(p.ad)} siparişten çıkar">×</button></li>`}).join("")
+    :`<li style="display:block"><p class="oempty">Sipariş boş. Ürün ararken <b>+ Sipariş</b>'e bas ya da aşağıdan WhatsApp mesajını yapıştır.</p></li>`}
+$("ol").addEventListener("input",e=>{const q=e.target.dataset.q;if(!q)return;const o=ord.find(x=>String(x.pid)===q);if(o){o.adet=Math.max(1,+e.target.value||1);saveOrd()}});
+$("ol").addEventListener("click",e=>{const b=e.target.closest("[data-rmo]");if(!b||PK)return;ord=ord.filter(x=>String(x.pid)!==b.dataset.rmo);saveOrd();renderOrd()});
+$("o_clr").addEventListener("click",e=>{const b=e.currentTarget;if(!ord.length)return;if(!b.dataset.sure){b.dataset.sure=1;b.textContent="Emin misin?";setTimeout(()=>{b.textContent="Temizle";delete b.dataset.sure},3000);return}
+  delete b.dataset.sure;b.textContent="Temizle";ord=[];PK=null;saveOrd();renderOrd();drawMap()});
+$("res").addEventListener("click",e=>{const a=e.target.closest("[data-resadd]");if(a){addOrder(a.dataset.resadd);a.textContent="Siparişe eklendi ✓"}});
+
+/* WhatsApp metnini ayrıştır */
+const toks=t=>norm(t).replace(/(\d)([a-z])/g,"$1 $2").replace(/([a-z])(\d)/g,"$1 $2").replace(/[^a-z0-9.,]+/g," ").split(" ").filter(Boolean);
+function parseLine(line){let t=" "+norm(line)+" ",q=1,m;
+  if(m=t.match(/(\d+)\s*(adet|ad\b|ad\.|tane|tn\b|paket|pk\b|kutu|koli|kova|torba|rulo)/)){q=+m[1];t=t.replace(m[0]," ")}
+  else if(m=t.match(/^\s*(\d+)\s*[x×*\-]\s+/)){q=+m[1];t=t.replace(m[0]," ")}
+  else if(m=t.match(/\s[x×*]\s*(\d+)\s*$/)){q=+m[1];t=t.replace(m[0]," ")}
+  const lt=toks(t);if(!lt.length)return null;let best=null;
+  for(const p of prods){const pt=toks(p.ad+" "+(p.kod||""));const nameT=toks(p.ad);let hit=0;
+    for(const a of nameT)if(lt.some(b=>b===a||(a.length>=3&&b.length>=3&&(b.startsWith(a)||a.startsWith(b)))))hit++;
+    const kodHit=p.kod&&lt.includes(norm(p.kod))?1:0,sc=kodHit?1.5:hit/nameT.length;
+    if((hit>=1&&sc>=.5||kodHit)&&(!best||sc>best.sc||(sc===best.sc&&hit>best.hit)))best={p,sc,hit}}
+  return best?{p:best.p,q:Math.max(1,q||1)}:null}
+$("o_parse").addEventListener("click",()=>{const lines=$("o_txt").value.split(/\r?\n/).map(l=>l.replace(/^\s*(?:[-•*·]+|\d+[.)])\s+/,"").trim()).filter(l=>l.length>1);
+  if(!lines.length){$("o_msg").textContent="Önce sipariş mesajını yapıştır.";return}
+  let ok=0;const miss=[];for(const l of lines){const r=parseLine(l);if(r){addOrder(r.p.id,r.q);ok++}else miss.push(l)}
+  $("o_msg").textContent=`${ok} satır eklendi.`+(miss.length?` Bulunamayan: ${miss.slice(0,5).join(" | ")}${miss.length>5?"…":""}`:"");if(!miss.length)$("o_txt").value="";
+  $("ord").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})});
+
+/* rota */
+function bfs(sx,sy){const B=blocked(),C=plan.cols,Rw=plan.rows,s0=sx+","+sy,dist={[s0]:0},prev={[s0]:null},q=[[sx,sy]];
+  while(q.length){const [x,y]=q.shift(),k=x+","+y;for(const [dx,dy] of [[0,-1],[1,0],[-1,0],[0,1]]){const nx=x+dx,ny=y+dy,nk=nx+","+ny;if(nx<0||ny<0||nx>=C||ny>=Rw||B.has(nk)||nk in dist)continue;dist[nk]=dist[k]+1;prev[nk]=k;q.push([nx,ny])}}
+  return{dist,prev}}
+function pathFrom(a,b){const {prev}=bfs(a[0],a[1]),pts=[];let k=b[0]+","+b[1];if(!(k in prev))return null;for(;k;k=prev[k])pts.unshift(k.split(",").map(Number));return pts}
+function access(r,b){const B=blocked(),out=[];for(const [x,y] of segCells(r,b))for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx>=0&&ny>=0&&nx<plan.cols&&ny<plan.rows&&!B.has(nx+","+ny))out.push([nx,ny])}return out}
+function buildPick(){const G=[plan.giris.x,plan.giris.y],E=bfs(...G).dist,map={},bad=[];
+  for(const o of ord){const p=prodById(o.pid);if(!p)continue;const r=rafBy(p.raf);if(!r){bad.push(p.ad);continue}
+    const b=Math.min(Math.max(1,+p.bolme||1),len(r)),k=Math.min(Math.max(1,+p.kat||1),r.kat||1),key=r.ad+"|"+b;
+    if(!map[key]){let cell=null,bd=1e9;for(const c of access(r,b)){const d=E[c[0]+","+c[1]];if(d!=null&&d<bd){bd=d;cell=c}}if(!cell){bad.push(p.ad);continue}map[key]={r,b,k,cell,items:[]}}
+    map[key].items.push({p,adet:o.adet,k})}
+  const S=Object.values(map),nodes=[G,...S.map(s=>s.cell)],D=nodes.map(n=>{const d=bfs(n[0],n[1]).dist;return nodes.map(m=>d[m[0]+","+m[1]]??1e6)});
+  let left=S.map((_,i)=>i+1),cur=0,tour=[];while(left.length){left.sort((a,b)=>D[cur][a]-D[cur][b]);cur=left.shift();tour.push(cur)}
+  const cost=t=>{let c=0,a=0;for(const v of t){c+=D[a][v];a=v}return c+D[a][0]};let imp=true;
+  while(imp){imp=false;for(let i=0;i<tour.length-1;i++)for(let j=i+1;j<tour.length;j++){const t=[...tour.slice(0,i),...tour.slice(i,j+1).reverse(),...tour.slice(j+1)];if(cost(t)<cost(tour)-1e-9){tour=t;imp=true}}}
+  const stops=tour.map((v,i)=>({...S[v-1],n:i+1}));let full=[],pos=G;for(const st of [...stops,{cell:G}]){const seg=pathFrom(pos,st.cell)||[];full=full.concat(full.length?seg.slice(1):seg);pos=st.cell}
+  return{stops,i:0,pos:G,full,state:{},bad,steps:cost(tour)}}
+function mapStops(){return PK.stops.map((s,i)=>({r:s.r,b:s.b,n:s.n,state:i<PK.i?(s.items.every(x=>PK.state[String(x.p.id)]==="skip")?"skip":"done"):i===PK.i?"now":""}))}
+function runStop(){renderOrd();if(PK.i>=PK.stops.length)return finishPick();const s=PK.stops[PK.i],pts=pathFrom(PK.pos,s.cell);
+  for(const it of s.items)PK.state[String(it.p.id)]="now";renderOrd();
+  $("res").innerHTML=`<div class="big">Durak ${PK.i+1} / ${PK.stops.length}</div><div class="loc">${isPal(s.r)?`${esc(s.r.ad)} paleti · yerde`:`${esc(s.r.ad)} rafı · ${s.b}. bölme`}</div>
+    <ul class="stopl">${s.items.map(it=>`<li>${esc(it.p.ad)} — <b>${esc(it.adet)} adet</b>${isPal(s.r)?"":` <span style="color:var(--mut)">(${it.k}. kat)</span>`}</li>`).join("")}</ul>
+    <div class="acts"><button class="btn p" type="button" id="pk_ok">Aldım ✓ ${PK.i+1<PK.stops.length?"Sonraki durak":"Bitir"}</button><button class="btn" type="button" id="pk_skip">Bulamadım, atla</button><button class="btn" type="button" id="pk_end">Toplamayı bitir</button></div>`;
+  drawMap({r:s.r,b:s.b,pts,stops:mapStops(),full:PK.full});drawFront(s.r,s.b,s.items[0].k);
+  $("res").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})}
+function nextStop(stat){const s=PK.stops[PK.i];for(const it of s.items)PK.state[String(it.p.id)]=stat;PK.pos=s.cell;PK.i++;runStop()}
+function finishPick(){const done=Object.values(PK.state).filter(v=>v==="done").length,skip=Object.values(PK.state).filter(v=>v==="skip").length,pts=pathFrom(PK.pos,[plan.giris.x,plan.giris.y]);
+  const stops=PK.stops.map(s=>({r:s.r,b:s.b,n:s.n,state:s.items.every(x=>PK.state[String(x.p.id)]==="done")?"done":"skip"}));
+  $("res").innerHTML=`<div class="big">Sipariş toplandı</div><div class="loc">${done} ürün alındı${skip?` · ${skip} atlandı`:""}</div><p>Girişe dönüş yolu haritada.${skip?" Atlanan ürünler listede çizgisiz duruyor.":""}</p>
+    <div class="acts"><button class="btn p" type="button" id="pk_new">Yeni sipariş</button><button class="btn" type="button" id="pk_keep">Listeyi koru</button></div>`;
+  drawMap({pts:pts&&pts.length>1?pts:null,stops,full:PK.full});PK.fin=true;renderOrd()}
+$("o_go").addEventListener("click",()=>{if(!ord.length)return;PK=buildPick();
+  if(!PK.stops.length){$("res").innerHTML=`<div class="big">Rota çıkmadı</div><p>Siparişteki ürünlerin rafı planda yok: ${esc(PK.bad.join(", "))}</p>`;PK=null;return}
+  if(PK.bad.length)$("st").textContent=`Yeri bulunamayan: ${PK.bad.join(", ")}`;window.scrollTo({top:0,behavior:RM?"auto":"smooth"});runStop()});
+$("res").addEventListener("click",e=>{const t=e.target.closest("button");if(!t||!PK)return;
+  if(t.id==="pk_ok")nextStop("done");if(t.id==="pk_skip")nextStop("skip");if(t.id==="pk_end"){PK.i=PK.stops.length;for(const s of PK.stops)for(const it of s.items)if(!PK.state[String(it.p.id)]||PK.state[String(it.p.id)]==="now")PK.state[String(it.p.id)]="skip";finishPick()}
+  if(t.id==="pk_new"){ord=[];saveOrd();PK=null;renderOrd();$("res").innerHTML=`<div class="big">Yeni sipariş</div><p>Ürünleri arayıp <b>+ Sipariş</b>'e bas ya da WhatsApp mesajını yapıştır.</p>`;drawMap()}
+  if(t.id==="pk_keep"){PK=null;renderOrd()}});
 
 /* ---------- ürün listesi ---------- */
 function rafOpts(){const v=$("f_raf").value,o=a=>a.map(r=>`<option value="${esc(r.ad)}">${esc(r.ad)}${isPal(r)?" paleti":" rafı"}</option>`).join(""),pl=plan.raflar.filter(isPal);
   $("f_raf").innerHTML=`<optgroup label="Raflar">${o(plan.raflar.filter(r=>!isPal(r)))}</optgroup>`+(pl.length?`<optgroup label="Paletler">${o(pl)}</optgroup>`:"");if(v)$("f_raf").value=v;palForm()}
 function palForm(){const pal=isPal(rafBy($("f_raf").value));for(const id of ["f_bol","f_kat"])$(id).closest("label").hidden=pal}
 $("f_raf").addEventListener("change",palForm);
-function renderList(){rafOpts();const L=[...prods].sort((a,b)=>String(a.ad).localeCompare(String(b.ad),"tr"));
+function renderList(){rafOpts();if(typeof renderOrd==="function")try{renderOrd()}catch(e){}const L=[...prods].sort((a,b)=>String(a.ad).localeCompare(String(b.ad),"tr"));
   $("pl").innerHTML=L.length?L.map(p=>`<tr><td>${esc(p.ad)}</td><td>${esc(p.kod)}</td><td>${isPal(rafBy(p.raf))?esc(p.raf)+" paleti":`${esc(p.raf)} / ${esc(p.bolme)} / ${esc(p.kat)}`}</td><td class="n">${esc(p.adet)}</td><td><div class="acts"><button class="btn" data-go="${esc(p.id)}">Göster</button><button class="btn" data-ed="${esc(p.id)}">Düzenle</button><button class="btn" data-del="${esc(p.id)}">Sil</button></div></td></tr>`).join(""):`<tr><td colspan="5">Henüz ürün yok. Yukarıdaki formdan ilk ürünü ekle.</td></tr>`;
   $("st").textContent=(db?"Ortak depo kaydı":"Bu cihazda kayıtlı")+` · ${prods.length} ürün`}
 $("pl").addEventListener("click",async e=>{const t=e.target.closest("button");if(!t)return;const id=t.dataset.go||t.dataset.ed||t.dataset.del,p=prods.find(x=>String(x.id)===id);if(!p)return;
