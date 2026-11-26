@@ -64,7 +64,7 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
 #splash.out{opacity:0;transform:translateY(-24px);pointer-events:none}
 #splash.kepenk::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,#f4f5f7 0 15px,#c3c9d1 15px 17px,#e4e7eb 17px 19px);mix-blend-mode:multiply;opacity:0;animation:kp .35s ease-out forwards}
 #splash.kepenk::after{content:"";position:absolute;left:0;right:0;bottom:14px;height:12px;background:linear-gradient(#8a929c,#5b636d);box-shadow:0 -1px 0 #ffffff55 inset;opacity:0;animation:kp .35s ease-out forwards}
-#splash.kepenk{animation:tit .32s .3s ease-in-out}
+#splash{will-change:transform}#splash.kepenk::before,#splash.kepenk::after{animation-duration:.5s}
 #splash.kalk{transform:translateY(-104%);transition:transform 1s cubic-bezier(.55,0,.2,1);pointer-events:none}
 @keyframes kp{to{opacity:1}}@keyframes tit{30%{transform:translateY(3px)}60%{transform:translateY(-2px)}}
 #splash svg{width:min(46vw,190px);height:auto;overflow:visible}
@@ -319,8 +319,6 @@ function drawMap(hl){
     <rect x="${x+.6}" y="${y+.6}" width="${w-1.2}" height="${h-1.2}" rx="1" fill="var(--rack)" stroke="${act?"#058a8e":"none"}" stroke-width="1.4"/>`;
     if(cift(r))g+=vert(r)?`<line x1="${x+w/2}" x2="${x+w/2}" y1="${y+1.5}" y2="${y+h-1.5}" stroke="#ffffff66" stroke-width=".6" stroke-dasharray="2 1.2"/>`:`<line y1="${y+h/2}" y2="${y+h/2}" x1="${x+1.5}" x2="${x+w-1.5}" stroke="#ffffff66" stroke-width=".6" stroke-dasharray="2 1.2"/>`;
     for(let i=1;i<n;i++){const o=Math.floor(i*L/n)*S;g+=vert(r)?`<line x1="${x+1}" x2="${x+w-1}" y1="${y+o}" y2="${y+o}" stroke="#fff4" stroke-width=".5"/>`:`<line y1="${y+1}" y2="${y+h-1}" x1="${x+o}" x2="${x+o}" stroke="#fff4" stroke-width=".5"/>`}
-    for(let i=0;i<r.w;i++)for(let j=0;j<r.h;j++){const cx=r.x+i,cy=r.y+j;if(!occ.has(cx+","+cy))continue;const bx=cx*S,by=cy*S,v=(cx*7+cy*3)%3;
-      g+=`<rect x="${bx+1.9}" y="${by+2}" width="${v?6.2:5.4}" height="${v===2?5.6:6.2}" rx=".5" fill="${["#d9b07a","#e3bf8c","#cfa268"][v]}" stroke="#8d6533" stroke-width=".3"/><line x1="${bx+1.9+(v?3.1:2.7)}" x2="${bx+1.9+(v?3.1:2.7)}" y1="${by+2}" y2="${by+(v===2?7.6:8.2)}" stroke="#f5e6c8" stroke-width=".6"/>`}
     g+=`<text x="${x+w/2}" y="${y+h/2+2.6}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="#fff" stroke="#0008" stroke-width=".4" paint-order="stroke">${esc(r.ad)}</text>`}
   for(const d of plan.kapilar||[]){if(d.kenar==="r"){const x=(d.x+1)*S,y=d.y*S,h=(d.h||1)*S,vy=y+h/2;
       g+=`<line x1="${x}" x2="${x}" y1="${y}" y2="${y+h}" stroke="#04585b" stroke-width="3"/><line class="kayan" x1="${x}" x2="${x}" y1="${y}" y2="${y+h}" stroke="#7fd3d6" stroke-width="3" stroke-dasharray="3 3"/>
@@ -439,7 +437,8 @@ $("zoutb").addEventListener("click",()=>{follow=false;zoomBy(1/1.6,null,null,RM?
   m.addEventListener("wheel",e=>{if(!e.ctrlKey&&curVB()[2]>=VB[2]*.98)return;e.preventDefault();const [x,y]=toSvg(e.clientX,e.clientY);follow=false;zoomBy(e.deltaY<0?1.15:1/1.15,x,y,0)},{passive:false});
   m.addEventListener("dblclick",e=>{const [x,y]=toSvg(e.clientX,e.clientY);zoomBy(2,x,y,RM?0:250)})}
 {const sp=$("splash"),bye=()=>{if(!sp||sp.dataset.k)return;sp.dataset.k=1;if(RM){sp.classList.add("out");setTimeout(()=>sp.remove(),400);return}
-    sp.classList.add("kepenk");setTimeout(()=>{sp.style.pointerEvents="none";const an=sp.animate([{transform:"translateY(0)"},{transform:"translateY(2.5%)",offset:.12},{transform:"translateY(-104%)"}],{duration:1150,easing:"cubic-bezier(.5,0,.25,1)",fill:"forwards"});an.onfinish=()=>sp.remove()},650);setTimeout(()=>{if(sp.isConnected)sp.remove()},2600)};
+    sp.classList.add("kepenk");setTimeout(()=>{sp.style.pointerEvents="none";const an=sp.animate([{transform:"translate3d(0,0,0)"},{transform:"translate3d(0,-102%,0)"}],{duration:1300,easing:"cubic-bezier(.65,0,.3,1)",fill:"forwards"});
+      for(const el of document.querySelectorAll("body>header,body>main"))el.animate([{opacity:.55,transform:"scale(.985)"},{opacity:1,transform:"none"}],{duration:1100,delay:250,easing:"cubic-bezier(.3,.6,.3,1)",fill:"backwards"});an.onfinish=()=>sp.remove()},700);setTimeout(()=>{if(sp.isConnected)sp.remove()},2900)};
   let seen=false;try{seen=sessionStorage.getItem("dbsplash")==="1";sessionStorage.setItem("dbsplash","1")}catch(e){}
   if(sp){if(seen)sp.remove();else{sp.addEventListener("click",bye);setTimeout(bye,RM?600:2300)}}}
 
