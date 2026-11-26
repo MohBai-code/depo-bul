@@ -133,12 +133,6 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
     </div>
     <p class="note" id="o_sort" style="margin:-2px 4px 8px" hidden></p>
     <ol id="ol"></ol>
-    <details id="o_pd" style="margin:6px 0 0;padding:0 4px;background:none">
-      <summary style="font-size:19px">WhatsApp siparişini yapıştır</summary>
-      <p class="note">Gelen sipariş mesajını olduğu gibi yapıştır. Her satır bir ürün: "dübel 8mm 50 adet", "3 x silikon şeffaf" gibi.</p>
-      <textarea id="o_txt" rows="5" placeholder="Sipariş mesajını buraya yapıştır"></textarea>
-      <div class="acts" style="margin:10px 0 12px"><button class="btn p" type="button" id="o_parse">Siparişe ekle</button><span class="note" id="o_msg" aria-live="polite"></span></div>
-    </details>
   </section>
 
   <details id="pd">
@@ -392,7 +386,7 @@ function renderOrd(){const L=ord.map(o=>({o,p:prodById(o.pid)})).filter(x=>x.p);
   $("ordn").textContent=L.length?`· ${L.length} ürün`:"";$("o_sort").hidden=L.length<2;$("o_sort").textContent=`Liste en kısa toplama sırasına dizildi: girişten başlıyor, ${endAd()} bitiyor.`;for(const i of document.querySelectorAll("[name=bitis]")){i.checked=i.value===bitis;i.disabled=!!PK&&!PK.fin}$("o_go").disabled=!L.length||(!!PK&&!PK.fin);
   $("ol").innerHTML=L.length?L.map(({o,p},i)=>{const st=PK?PK.state[String(o.pid)]||"":"";
     return `<li class="${st}"><span class="n">${st==="done"?"✓":st==="skip"?"–":i+1}</span><span class="nm">${esc(p.ad)}<small>${esc(locTxt(p))}</small></span><input type="number" min="1" inputmode="numeric" aria-label="${esc(p.ad)} adet" data-q="${esc(o.pid)}" value="${esc(o.adet)}"><button class="x" type="button" data-rmo="${esc(o.pid)}" aria-label="${esc(p.ad)} siparişten çıkar">×</button></li>`}).join("")
-    :`<li style="display:block"><p class="oempty">Sipariş boş. Ürün ararken <b>+ Sipariş</b>'e bas ya da aşağıdan WhatsApp mesajını yapıştır.</p></li>`}
+    :`<li style="display:block"><p class="oempty">Sipariş boş. Ürün ararken çıkan listede <b>+ Sipariş</b>'e ya da ürün kartındaki <b>+ Siparişe ekle</b>'ye bas.</p></li>`}
 for(const i of document.querySelectorAll("[name=bitis]"))i.addEventListener("change",()=>{if(!i.checked)return;bitis=i.value;try{localStorage.setItem("rafta-bitis",bitis)}catch(e){}
   if(bitis==="sevk"&&!sevkCell())$("st").textContent="Planda araç kapısı yok, toplama girişte bitecek";sortOrd();saveOrd();renderOrd()});
 $("ol").addEventListener("input",e=>{const q=e.target.dataset.q;if(!q)return;const o=ord.find(x=>String(x.pid)===q);if(o){o.adet=Math.max(1,+e.target.value||1);saveOrd()}});
@@ -413,11 +407,6 @@ function parseLine(line){let t=" "+norm(line)+" ",q=1,m;
     const kodHit=p.kod&&lt.includes(norm(p.kod))?1:0,sc=kodHit?1.5:hit/nameT.length;
     if((hit>=1&&sc>=.5||kodHit)&&(!best||sc>best.sc||(sc===best.sc&&hit>best.hit)))best={p,sc,hit}}
   return best?{p:best.p,q:Math.max(1,q||1)}:null}
-$("o_parse").addEventListener("click",()=>{const lines=$("o_txt").value.split(/\r?\n/).map(l=>l.replace(/^\s*(?:[-•*·]+|\d+[.)])\s+/,"").trim()).filter(l=>l.length>1);
-  if(!lines.length){$("o_msg").textContent="Önce sipariş mesajını yapıştır.";return}
-  let ok=0;const miss=[];bulk=true;for(const l of lines){const r=parseLine(l);if(r){addOrder(r.p.id,r.q);ok++}else miss.push(l)}bulk=false;sortOrd();saveOrd();renderOrd();
-  $("o_msg").textContent=`${ok} satır eklendi.`+(miss.length?` Bulunamayan: ${miss.slice(0,5).join(" | ")}${miss.length>5?"…":""}`:"");if(!miss.length)$("o_txt").value="";
-  $("ord").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})});
 
 /* rota */
 function bfs(sx,sy){const B=blocked(),C=plan.cols,Rw=plan.rows,s0=sx+","+sy,dist={[s0]:0},prev={[s0]:null},q=[[sx,sy]];
@@ -455,7 +444,7 @@ $("o_go").addEventListener("click",()=>{if(!ord.length)return;PK=buildPick();
   if(PK.bad.length)$("st").textContent=`Yeri bulunamayan: ${PK.bad.join(", ")}`;window.scrollTo({top:0,behavior:RM?"auto":"smooth"});runStop()});
 $("res").addEventListener("click",e=>{const t=e.target.closest("button");if(!t||!PK)return;
   if(t.id==="pk_ok")nextStop("done");if(t.id==="pk_skip")nextStop("skip");if(t.id==="pk_end"){PK.i=PK.stops.length;for(const s of PK.stops)for(const it of s.items)if(!PK.state[String(it.p.id)]||PK.state[String(it.p.id)]==="now")PK.state[String(it.p.id)]="skip";finishPick()}
-  if(t.id==="pk_new"){ord=[];saveOrd();PK=null;renderOrd();$("res").innerHTML=`<div class="big">Yeni sipariş</div><p>Ürünleri arayıp <b>+ Sipariş</b>'e bas ya da WhatsApp mesajını yapıştır.</p>`;drawMap()}
+  if(t.id==="pk_new"){ord=[];saveOrd();PK=null;renderOrd();$("res").innerHTML=`<div class="big">Yeni sipariş</div><p>Ürünleri arayıp <b>+ Sipariş</b>'e bas.</p>`;drawMap()}
   if(t.id==="pk_keep"){PK=null;renderOrd()}});
 
 /* ---------- ürün listesi ---------- */
