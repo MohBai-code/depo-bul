@@ -98,6 +98,10 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
 #ol li .x{all:unset;width:44px;height:40px;display:grid;place-items:center;font-size:22px;color:var(--mut);cursor:pointer;border-radius:8px}#ol li .x:focus-visible{outline:3px solid var(--org)}
 .oempty{color:var(--mut);padding:6px 4px 10px;margin:0}
 #o_txt{width:100%;font:15px/1.4 Barlow,sans-serif;padding:10px;border-radius:8px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.rk{flex-basis:100%;margin:4px 0 0}.rk h3{font:800 19px "Barlow Condensed",Barlow,sans-serif;margin:12px 0 4px;color:var(--yel)}
+.rk ul{list-style:none;margin:0;padding:0}.rk li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.rk .w{font-size:13px;color:var(--mut);display:block}.rk .nm{font-size:17px}.rk .acts{flex-basis:auto;flex-wrap:nowrap}.rk .acts .btn{min-height:40px;padding:4px 10px;font-size:14px}
+.rk .bos{color:var(--mut);margin:6px 0}.mapnote{margin:8px 4px 0;font-size:13px;color:var(--mut)}#map{cursor:pointer}
 .stopl{margin:6px 0 4px;padding:0;list-style:none;flex-basis:100%}.stopl li{font-size:18px;padding:2px 0}.stopl b{color:var(--org);white-space:nowrap}
 .res .acts{flex-basis:100%}
 .btn:disabled{opacity:.45;cursor:not-allowed}
@@ -121,7 +125,7 @@ th{font-size:13px;color:var(--mut);font-weight:600}td.n{text-align:right;white-s
 <main>
   <div class="res" id="res"><div><div class="big">Ne arıyorsun?</div><p>Ürünü yaz, depodaki yerini girişten başlayarak göstereyim.</p></div></div>
   <div class="grid">
-    <div class="card mapc"><h2>Depo planı</h2><button id="zout" type="button" hidden>Tüm depoyu göster</button><div id="phint" hidden><span>Paleti koymak istediğin yere dokun</span><button class="btn" type="button" id="p_cancel">Vazgeç</button></div><div class="mapw"><svg id="map" role="img" aria-label="Depo kuşbakışı plan"></svg></div></div>
+    <div class="card mapc"><h2>Depo planı</h2><button id="zout" type="button" hidden>Tüm depoyu göster</button><div id="phint" hidden><span>Paleti koymak istediğin yere dokun</span><button class="btn" type="button" id="p_cancel">Vazgeç</button></div><div class="mapw"><svg id="map" role="img" aria-label="Depo kuşbakışı plan"></svg></div><p class="mapnote">İçinde ne olduğunu görmek için bir rafa ya da palete dokun.</p></div>
     <div class="card"><h2 id="fh">Raf önü</h2><svg id="front" role="img" aria-label="Rafın önden görünümü"></svg><p class="note" id="fn">Bir ürün seçince rafın hangi katında ve bölmesinde olduğu burada yanıp söner.</p></div>
   </div>
 
@@ -288,7 +292,8 @@ function drawMap(hl){
   const gx=plan.giris.x*S,gy=plan.giris.y*S;
   g+=`<rect x="${gx-S}" y="${gy+S-1.5}" width="${S*3}" height="3" fill="url(#hz)"/><text x="${gx+S/2}" y="${gy+S+8}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="7" fill="var(--ink)">GİRİŞ</text>`;
   if(hl){if(hl.full&&hl.full.length>1)g+=`<path d="${hl.full.map(([x,y],i)=>(i?"L":"M")+(x*S+S/2)+" "+(y*S+S/2)).join(" ")}" fill="none" stroke="#058a8e" stroke-width="1.3" stroke-dasharray="1.2 2.6" stroke-linecap="round" opacity=".6"/>`;
-    if(hl.r)for(const [cx,cy] of segCells(hl.r,hl.b,hl.t))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#ff6a13"/>`;
+    if(hl.all){for(const q of rackItems(hl.r)){const t=tOf(q,hl.r);for(const [cx,cy] of segCells(hl.r,+q.bolme||1,t))g+=`<rect x="${cx*S+1.6}" y="${cy*S+1.6}" width="${S-3.2}" height="${S-3.2}" rx="1" fill="#058a8e" opacity=".85"/>`}}
+    else if(hl.r)for(const [cx,cy] of segCells(hl.r,hl.b,hl.t))g+=`<rect class="pulse" x="${cx*S+.8}" y="${cy*S+.8}" width="${S-1.6}" height="${S-1.6}" rx="1" fill="#ff6a13"/>`;
     for(const st of hl.stops||[]){const c=segCells(st.r,st.b,st.t);let sx=0,sy=0;for(const [x,y] of c){sx+=x*S+S/2;sy+=y*S+S/2}sx/=c.length;sy/=c.length;
       g+=`<g><circle cx="${sx}" cy="${sy}" r="4.4" fill="${st.state==="done"?"#6b8f71":st.state==="skip"?"#8a8f96":st.state==="now"?"#ff6a13":"#058a8e"}" stroke="#fff" stroke-width=".9"/><text x="${sx}" y="${sy+2.1}" text-anchor="middle" font-family="Barlow Condensed,Barlow,sans-serif" font-weight="800" font-size="5.6" fill="#fff">${st.state==="done"?"✓":st.n}</text></g>`}
     if(hl.pts){const d=hl.pts.map(([x,y],i)=>(i?"L":"M")+(x*S+S/2)+" "+(y*S+S/2)).join(" ");
@@ -323,6 +328,15 @@ function drawMap(hl){
       else if(!hl.r){if(hl.onArrive)hl.onArrive()}else{if(hl.onArrive)hl.onArrive();bb.setAttribute("transform",`translate(${(pt.x+4).toFixed(1)} ${Math.max(-8,pt.y-31).toFixed(1)})`);bb.setAttribute("opacity","1");if(!RM)bb.animate([{opacity:0},{opacity:1}],{duration:300});setTimeout(()=>zoomOn(hl,pt),RM?0:350)}};
     anim=requestAnimationFrame(step)}
 }
+function drawRackFront(r,t){if(isPal(r)){drawPal(r);$("fn").textContent=`${rackItems(r).length} ürün bu paletin üzerinde.`;return}
+  const n=len(r),K=r.kat||4,cw=28,kh=30,W=n*cw+24,H=K*kh+34,f=$("front"),its=rackItems(r).filter(p=>!cift(r)||tOf(p,r)===t),cnt={};
+  for(const p of its){const k=Math.min(Math.max(1,+p.bolme||1),n)+"|"+Math.min(Math.max(1,+p.kat||1),K);cnt[k]=(cnt[k]||0)+1}
+  f.setAttribute("viewBox",`0 0 ${W} ${H}`);let g=`<rect x="6" y="6" width="5" height="${H-14}" fill="var(--rack)"/><rect x="${W-11}" y="6" width="5" height="${H-14}" fill="var(--rack)"/>`;
+  for(let i=0;i<K;i++){const y=6+(K-1-i)*kh;g+=`<rect x="6" y="${y+kh-4}" width="${W-12}" height="4" fill="var(--rack)"/><text x="${W-2}" y="${y+kh-8}" font-size="8" text-anchor="end" fill="var(--mut)" font-family="Barlow">${i+1}</text>`;
+    for(let j=0;j<n;j++){const x=12+j*cw,c=cnt[(j+1)+"|"+(i+1)]||0,bh=c?kh-9:10+((i*7+j*5)%9);
+      g+=`<rect x="${x+3}" y="${y+kh-4-bh}" width="${cw-6}" height="${bh}" rx="1.5" fill="${c?"#058a8e":"color-mix(in srgb,var(--mut) 25%,transparent)"}"/>`+(c?`<text x="${x+cw/2}" y="${y+kh-10}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Barlow">${c}</text>`:"")}}
+  for(let j=0;j<n;j++)g+=`<text x="${12+j*cw+cw/2}" y="${H-4}" font-size="8" text-anchor="middle" fill="var(--mut)" font-family="Barlow">${j+1}</text>`;
+  f.innerHTML=g;$("fh").textContent=`${r.ad} rafı · ${t?tarafAd(r,t):"önden"}`;$("fn").textContent=`Turkuaz kutular dolu yerler, üstündeki sayı oradaki ürün çeşidi. Alttaki sayılar bölme, sağdakiler kat.`}
 function drawPal(r){const f=$("front");f.setAttribute("viewBox","0 0 220 150");
   let g=`<rect x="20" y="128" width="180" height="6" rx="1.5" fill="#9c6a32"/>${[24,102,180].map(x=>`<rect x="${x}" y="134" width="16" height="10" rx="1" fill="#7a4f1f"/>`).join("")}<rect x="20" y="144" width="180" height="4" rx="1" fill="#9c6a32"/>`;
   const B=[[26,96,54,32],[83,96,54,32],[140,96,54,32],[34,62,50,34],[87,62,50,34],[140,66,46,30],[52,30,58,32],[113,34,52,28]];
@@ -351,6 +365,23 @@ $("zout").addEventListener("click",()=>{zoomTo(VB,RM?0:700);$("zout").hidden=tru
 {const sp=$("splash"),bye=()=>{if(!sp||sp.classList.contains("out"))return;sp.classList.add("out");setTimeout(()=>sp.remove(),500)};
   let seen=false;try{seen=sessionStorage.getItem("dbsplash")==="1";sessionStorage.setItem("dbsplash","1")}catch(e){}
   if(sp){if(seen)sp.remove();else{sp.addEventListener("click",bye);setTimeout(bye,RM?600:2600)}}}
+
+/* ---------- rafa dokun, içini gör ---------- */
+const rackItems=r=>prods.filter(p=>rafBy(p.raf)===r);
+function zoomRack(r){const S=10,z0=matchMedia("(max-width:760px)").matches?3:2.4,z=Math.max(1,Math.min(z0,VB[2]/(r.w*S+70),VB[3]/(r.h*S+70))),w=VB[2]/z,h=VB[3]/z,cx=(r.x+r.w/2)*S,cy=(r.y+r.h/2)*S,
+  cl=(v,a,b)=>Math.max(a,Math.min(b,v));if(z<=1.05)return;zoomTo([cl(cx-w/2,VB[0],VB[0]+VB[2]-w),cl(cy-h/2,VB[1],VB[1]+VB[3]-h),w,h],RM?0:800);$("zout").hidden=false}
+function showRack(r,t){cur=null;const its=rackItems(r),pal=isPal(r),sides=cift(r)?[1,2]:[undefined];t=cift(r)?(t||1):undefined;
+  const row=p=>`<li><span><span class="w">${pal?"Palet üstü":`${Math.min(Math.max(1,+p.bolme||1),len(r))}. bölme · ${Math.min(Math.max(1,+p.kat||1),r.kat||1)}. kat`}</span><span class="nm">${esc(p.ad)}</span>${p.adet!==""&&p.adet!=null?` <span class="w" style="display:inline">· ${esc(p.adet)} adet</span>`:""}</span>
+    <span class="acts"><button class="btn" type="button" data-show="${esc(p.id)}">Göster</button><button class="btn" type="button" data-resadd="${esc(p.id)}">+ Sipariş</button></span></li>`;
+  const sort=a=>a.sort((x,y)=>(+x.bolme||1)-(+y.bolme||1)||(+y.kat||1)-(+x.kat||1)||String(x.ad).localeCompare(String(y.ad),"tr"));
+  const body=sides.map(sd=>{const L=sort(its.filter(p=>sd===undefined||tOf(p,r)===sd));
+    return `${sd?`<h3>${tarafAd(r,sd).replace(/^./,c=>c.toLocaleUpperCase("tr"))} <span class="w" style="display:inline">· ${L.length} ürün</span></h3>`:""}${L.length?`<ul>${L.map(row).join("")}</ul>`:`<p class="bos">${sd?"Bu tarafa":pal?"Bu palete":"Bu rafa"} henüz ürün girilmemiş.</p>`}
+      ${sd?`<div class="acts" style="margin:6px 0 2px"><button class="btn" type="button" data-side="${sd}">${tarafAd(r,sd).replace(/^./,c=>c.toLocaleUpperCase("tr"))}ı önden göster</button></div>`:""}`}).join("");
+  $("res").innerHTML=`<div class="big">${esc(r.ad)} ${pal?"paleti":"rafı"}</div><div class="loc">${pal?"Yerde duran palet":`${len(r)} bölme · ${r.kat||1} kat${cift(r)?" · çift taraflı":""}`} · ${its.length} ürün</div><div class="rk" data-raf="${esc(r.ad)}">${body}</div>`;
+  drawMap({r,all:true});zoomRack(r);drawRackFront(r,t);
+  if(matchMedia("(max-width:760px)").matches)$("res").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})}
+$("res").addEventListener("click",e=>{const s=e.target.closest("[data-show]");if(s){const p=prodById(s.dataset.show);if(p){qi.value=p.ad;show(p,true)}return}
+  const d=e.target.closest("[data-side]");if(d){const r=rafBy(e.target.closest("[data-raf]").dataset.raf);if(r){drawRackFront(r,+d.dataset.side);if(matchMedia("(max-width:760px)").matches)$("front").scrollIntoView({behavior:RM?"auto":"smooth",block:"center"})}}});
 
 /* ---------- arama ---------- */
 function find(q){const n=norm(q);if(!n)return[];const w=n.split(" ");
@@ -482,7 +513,10 @@ function reachAll(){for(const r of plan.raflar)for(let b=1;b<=len(r);b++)for(con
 function setPlacing(on){$("phint").hidden=!on;document.querySelector(".mapc").classList.toggle("placing",on);if(on){cur=null;drawMap();document.querySelector(".mapc").scrollIntoView({behavior:RM?"auto":"smooth",block:"center"})}}
 $("p_add").addEventListener("click",()=>{plan=readPlanForm();setPlacing(true)});
 $("p_cancel").addEventListener("click",()=>setPlacing(false));
-$("map").addEventListener("click",async e=>{if($("phint").hidden)return;const m=$("map"),pt=m.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(m.getScreenCTM().inverse()),x=Math.floor(q.x/10),y=Math.floor(q.y/10);
+$("map").addEventListener("click",async e=>{const m=$("map"),pt=m.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(m.getScreenCTM().inverse()),x=Math.floor(q.x/10),y=Math.floor(q.y/10);
+  if($("phint").hidden){if(PK&&!PK.fin)return;const hit=r=>x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h;let r=plan.raflar.find(hit);
+    if(!r){const fx=q.x/10,fy=q.y/10;let best=null,bd=.9;for(const c of plan.raflar){const dx=Math.max(c.x-fx,0,fx-(c.x+c.w)),dy=Math.max(c.y-fy,0,fy-(c.y+c.h)),d=Math.hypot(dx,dy);if(d<bd){bd=d;best=c}}r=best}
+    if(r){let t;if(cift(r))t=vert(r)?(q.x/10<r.x+r.w/2?1:2):(q.y/10<r.y+r.h/2?1:2);showRack(r,t)}return}
   const O=outside(),B=blocked();if(x<0||y<0||x>=plan.cols||y>=plan.rows||O.has(x+","+y)){$("st").textContent="Oraya palet konamaz: depo dışı";return}
   if(B.has(x+","+y)){$("st").textContent="Orada zaten raf ya da palet var";return}
   if(x===plan.giris.x&&y===plan.giris.y){$("st").textContent="Girişin önüne palet konamaz";return}
