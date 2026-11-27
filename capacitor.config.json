@@ -1,1 +1,1 @@
-{"appId": "com.alianil.depobul", "appName": "Koray - Rafta", "webDir": "www"}
+{"appId": "com.alianil.depobul", "appName": "Koray - Rafta", "webDir": "www", "plugins": {"PushNotifications": {"presentationOptions": ["sound", "alert"]}}}

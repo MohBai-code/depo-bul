@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "547988807383",
+    "project_id": "koray-rafta",
+    "storage_bucket": "koray-rafta.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547988807383:android:3dd6c3dabbcb70f0555a92",
+        "android_client_info": {
+          "package_name": "com.alianil.depobul"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvS4K1EDl3ggsbfzpe8i7-SvM6DlAMzVo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

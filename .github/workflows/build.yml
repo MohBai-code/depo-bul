@@ -27,6 +27,19 @@ jobs:
         run: npm install
       - name: Android projesini olustur
         run: npx cap add android
+      - name: Bildirim ayarlari (Firebase)
+        run: |
+          cp google-services.json android/app/google-services.json
+          mkdir -p android/app/src/main/res/drawable
+          cat > android/app/src/main/res/drawable/ic_stat_rafta.xml <<'XML'
+          <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+            <path android:fillColor="#FFFFFFFF" android:pathData="M3,3h2v18H3zM19,3h2v18h-2zM5,6h14v2H5zM5,12h14v2H5zM5,18h14v2H5zM7,9h4v3H7zM13,15h4v3h-4z"/>
+          </vector>
+          XML
+          sed -i 's#</application>#<meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_rafta"/><meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/rafta_renk"/><meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="sorular"/></application>#' android/app/src/main/AndroidManifest.xml
+          mkdir -p android/app/src/main/res/values
+          printf '<?xml version="1.0" encoding="utf-8"?>\n<resources><color name="rafta_renk">#058a8e</color></resources>\n' > android/app/src/main/res/values/rafta_renk.xml
+          grep -c ic_stat_rafta android/app/src/main/AndroidManifest.xml
       - name: Uygulama simgesi
         continue-on-error: true
         run: npx @capacitor/assets generate --android --iconBackgroundColor '#058a8e' --splashBackgroundColor '#ffffff'

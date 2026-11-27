@@ -174,6 +174,7 @@ summary .lk svg{width:12px;height:12px}.acik summary .lk{background:color-mix(in
 .sqh{display:flex;align-items:center;gap:8px;justify-content:space-between}.sqh small{color:var(--mut);font-size:13px}
 .sqb{font:800 14px "Barlow Condensed",Barlow,sans-serif;padding:3px 10px;border-radius:999px;background:#ff6a13;color:#fff}.sqb.bek{background:var(--yel)}.sqb.var{background:#2e9e5b}.sqb.yok{background:#c2410c}
 .sqn{font:800 24px/1.1 "Barlow Condensed",Barlow,sans-serif}.sqy{color:var(--mut);font-size:15px;display:flex;align-items:center;gap:6px}
+.bilbar{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--yel) 12%,var(--card,var(--bg)));border:2px solid color-mix(in srgb,var(--yel) 45%,transparent)}.bilbar[hidden]{display:none}.bilbar>span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}.bilbar small{opacity:.75;font-size:13px}.bili{font-size:22px}.bilx{background:none;border:0;color:inherit;font-size:24px;line-height:1;padding:6px 8px;cursor:pointer;opacity:.6}
 .sqa{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.sqa input{width:92px;min-height:44px}.sqa .btn.yok{border-color:#c2410c;color:#c2410c}
 .nokta{width:9px;height:9px;border-radius:50%;background:var(--yel);animation:pl .8s ease-in-out infinite alternate}
 .sorbtn{border-color:#ff6a13;color:#ff6a13}
@@ -195,6 +196,7 @@ summary .lk svg{width:12px;height:12px}.acik summary .lk{background:color-mix(in
 <div id="pinm" hidden><div class="pinb" role="dialog" aria-modal="true" aria-labelledby="pint" id="pinb"></div></div>
 <main>
   <section id="soruP" aria-live="polite" hidden></section>
+  <div id="bilBar" class="bilbar" hidden><span class="bili" aria-hidden="true">🔔</span><span><b>Bildirimleri aç</b><small>"Var mı?" soruları ve cevapları telefon kilitliyken de gelsin.</small></span><button class="btn p" type="button" id="bilAc">Aç</button><button class="bilx" type="button" id="bilKapat" aria-label="Şimdilik kapat">×</button></div>
   <div class="res" id="res"><div class="hosg"><div><div class="big">Ne arıyorsun?</div><p>Ürünü yaz, depodaki yerini girişten başlayarak göstereyim.</p><div class="adim"><span>1 · Yaz</span><span>2 · Seç</span><span>3 · Rafa yürü</span></div></div>
     <svg viewBox="0 0 96 76" aria-hidden="true"><rect x="40" y="8" width="5" height="62" rx="1.5" fill="#2c4f9a"/><rect x="88" y="8" width="5" height="62" rx="1.5" fill="#2c4f9a"/>
     <rect x="42" y="27" width="49" height="3.5" rx="1" fill="#f28c28"/><rect x="42" y="49" width="49" height="3.5" rx="1" fill="#f28c28"/><rect x="38" y="69" width="58" height="2" fill="#c9c5bb"/>
@@ -835,7 +837,7 @@ function bip(tip){try{navigator.vibrate&&navigator.vibrate(tip==="soru"?[120,80,
 function adSor(cb){pencere(`<h3 id="pint">Adın ne?</h3><p>Sorularda ve cevaplarda bu ad görünecek. Bir kez soruyorum.</p><input id="pin1" maxlength="20" placeholder="Örn. Ali, Tezgâh, Mehmet" style="letter-spacing:0;font-size:20px"><p class="pine"></p><div class="acts"><button class="btn p" type="button">Tamam</button><button class="btn" type="button" data-k="iptal">Vazgeç</button></div>`);
   PB().querySelector("[data-k=iptal]").onclick=pinKapat;PB().querySelector(".btn.p").onclick=()=>{const a=$("pin1").value.trim();if(a.length<2)return hata("Adını yaz.");try{localStorage.setItem("rafta-ad",a)}catch(e){}pinKapat();cb(a)}}
 function soruSor(p){if(!bulutUrl()){toast("Bunun için bulut bağlantısı gerekiyor");return}const go=ad=>{const id="q"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
-    s={id,urunId:String(p.id),urun:p.ad,yer:locTxt(p),soran:ad};benim.add(id);benimKaydet();SOR.unshift({...s,zaman:Date.now()+saatFark,durum:"bekliyor",adet:"",cevaplayan:""});sorOnceki[id]="bekliyor";
+    s={id,urunId:String(p.id),urun:p.ad,yer:locTxt(p),soran:ad,cid:cihazId()};benim.add(id);benimKaydet();SOR.unshift({...s,zaman:Date.now()+saatFark,durum:"bekliyor",adet:"",cevaplayan:""});sorOnceki[id]="bekliyor";
     mesajEkle({t:"soru",s});soruCiz();toast("Depoya soruldu, cevap bekleniyor");$("soruP").scrollIntoView({behavior:RM?"auto":"smooth",block:"center"})};
   const a=cihazAd();if(a)go(a);else adSor(go)}
 function sorularGuncelle(list,simdi){if(!Array.isArray(list))return;if(simdi)saatFark=simdi-Date.now();
@@ -859,6 +861,48 @@ $("soruP").addEventListener("click",e=>{const b=e.target.closest("button");if(!b
   if(b.dataset.kapat){const id=b.dataset.kapat;SOR=SOR.filter(y=>y.id!==id);benim.delete(id);benimKaydet();mesajEkle({t:"kapat",id});soruCiz()}
   if(b.dataset.sgo){const p=prodById(b.dataset.sgo);if(p){qi.value=p.ad;show(p,true)}}});
 setInterval(()=>{if(SOR.length)soruCiz()},30000);
+/* ---------- bildirimler (Firebase) ---------- */
+const FB={apiKey:"AIzaSyCJ5Yrff8yIy4XM1uc3Np-kG6iM2KumxAE",authDomain:"koray-rafta.firebaseapp.com",projectId:"koray-rafta",storageBucket:"koray-rafta.firebasestorage.app",messagingSenderId:"547988807383",appId:"1:547988807383:web:9d92c8c551ebb6ff555a92"},
+  FB_VAPID="BEDbMgCNt8L8-WVtc4qjIdf7q5g44-Dgen67IYVxy5ztN9AgMtctBNtDkyPNZQyfR60ln3JiBjRo277CkXHW2kM",FB_SURUM="10.14.1";
+function cihazId(){try{let c=localStorage.getItem("rafta-cid");if(!c){c="c"+Date.now().toString(36)+Math.random().toString(36).slice(2,8);localStorage.setItem("rafta-cid",c)}return c}catch(e){return""}}
+const yerel=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&window.Capacitor.Plugins&&window.Capacitor.Plugins.PushNotifications);
+const webPush=()=>"serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window&&location.protocol==="https:"&&!location.hostname.endsWith("claude.ai")&&location.hostname!=="localhost";
+const bilDestek=()=>yerel()||webPush();
+const bilKayit=()=>{try{return JSON.parse(localStorage.getItem("rafta-bildirim")||"null")}catch(e){return null}};
+function bilKaydet(token,tip){const k=bilKayit(),ad=cihazAd();if(k&&k.token===token&&k.ad===ad&&Date.now()-k.t<3*864e5){bilBarCiz();return}
+  try{localStorage.setItem("rafta-bildirim",JSON.stringify({token,tip,ad,t:Date.now()}))}catch(e){}mesajEkle({t:"kayit",cid:cihazId(),token,tip,ad});bilBarCiz()}
+function bilBarCiz(){const b=$("bilBar");if(!b)return;let gizle=!bulutUrl()||!bilDestek()||!!bilKayit();
+  try{const z=+localStorage.getItem("rafta-bil-sonra")||0;if(Date.now()-z<3*864e5)gizle=true}catch(e){}
+  if(!gizle&&!yerel()&&Notification.permission==="denied")gizle=true;b.hidden=gizle}
+let fbYuk=null;const fbYukle=()=>fbYuk||(fbYuk=new Promise((ok,no)=>{const y=src=>new Promise((o,n)=>{const e=document.createElement("script");e.src=src;e.onload=o;e.onerror=n;document.head.appendChild(e)});
+  y(`https://www.gstatic.com/firebasejs/${FB_SURUM}/firebase-app-compat.js`).then(()=>y(`https://www.gstatic.com/firebasejs/${FB_SURUM}/firebase-messaging-compat.js`)).then(()=>{if(!firebase.apps.length)firebase.initializeApp(FB);ok(firebase.messaging())}).catch(e=>{fbYuk=null;no(e)})}));
+let yerelDinle=false;
+async function bildirimAc(sessiz){
+  if(yerel()){const P=window.Capacitor.Plugins.PushNotifications;
+    try{let iz=await P.checkPermissions();if(iz.receive!=="granted"){if(sessiz)return;iz=await P.requestPermissions()}
+      if(iz.receive!=="granted"){toast("Bildirim izni verilmedi. Telefon ayarlarından açabilirsin.");return}
+      try{await P.createChannel({id:"sorular",name:"Var mı? soruları",description:"Depo soruları ve cevapları",importance:5,visibility:1,vibration:true,lights:true,lightColor:"#058a8e"})}catch(e){}
+      if(!yerelDinle){yerelDinle=true;
+        P.addListener("registration",t=>{bilKaydet(t.value,"android");if(!sessiz)toast("Bildirimler açıldı 🔔")});
+        P.addListener("registrationError",()=>{if(!sessiz)toast("Bildirim kaydı yapılamadı, internete bağlanıp tekrar dene")});
+        P.addListener("pushNotificationReceived",()=>bulutEsitle());
+        P.addListener("pushNotificationActionPerformed",()=>{bulutEsitle();setTimeout(()=>{const s=$("soruP");if(s&&!s.hidden)s.scrollIntoView({block:"center"})},600)})}
+      await P.register()}catch(e){if(!sessiz)toast("Bildirimler açılamadı")}
+    return}
+  if(!webPush()){if(!sessiz)toast(/iPhone|iPad/.test(navigator.userAgent)?"iPhone'da önce Safari'de Paylaş → Ana Ekrana Ekle, sonra uygulamayı ana ekrandan aç":"Bu tarayıcı bildirimleri desteklemiyor");return}
+  let izin=Notification.permission;
+  if(izin!=="granted"){if(sessiz)return;try{izin=await Notification.requestPermission()}catch(e){}}
+  if(izin!=="granted"){toast("Bildirim izni verilmedi");bilBarCiz();return}
+  if(navigator.onLine===false)return;
+  try{const m=await fbYukle(),reg=await navigator.serviceWorker.ready;const t=await m.getToken({vapidKey:FB_VAPID,serviceWorkerRegistration:reg});
+    if(t){bilKaydet(t,"web");if(!sessiz)toast("Bildirimler açıldı 🔔")}
+    if(!m._raftaDinle){m._raftaDinle=1;m.onMessage(()=>bulutEsitle())}}
+  catch(e){if(!sessiz)toast("Bildirimler açılamadı, biraz sonra tekrar dene")}}
+$("bilAc").onclick=()=>{const go=()=>bildirimAc(false);if(cihazAd())go();else adSor(()=>{bilBarCiz();go()})};
+$("bilKapat").onclick=()=>{try{localStorage.setItem("rafta-bil-sonra",String(Date.now()))}catch(e){}bilBarCiz()};
+if("serviceWorker" in navigator)navigator.serviceWorker.addEventListener("message",e=>{if(e.data&&e.data.rafta==="esitle")bulutEsitle()});
+bilBarCiz();setTimeout(()=>bildirimAc(true),1500);
+
 yoklamaDongu();
 
 /* ---------- paylaş / içe al ---------- */
