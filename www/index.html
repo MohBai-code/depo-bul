@@ -182,7 +182,9 @@ summary .lk svg{width:12px;height:12px}.acik summary .lk{background:color-mix(in
 .ggun{font:800 15px "Barlow Condensed",sans-serif;letter-spacing:.04em;text-transform:uppercase;opacity:.65;margin:14px 0 4px}.grow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;padding:10px 4px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer}
 .grow time{font-variant-numeric:tabular-nums;font-size:14px;opacity:.7}.grow b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.grow small{display:block;font-size:13px;opacity:.7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gbad{font:800 14px "Barlow Condensed",sans-serif;padding:3px 9px;border-radius:999px;white-space:nowrap;color:#fff;background:var(--yel)}.gbad.var{background:#2e9e5b}.gbad.yok{background:#c2410c}
-.sqa{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.sqa input{width:92px;min-height:44px}.sqa .btn.yok{border-color:#c2410c;color:#c2410c}
+.sq.eksik{border-left-color:#e08a00}.sqb.eksik,.gbad.eksik{background:#e08a00}.sqist{display:inline-block;margin:2px 0 4px;padding:2px 10px;border-radius:8px;background:color-mix(in srgb,var(--yel) 14%,transparent);font-size:15px}.sqist b{font:800 18px "Barlow Condensed",sans-serif}
+.sqmu{display:flex;flex-direction:column;gap:2px;margin:4px 0 12px}.sqmu small{opacity:.7}.sqlab{display:flex;flex-direction:column;gap:6px;text-align:left;font-weight:600;margin:0 0 10px}.sqlab small{font-weight:400;opacity:.65}.sqlab input{letter-spacing:0!important;font-size:20px!important;text-align:left!important}
+.sqa{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.sqa input{width:112px;min-height:44px}.sqa .btn.yok{border-color:#c2410c;color:#c2410c}
 .nokta{width:9px;height:9px;border-radius:50%;background:var(--yel);animation:pl .8s ease-in-out infinite alternate}
 .sorbtn{border-color:#ff6a13;color:#ff6a13}
 #zout:focus-visible{outline:3px solid var(--org);outline-offset:2px}
@@ -745,7 +747,7 @@ $("akilit").addEventListener("click",()=>{kilitle();toast("Çıkış yapıldı")
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&aktif){acikT2=setTimeout(kilitle,2*60*1000)}else clearTimeout(acikT2)});
 let pinCb=null;const PB=()=>$("pinb");
 const LOCKIC='<div class="pinic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="currentColor"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2.4"/></svg></div>';
-function pencere(html){$("pinm").hidden=false;PB().innerHTML=LOCKIC+html;const f=PB().querySelector("input");if(f)setTimeout(()=>f.focus(),60)}
+function pencere(html,ic){$("pinm").hidden=false;PB().innerHTML=(ic===undefined?LOCKIC:ic)+html;const f=PB().querySelector("input");if(f)setTimeout(()=>f.focus(),60)}
 function pinKapat(){$("pinm").hidden=true;pinCb=null}
 const hata=m=>{const e=PB().querySelector(".pine");if(e)e.textContent=m;if(!RM)PB().animate([{transform:"translateX(0)"},{transform:"translateX(-9px)"},{transform:"translateX(9px)"},{transform:"translateX(0)"}],{duration:260})};
 $("pinm").addEventListener("click",e=>{if(e.target.id==="pinm")pinKapat()});
@@ -850,27 +852,41 @@ function bip(tip){try{navigator.vibrate&&navigator.vibrate(tip==="soru"?[120,80,
   try{if(!AC)return;const n=AC.currentTime,notalar=tip==="soru"?[880,1175,880,1175]:[660,990];notalar.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(.0001,n+i*.16);g.gain.exponentialRampToValueAtTime(.35,n+i*.16+.02);g.gain.exponentialRampToValueAtTime(.0001,n+i*.16+.15);o.connect(g).connect(AC.destination);o.start(n+i*.16);o.stop(n+i*.16+.16)})}catch(e){}}
 function adSor(cb){pencere(`<h3 id="pint">Adın ne?</h3><p>Sorularda ve cevaplarda bu ad görünecek. Bir kez soruyorum.</p><input id="pin1" maxlength="20" placeholder="Örn. Ali, Tezgâh, Mehmet" style="letter-spacing:0;font-size:20px"><p class="pine"></p><div class="acts"><button class="btn p" type="button">Tamam</button><button class="btn" type="button" data-k="iptal">Vazgeç</button></div>`);
   PB().querySelector("[data-k=iptal]").onclick=pinKapat;PB().querySelector(".btn.p").onclick=()=>{const a=$("pin1").value.trim();if(a.length<2)return hata("Adını yaz.");try{localStorage.setItem("rafta-ad",a)}catch(e){}pinKapat();cb(a)}}
-function soruSor(p){if(!bulutUrl()){toast("Bunun için bulut bağlantısı gerekiyor");return}const go=ad=>{const id="q"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
-    s={id,urunId:String(p.id),urun:p.ad,yer:locTxt(p),soran:ad,cid:cihazId()};benim.add(id);benimKaydet();SOR.unshift({...s,zaman:Date.now()+saatFark,durum:"bekliyor",adet:"",cevaplayan:""});sorOnceki[id]="bekliyor";
+function soruSor(p){if(!bulutUrl()){toast("Bunun için bulut bağlantısı gerekiyor");return}const go=(ad,ist)=>{const id="q"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    s={id,urunId:String(p.id),urun:p.ad,yer:locTxt(p),soran:ad,cid:cihazId(),istenen:ist};benim.add(id);benimKaydet();SOR.unshift({...s,zaman:Date.now()+saatFark,durum:"bekliyor",adet:"",cevaplayan:""});sorOnceki[id]="bekliyor";
     mesajEkle({t:"soru",s});soruCiz();toast("Depoya soruldu, cevap bekleniyor");$("soruP").scrollIntoView({behavior:RM?"auto":"smooth",block:"center"})};
-  const a=cihazAd();if(a)go(a);else adSor(go)}
+  const adVar=cihazAd();
+  pencere(`<h3 id="pint">Var mı? Depoya sor</h3><p class="sqmu"><b>${esc(p.ad)}</b><small>${esc(locTxt(p))}</small></p>
+    <label class="sqlab">Kaç adet lazım? <small>(boş bırakabilirsin)</small><input id="sqIst" type="number" min="1" step="1" inputmode="numeric" placeholder="Örn. 5000"></label>
+    ${adVar?"":`<label class="sqlab">Adın<input id="sqAd" maxlength="20" placeholder="Örn. Ali, Tezgâh"></label>`}
+    <p class="pine"></p><div class="acts"><button class="btn p" type="button">Depoya sor</button><button class="btn" type="button" data-k="iptal">Vazgeç</button></div>`,SORUIC);
+  PB().querySelector("[data-k=iptal]").onclick=pinKapat;
+  PB().querySelector(".btn.p").onclick=()=>{const iv=$("sqIst").value.trim(),ist=iv===""?"":Math.round(+iv);if(iv!==""&&!(ist>0))return hata("Adeti sayı olarak yaz.");
+    let ad=adVar;if(!ad){ad=$("sqAd").value.trim();if(ad.length<2)return hata("Adını yaz.");try{localStorage.setItem("rafta-ad",ad)}catch(e){}}
+    pinKapat();go(ad,ist)}}
+const SORUIC='<div class="pinic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="currentColor"/><path d="M9.4 9.3a2.7 2.7 0 1 1 3.8 2.5c-.8.4-1.2 1-1.2 1.8v.6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="17.2" r="1.3" fill="#fff"/></svg></div>';
+const adetVar=x=>x.adet!==""&&x.adet!=null,istVar=x=>x.istenen!==""&&x.istenen!=null&&+x.istenen>0;
+const eksikMi=x=>x.durum==="var"&&istVar(x)&&adetVar(x)&&+x.adet<+x.istenen;
+const cevapKisa=x=>x.durum==="yok"?"Yok":eksikMi(x)?`Eksik · ${x.adet}/${x.istenen} adet`:`Var${adetVar(x)?` · ${x.adet} adet`:""}`;
 function sorularGuncelle(list,simdi){if(!Array.isArray(list))return;if(simdi)saatFark=simdi-Date.now();
   const bekleyen=new Set(mesajOku().filter(o=>o.t==="soru").map(o=>o.s.id)),kapanan=new Set(mesajOku().filter(o=>o.t==="kapat").map(o=>o.id)),cevaplanan=new Map(mesajOku().filter(o=>o.t==="cevap").map(o=>[o.id,o]));
   const yeni=list.filter(x=>!kapanan.has(x.id)).map(x=>cevaplanan.has(x.id)&&x.durum==="bekliyor"?{...x,durum:cevaplanan.get(x.id).durum,adet:cevaplanan.get(x.id).adet,cevaplayan:cevaplanan.get(x.id).kim}:x);
   for(const x of SOR)if(bekleyen.has(x.id)&&!yeni.some(y=>y.id===x.id))yeni.unshift(x);
   for(const x of yeni){const once=sorOnceki[x.id];
-    if(!sorIlk){if(once===undefined&&!benim.has(x.id)&&x.durum==="bekliyor"){bip("soru");toast(`${x.soran} soruyor: ${x.urun} var mı?`)}
-      if(benim.has(x.id)&&once==="bekliyor"&&x.durum!=="bekliyor"){bip("cevap");toast(x.durum==="var"?`Var${x.adet!==""?` · ${x.adet} adet`:""} — ${x.cevaplayan}`:`Yok — ${x.cevaplayan}`)}}
+    if(!sorIlk){if(once===undefined&&!benim.has(x.id)&&x.durum==="bekliyor"){bip("soru");toast(`${x.soran} soruyor: ${istVar(x)?x.istenen+" adet ":""}${x.urun} var mı?`)}
+      if(benim.has(x.id)&&once==="bekliyor"&&x.durum!=="bekliyor"){bip("cevap");toast(`${cevapKisa(x)} — ${x.cevaplayan}`)}}
     sorOnceki[x.id]=x.durum}
   sorIlk=false;SOR=yeni;soruCiz()}
 const once=z=>{const d=Math.max(0,Math.round((Date.now()+saatFark-z)/60000));return d<1?"az önce":d<60?`${d} dk önce`:`${Math.round(d/60)} sa önce`};
 function soruCiz(){const P=$("soruP"),ben=SOR.filter(x=>benim.has(x.id)),dig=SOR.filter(x=>!benim.has(x.id)&&x.durum==="bekliyor");P.hidden=!ben.length&&!dig.length;if(P.hidden){P.innerHTML="";return}
-  P.innerHTML=dig.map(x=>`<div class="sq gelen"><div class="sqh"><span class="sqb">Var mı?</span><small>${esc(x.soran)} soruyor · ${once(x.zaman)}</small></div><b class="sqn">${esc(x.urun)}</b><span class="sqy">${esc(x.yer)}</span>
-      <div class="sqa"><input type="number" min="0" inputmode="numeric" placeholder="Adet" aria-label="Adet" data-adet="${esc(x.id)}"><button class="btn p" type="button" data-var="${esc(x.id)}">Var</button><button class="btn yok" type="button" data-yok="${esc(x.id)}">Yok</button><button class="btn" type="button" data-sgo="${esc(x.urunId)}">Göster</button></div></div>`).join("")
-   +ben.map(x=>x.durum==="bekliyor"?`<div class="sq ben"><div class="sqh"><span class="sqb bek">Soruldu</span><small>${once(x.zaman)}</small></div><b class="sqn">${esc(x.urun)}</b><span class="sqy"><span class="nokta"></span> Depodan cevap bekleniyor…</span><div class="sqa"><button class="btn" type="button" data-kapat="${esc(x.id)}">İptal</button></div></div>`
-      :`<div class="sq ben ${x.durum}"><div class="sqh"><span class="sqb ${x.durum}">${x.durum==="var"?"Var":"Yok"}</span><small>${esc(x.cevaplayan)} cevapladı</small></div><b class="sqn">${esc(x.urun)}</b><span class="sqy">${x.durum==="var"?(x.adet!==""&&x.adet!=null?`Depoda ${esc(x.adet)} adet var`:"Depoda var"):"Depoda yok"}</span><div class="sqa"><button class="btn p" type="button" data-kapat="${esc(x.id)}">Tamam</button></div></div>`).join("")}
+  P.innerHTML=dig.map(x=>`<div class="sq gelen"><div class="sqh"><span class="sqb">Var mı?</span><small>${esc(x.soran)} soruyor · ${once(x.zaman)}</small></div><b class="sqn">${esc(x.urun)}</b>${istVar(x)?`<span class="sqist"><b>${esc(x.istenen)}</b> adet lazım</span>`:""}<span class="sqy">${esc(x.yer)}</span>
+      <div class="sqa">${istVar(x)?`<button class="btn p" type="button" data-hep="${esc(x.id)}">Hepsi var</button>`:""}<input type="number" min="0" inputmode="numeric" placeholder="${istVar(x)?"Kaç var?":"Adet"}" aria-label="Depodaki adet" data-adet="${esc(x.id)}"><button class="btn ${istVar(x)?"":"p"}" type="button" data-var="${esc(x.id)}">${istVar(x)?"Bu kadar var":"Var"}</button><button class="btn yok" type="button" data-yok="${esc(x.id)}">Yok</button><button class="btn" type="button" data-sgo="${esc(x.urunId)}">Göster</button></div></div>`).join("")
+   +ben.map(x=>x.durum==="bekliyor"?`<div class="sq ben"><div class="sqh"><span class="sqb bek">Soruldu</span><small>${once(x.zaman)}</small></div><b class="sqn">${esc(x.urun)}</b>${istVar(x)?`<span class="sqist"><b>${esc(x.istenen)}</b> adet soruldu</span>`:""}<span class="sqy"><span class="nokta"></span> Depodan cevap bekleniyor…</span><div class="sqa"><button class="btn" type="button" data-kapat="${esc(x.id)}">İptal</button></div></div>`
+      :`<div class="sq ben ${eksikMi(x)?"eksik":x.durum}"><div class="sqh"><span class="sqb ${eksikMi(x)?"eksik":x.durum}">${eksikMi(x)?"Eksik":x.durum==="var"?"Var":"Yok"}</span><small>${esc(x.cevaplayan)} cevapladı</small></div><b class="sqn">${esc(x.urun)}</b><span class="sqy"><span>${x.durum==="var"?(adetVar(x)?`Depoda ${esc(x.adet)} adet var`+(istVar(x)?(eksikMi(x)?` — <b>${esc(x.istenen-x.adet)} adet eksik</b> (${esc(x.istenen)} lazım)`:` (${esc(x.istenen)} lazım ✓)`):""):(istVar(x)?`${esc(x.istenen)} adetin hepsi var`:"Depoda var")):"Depoda yok"}</span></span><div class="sqa"><button class="btn p" type="button" data-kapat="${esc(x.id)}">Tamam</button></div></div>`).join("")}
 $("soruP").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
-  if(b.dataset.var||b.dataset.yok){const id=b.dataset.var||b.dataset.yok,durum=b.dataset.var?"var":"yok",inp=$("soruP").querySelector(`[data-adet="${CSS.escape(id)}"]`),adet=durum==="var"&&inp&&inp.value!==""?+inp.value:"";
+  if(b.dataset.var||b.dataset.yok||b.dataset.hep){const id=b.dataset.var||b.dataset.yok||b.dataset.hep,durum=b.dataset.yok?"yok":"var",inp=$("soruP").querySelector(`[data-adet="${CSS.escape(id)}"]`),hx=SOR.find(y=>y.id===id);
+    let adet=durum==="var"&&inp&&inp.value!==""?+inp.value:"";if(b.dataset.hep&&hx)adet=+hx.istenen;
+    if(b.dataset.var&&hx&&istVar(hx)&&adet===""){toast("Depoda kaç tane olduğunu yaz");inp&&inp.focus();return}
     const go=ad=>{const x=SOR.find(y=>y.id===id);if(x){x.durum=durum;x.adet=adet;x.cevaplayan=ad}mesajEkle({t:"cevap",id,durum,adet,kim:ad});tick();soruCiz();toast("Cevap gönderildi")};const a=cihazAd();if(a)go(a);else adSor(go)}
   if(b.dataset.kapat){const id=b.dataset.kapat;SOR=SOR.filter(y=>y.id!==id);benim.delete(id);benimKaydet();mesajEkle({t:"kapat",id});soruCiz()}
   if(b.dataset.sgo){const p=prodById(b.dataset.sgo);if(p){qi.value=p.ad;show(p,true)}}});
@@ -898,8 +914,8 @@ function gecCiz(){const L=GEC.liste||[],q=norm(GEC.ara),bas=GEC.gun===1?gunBas(D
   $("gYok").innerHTML=top.length?`<div class="gyok"><h4>En çok “yok” denenler — sipariş edilmeli</h4>${top.map(([u,n])=>`<button type="button" data-gara="${esc(u)}">${esc(u)}${n>1?` ×${n}`:""}</button>`).join("")}</div>`:"";
   let son="",h="";for(const x of gor){const g=gunAdi(x.zaman);if(g!==son){h+=`<div class="ggun">${esc(g)}</div>`;son=g}
     const saat=new Date(x.zaman).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}),
-      kim=x.cevaplayan?`${esc(x.soran)} → ${esc(x.cevaplayan)}${x.cevapZaman>x.zaman?` · ${sureYaz(x.cevapZaman-x.zaman)}`:""}`:`${esc(x.soran)} sordu`,
-      rozet=x.durum==="var"?`<span class="gbad var">Var${x.adet!==""&&x.adet!=null?` · ${esc(x.adet)}`:""}</span>`:x.durum==="yok"?`<span class="gbad yok">Yok</span>`:`<span class="gbad">Bekliyor</span>`;
+      kim=(istVar(x)?`${esc(x.istenen)} adet · `:"")+(x.cevaplayan?`${esc(x.soran)} → ${esc(x.cevaplayan)}${x.cevapZaman>x.zaman?` · ${sureYaz(x.cevapZaman-x.zaman)}`:""}`:`${esc(x.soran)} sordu`),
+      rozet=eksikMi(x)?`<span class="gbad eksik">Eksik · ${esc(x.adet)}</span>`:x.durum==="var"?`<span class="gbad var">Var${x.adet!==""&&x.adet!=null?` · ${esc(x.adet)}`:""}</span>`:x.durum==="yok"?`<span class="gbad yok">Yok</span>`:`<span class="gbad">Bekliyor</span>`;
     h+=`<button type="button" class="grow" data-gurun="${esc(x.urunId)}"><time>${saat}</time><span><b>${esc(x.urun)}</b><small>${kim}</small></span>${rozet}</button>`}
   $("gList").innerHTML=h||`<p class="note">${L.length?"Bu seçimde soru yok.":"Henüz soru yok."}</p>`;
   for(const b of $("gGun").children)b.classList.toggle("on",+b.dataset.gun===GEC.gun);for(const b of $("gDur").children)b.classList.toggle("on",b.dataset.d===GEC.d)}

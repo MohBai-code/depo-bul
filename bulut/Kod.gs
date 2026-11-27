@@ -5,7 +5,7 @@
  * "Urunler" sayfasını Excel gibi düzenleyebilirsiniz; telefonlar değişikliği alır.
  */
 const SH_U = 'Urunler', SH_A = 'Ayar', SH_S = 'Sorular', SH_C = 'Cihazlar';
-const SCOLS = ['id', 'urunId', 'urun', 'yer', 'soran', 'zaman', 'durum', 'adet', 'cevaplayan', 'cevapZaman', 'kapali', 'cihaz'];
+const SCOLS = ['id', 'urunId', 'urun', 'yer', 'soran', 'zaman', 'durum', 'adet', 'cevaplayan', 'cevapZaman', 'kapali', 'cihaz', 'istenen'];
 const CCOLS = ['cihaz', 'token', 'tip', 'ad', 'zaman'];
 const FB_PROJE = 'koray-rafta', UYG_ADRES = 'https://mohbai-code.github.io/depo-bul/';
 const COLS = ['id', 'ad', 'kod', 'raf', 'bolme', 'kat', 'taraf', 'adet', 'guncelleyen', 'guncelleme'];
@@ -56,7 +56,7 @@ function sorular_() {
     const r = v[i], z = r[5] instanceof Date ? r[5].getTime() : Date.parse(r[5]);
     if (!r[0] || r[10] === true || String(r[10]) === 'evet' || !(z > sinir)) continue;
     out.push({ id: String(r[0]), urunId: String(r[1]), urun: String(r[2]), yer: String(r[3]), soran: String(r[4]), zaman: z,
-      durum: String(r[6] || 'bekliyor'), adet: r[7] === '' ? '' : r[7], cevaplayan: String(r[8] || ''), cevapZaman: r[9] instanceof Date ? r[9].getTime() : (r[9] ? Date.parse(r[9]) : 0) });
+      durum: String(r[6] || 'bekliyor'), adet: r[7] === '' ? '' : r[7], cevaplayan: String(r[8] || ''), cevapZaman: r[9] instanceof Date ? r[9].getTime() : (r[9] ? Date.parse(r[9]) : 0), istenen: Number(r[12]) > 0 ? Number(r[12]) : '' });
   }
   return out;
 }
@@ -86,7 +86,7 @@ function gecmis_(gun) {
   for (let i = v.length - 1; i >= 1; i--) {
     const r = v[i], z = zz(r[5]); if (!r[0]) continue; if (z && z < sinir) break;
     out.push({ id: String(r[0]), urunId: String(r[1]), urun: String(r[2]), yer: String(r[3]), soran: String(r[4]), zaman: z,
-      durum: String(r[6] || 'bekliyor'), adet: r[7] === '' ? '' : r[7], cevaplayan: String(r[8] || ''), cevapZaman: zz(r[9]) });
+      durum: String(r[6] || 'bekliyor'), adet: r[7] === '' ? '' : r[7], cevaplayan: String(r[8] || ''), cevapZaman: zz(r[9]), istenen: Number(r[12]) > 0 ? Number(r[12]) : '' });
   }
   return { ok: true, gun: gun, simdi: Date.now(), gecmis: out };
 }
@@ -94,9 +94,9 @@ const SERBEST = { kayit: true,  soru: 1, cevap: 1, kapat: 1 };
 function soruIslem_(op) {
   const s = sayfa_(SH_S, SCOLS), simdi = new Date();
   if (op.t === 'soru' && op.s && op.s.id) {
-    const cid = String(op.s.cid || '').slice(0, 40);
-    s.appendRow([String(op.s.id), String(op.s.urunId || ''), String(op.s.urun || '').slice(0, 80), String(op.s.yer || '').slice(0, 80), String(op.s.soran || '').slice(0, 30), simdi, 'bekliyor', '', '', '', '', cid]);
-    bildirimKuyruk_.push({ haric: cid, baslik: 'Var mı? ' + String(op.s.urun || '').slice(0, 60), metin: String(op.s.soran || 'Tezgâh') + ' soruyor' + (op.s.yer ? ' · ' + String(op.s.yer).slice(0, 60) : ''), etiket: String(op.s.id), tur: 'soru' });
+    const cid = String(op.s.cid || '').slice(0, 40), ist = Math.round(Number(op.s.istenen)) > 0 ? Math.round(Number(op.s.istenen)) : '';
+    s.appendRow([String(op.s.id), String(op.s.urunId || ''), String(op.s.urun || '').slice(0, 80), String(op.s.yer || '').slice(0, 80), String(op.s.soran || '').slice(0, 30), simdi, 'bekliyor', '', '', '', '', cid, ist]);
+    bildirimKuyruk_.push({ haric: cid, baslik: 'Var mı? ' + (ist ? ist + ' adet · ' : '') + String(op.s.urun || '').slice(0, 60), metin: String(op.s.soran || 'Tezgâh') + ' soruyor' + (op.s.yer ? ' · ' + String(op.s.yer).slice(0, 60) : ''), etiket: String(op.s.id), tur: 'soru' });
     return;
   }
   if (op.t === 'kayit') { cihazKaydet_(op); return; }
@@ -105,7 +105,8 @@ function soruIslem_(op) {
     if (op.t === 'cevap' && String(v[i][6] || 'bekliyor') === 'bekliyor') {
       const adet = op.adet === '' || op.adet == null ? '' : Number(op.adet) || '', varMi = op.durum === 'var';
       s.getRange(i + 1, 7, 1, 4).setValues([[varMi ? 'var' : 'yok', adet, String(op.kim || '').slice(0, 30), simdi]]);
-      if (v[i][11]) bildirimKuyruk_.push({ sadece: String(v[i][11]), baslik: (varMi ? '✅ Var' + (adet !== '' ? ' · ' + adet + ' adet' : '') : '❌ Yok') + ' — ' + String(v[i][2]).slice(0, 60), metin: String(op.kim || 'Depo').slice(0, 30) + ' cevapladı', etiket: String(op.id), tur: 'cevap' });
+      const ist = Number(v[i][12]) > 0 ? Number(v[i][12]) : 0, eksik = varMi && ist && adet !== '' && adet < ist;
+      if (v[i][11]) bildirimKuyruk_.push({ sadece: String(v[i][11]), baslik: (eksik ? '⚠️ Eksik · ' + adet + '/' + ist + ' adet' : varMi ? '✅ Var' + (adet !== '' ? ' · ' + adet + ' adet' : ist ? ' · ' + ist + ' adetin hepsi' : '') : '❌ Yok') + ' — ' + String(v[i][2]).slice(0, 60), metin: String(op.kim || 'Depo').slice(0, 30) + ' cevapladı', etiket: String(op.id), tur: 'cevap' });
     }
     if (op.t === 'kapat') s.getRange(i + 1, 11).setValue('evet');
     return;
