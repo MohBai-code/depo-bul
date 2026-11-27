@@ -175,6 +175,13 @@ summary .lk svg{width:12px;height:12px}.acik summary .lk{background:color-mix(in
 .sqb{font:800 14px "Barlow Condensed",Barlow,sans-serif;padding:3px 10px;border-radius:999px;background:#ff6a13;color:#fff}.sqb.bek{background:var(--yel)}.sqb.var{background:#2e9e5b}.sqb.yok{background:#c2410c}
 .sqn{font:800 24px/1.1 "Barlow Condensed",Barlow,sans-serif}.sqy{color:var(--mut);font-size:15px;display:flex;align-items:center;gap:6px}
 .bilbar{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--yel) 12%,var(--card,var(--bg)));border:2px solid color-mix(in srgb,var(--yel) 45%,transparent)}.bilbar[hidden]{display:none}.bilbar>span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}.bilbar small{opacity:.75;font-size:13px}.bili{font-size:22px}.bilx{background:none;border:0;color:inherit;font-size:24px;line-height:1;padding:6px 8px;cursor:pointer;opacity:.6}
+.gfil{display:flex;flex-direction:column;gap:8px;margin:2px 0 12px}.gseg{display:flex;gap:6px;flex-wrap:wrap}.gseg button{font:600 15px Barlow,sans-serif;min-height:38px;padding:6px 14px;border-radius:999px;border:2px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}.gseg button.on{background:var(--yel);border-color:var(--yel);color:#fff}
+.gara{display:flex;gap:8px}.gara input{flex:1;min-width:0;min-height:44px;font-size:16px;padding:8px 12px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.gozet{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:12px}.gozet div{background:var(--bg);border-radius:10px;padding:8px 6px;text-align:center}.gozet b{display:block;font:800 24px "Barlow Condensed",sans-serif;line-height:1.1}.gozet small{font-size:12px;opacity:.7}.gozet .gv b{color:#2e9e5b}.gozet .gy b{color:#c2410c}
+.gyok{margin:0 0 12px}.gyok h4{margin:0 0 6px;font:800 16px "Barlow Condensed",sans-serif;color:#c2410c}.gyok button{font:600 14px Barlow,sans-serif;margin:0 6px 6px 0;padding:5px 10px;border-radius:999px;border:1.5px solid color-mix(in srgb,#c2410c 50%,transparent);background:color-mix(in srgb,#c2410c 8%,transparent);color:var(--ink);cursor:pointer}
+.ggun{font:800 15px "Barlow Condensed",sans-serif;letter-spacing:.04em;text-transform:uppercase;opacity:.65;margin:14px 0 4px}.grow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;padding:10px 4px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer}
+.grow time{font-variant-numeric:tabular-nums;font-size:14px;opacity:.7}.grow b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.grow small{display:block;font-size:13px;opacity:.7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gbad{font:800 14px "Barlow Condensed",sans-serif;padding:3px 9px;border-radius:999px;white-space:nowrap;color:#fff;background:var(--yel)}.gbad.var{background:#2e9e5b}.gbad.yok{background:#c2410c}
 .sqa{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.sqa input{width:92px;min-height:44px}.sqa .btn.yok{border-color:#c2410c;color:#c2410c}
 .nokta{width:9px;height:9px;border-radius:50%;background:var(--yel);animation:pl .8s ease-in-out infinite alternate}
 .sorbtn{border-color:#ff6a13;color:#ff6a13}
@@ -220,6 +227,13 @@ summary .lk svg{width:12px;height:12px}.acik summary .lk{background:color-mix(in
     <ol id="ol"></ol>
   </section>
 
+  <details id="gec">
+    <summary><span class="si"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Soru geçmişi</summary>
+    <div class="gfil"><div class="gseg" id="gGun" role="group" aria-label="Süre"><button type="button" data-gun="1">Bugün</button><button type="button" data-gun="7" class="on">7 gün</button><button type="button" data-gun="30">30 gün</button></div>
+      <div class="gseg" id="gDur" role="group" aria-label="Cevap"><button type="button" data-d="" class="on">Hepsi</button><button type="button" data-d="var">Var</button><button type="button" data-d="yok">Yok</button><button type="button" data-d="bekliyor">Bekleyen</button></div>
+      <div class="gara"><input id="gAra" type="search" placeholder="Ürün ya da kişi ara" autocomplete="off" aria-label="Geçmişte ara"><button class="btn" type="button" id="gYenile">Yenile</button></div></div>
+    <div id="gOzet" class="gozet"></div><div id="gYok"></div><div id="gList"></div><p class="note" id="gMsg" aria-live="polite"></p>
+  </details>
   <details id="pd" data-kilit="1">
     <summary><span class="si"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z M3 8l9 5 9-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M17 15v6M14 18h6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>Ürün ekle / düzenle<span class="lk" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="currentColor"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2.4"/></svg><i>Kilitli</i></span></summary>
     <form id="pf">
@@ -861,6 +875,42 @@ $("soruP").addEventListener("click",e=>{const b=e.target.closest("button");if(!b
   if(b.dataset.kapat){const id=b.dataset.kapat;SOR=SOR.filter(y=>y.id!==id);benim.delete(id);benimKaydet();mesajEkle({t:"kapat",id});soruCiz()}
   if(b.dataset.sgo){const p=prodById(b.dataset.sgo);if(p){qi.value=p.ad;show(p,true)}}});
 setInterval(()=>{if(SOR.length)soruCiz()},30000);
+/* ---------- soru geçmişi ---------- */
+let GEC={gun:7,d:"",liste:null,ara:""};
+const gecSakla=()=>{try{localStorage.setItem("rafta-gecmis",JSON.stringify({gun:GEC.gun,liste:GEC.liste,t:Date.now()}))}catch(e){}};
+try{const c=JSON.parse(localStorage.getItem("rafta-gecmis")||"null");if(c&&Array.isArray(c.liste)){GEC.liste=c.liste;GEC.gun=c.gun||7}}catch(e){}
+const sureYaz=ms=>{const s=Math.round(ms/1000);return s<60?`${s} sn`:s<3600?`${Math.floor(s/60)} dk${s%60?` ${s%60} sn`:""}`:`${Math.floor(s/3600)} sa ${Math.round(s%3600/60)} dk`};
+const gunBas=t=>{const d=new Date(t);d.setHours(0,0,0,0);return d.getTime()};
+function gunAdi(t){const b=gunBas(Date.now()),g=gunBas(t);if(g===b)return"Bugün";if(g===b-864e5)return"Dün";return new Date(t).toLocaleDateString("tr-TR",{day:"numeric",month:"long",weekday:"long"})}
+async function gecYukle(){const url=bulutUrl();if(!url){$("gMsg").textContent="Geçmiş için bulut bağlantısı gerekiyor.";gecCiz();return}
+  if(navigator.onLine===false){$("gMsg").textContent="İnternet yok, son kaydedilen geçmiş gösteriliyor.";gecCiz();return}
+  $("gMsg").textContent="Yükleniyor…";
+  try{const r=await fetch(url+(url.includes("?")?"&":"?")+"gecmis=1&gun="+Math.max(1,GEC.gun)+"&t="+Date.now());const d=await r.json();
+    if(!d||!Array.isArray(d.gecmis))throw 0;GEC.liste=d.gecmis;gecSakla();$("gMsg").textContent=""}
+  catch(e){$("gMsg").textContent="Geçmiş alınamadı. Apps Script güncel mi?"}
+  gecCiz()}
+function gecCiz(){const L=GEC.liste||[],q=norm(GEC.ara),bas=GEC.gun===1?gunBas(Date.now()):Date.now()-GEC.gun*864e5;
+  const zaman=L.filter(x=>x.zaman>=bas),gor=zaman.filter(x=>(!GEC.d||x.durum===GEC.d)&&(!q||norm(`${x.urun} ${x.soran} ${x.cevaplayan}`).includes(q)));
+  const v=zaman.filter(x=>x.durum==="var"),y=zaman.filter(x=>x.durum==="yok"),sur=zaman.filter(x=>x.cevapZaman>x.zaman).map(x=>x.cevapZaman-x.zaman).sort((a,b)=>a-b);
+  const orta=sur.length?sur[Math.floor(sur.length/2)]:0;
+  $("gOzet").innerHTML=`<div><b>${zaman.length}</b><small>Soru</small></div><div class="gv"><b>${v.length}</b><small>Var</small></div><div class="gy"><b>${y.length}</b><small>Yok</small></div><div><b>${orta?sureYaz(orta):"–"}</b><small>Cevap süresi</small></div>`;
+  const say={};for(const x of y)say[x.urun]=(say[x.urun]||0)+1;const top=Object.entries(say).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  $("gYok").innerHTML=top.length?`<div class="gyok"><h4>En çok “yok” denenler — sipariş edilmeli</h4>${top.map(([u,n])=>`<button type="button" data-gara="${esc(u)}">${esc(u)}${n>1?` ×${n}`:""}</button>`).join("")}</div>`:"";
+  let son="",h="";for(const x of gor){const g=gunAdi(x.zaman);if(g!==son){h+=`<div class="ggun">${esc(g)}</div>`;son=g}
+    const saat=new Date(x.zaman).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}),
+      kim=x.cevaplayan?`${esc(x.soran)} → ${esc(x.cevaplayan)}${x.cevapZaman>x.zaman?` · ${sureYaz(x.cevapZaman-x.zaman)}`:""}`:`${esc(x.soran)} sordu`,
+      rozet=x.durum==="var"?`<span class="gbad var">Var${x.adet!==""&&x.adet!=null?` · ${esc(x.adet)}`:""}</span>`:x.durum==="yok"?`<span class="gbad yok">Yok</span>`:`<span class="gbad">Bekliyor</span>`;
+    h+=`<button type="button" class="grow" data-gurun="${esc(x.urunId)}"><time>${saat}</time><span><b>${esc(x.urun)}</b><small>${kim}</small></span>${rozet}</button>`}
+  $("gList").innerHTML=h||`<p class="note">${L.length?"Bu seçimde soru yok.":"Henüz soru yok."}</p>`;
+  for(const b of $("gGun").children)b.classList.toggle("on",+b.dataset.gun===GEC.gun);for(const b of $("gDur").children)b.classList.toggle("on",b.dataset.d===GEC.d)}
+$("gec").addEventListener("toggle",()=>{if($("gec").open){gecCiz();gecYukle()}});
+$("gGun").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const eski=GEC.gun;GEC.gun=+b.dataset.gun;if(GEC.gun>eski||!GEC.liste)gecYukle();else gecCiz()});
+$("gDur").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;GEC.d=b.dataset.d;gecCiz()});
+$("gAra").addEventListener("input",e=>{GEC.ara=e.target.value;gecCiz()});
+$("gYenile").onclick=gecYukle;
+$("gYok").addEventListener("click",e=>{const b=e.target.closest("[data-gara]");if(!b)return;$("gAra").value=GEC.ara=b.dataset.gara;GEC.d="";gecCiz()});
+$("gList").addEventListener("click",e=>{const b=e.target.closest("[data-gurun]");if(!b)return;const p=prodById(b.dataset.gurun);if(!p){toast("Bu ürün artık listede yok");return}qi.value=p.ad;show(p,true);$("res").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})});
+
 /* ---------- bildirimler (Firebase) ---------- */
 const FB={apiKey:"AIzaSyCJ5Yrff8yIy4XM1uc3Np-kG6iM2KumxAE",authDomain:"koray-rafta.firebaseapp.com",projectId:"koray-rafta",storageBucket:"koray-rafta.firebasestorage.app",messagingSenderId:"547988807383",appId:"1:547988807383:web:9d92c8c551ebb6ff555a92"},
   FB_VAPID="BEDbMgCNt8L8-WVtc4qjIdf7q5g44-Dgen67IYVxy5ztN9AgMtctBNtDkyPNZQyfR60ln3JiBjRo277CkXHW2kM",FB_SURUM="10.14.1";

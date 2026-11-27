@@ -43,8 +43,15 @@ function urunler_() {
   }
   return out;
 }
+// Sorular sayfasının sadece son satırlarını oku (sayfa büyüdükçe yavaşlamasın)
+function sonSatirlar_(adet) {
+  const s = sayfa_(SH_S, SCOLS), son = s.getLastRow();
+  if (son < 2) return [SCOLS];
+  const bas = Math.max(2, son - adet + 1);
+  return [SCOLS].concat(s.getRange(bas, 1, son - bas + 1, SCOLS.length).getValues());
+}
 function sorular_() {
-  const v = sayfa_(SH_S, SCOLS).getDataRange().getValues(), out = [], sinir = Date.now() - 12 * 3600 * 1000;
+  const v = sonSatirlar_(250), out = [], sinir = Date.now() - 12 * 3600 * 1000;
   for (let i = v.length - 1; i >= 1 && out.length < 40; i--) {
     const r = v[i], z = r[5] instanceof Date ? r[5].getTime() : Date.parse(r[5]);
     if (!r[0] || r[10] === true || String(r[10]) === 'evet' || !(z > sinir)) continue;
@@ -66,8 +73,22 @@ function durum_(v) {
 function cevap_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
 
 function doGet(e) {
+  const p = (e && e.parameter) || {};
+  if (p.gecmis) return cevap_(gecmis_(Number(p.gun) || 7));
   // Okuma: telefonlar birbirini beklemesin diye kilitsiz
-  return cevap_(durum_(e && e.parameter && e.parameter.v));
+  return cevap_(durum_(p.v));
+}
+// Soru geçmişi: son N gün (en fazla 90 gün / 3000 soru)
+function gecmis_(gun) {
+  gun = Math.min(90, Math.max(1, gun));
+  const v = sonSatirlar_(3000), sinir = Date.now() - gun * 864e5, out = [];
+  const zz = x => x instanceof Date ? x.getTime() : (x ? Date.parse(x) || 0 : 0);
+  for (let i = v.length - 1; i >= 1; i--) {
+    const r = v[i], z = zz(r[5]); if (!r[0]) continue; if (z && z < sinir) break;
+    out.push({ id: String(r[0]), urunId: String(r[1]), urun: String(r[2]), yer: String(r[3]), soran: String(r[4]), zaman: z,
+      durum: String(r[6] || 'bekliyor'), adet: r[7] === '' ? '' : r[7], cevaplayan: String(r[8] || ''), cevapZaman: zz(r[9]) });
+  }
+  return { ok: true, gun: gun, simdi: Date.now(), gecmis: out };
 }
 const SERBEST = { kayit: true,  soru: 1, cevap: 1, kapat: 1 };
 function soruIslem_(op) {
