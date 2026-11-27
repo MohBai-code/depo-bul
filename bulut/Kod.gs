@@ -4,7 +4,8 @@
  * Dağıt > Yeni dağıtım > Web uygulaması olarak yayınlayın.
  * "Urunler" sayfasını Excel gibi düzenleyebilirsiniz; telefonlar değişikliği alır.
  */
-const SH_U = 'Urunler', SH_A = 'Ayar';
+const SH_U = 'Urunler', SH_A = 'Ayar', SH_S = 'Sorular';
+const SCOLS = ['id', 'urunId', 'urun', 'yer', 'soran', 'zaman', 'durum', 'adet', 'cevaplayan', 'cevapZaman', 'kapali'];
 const COLS = ['id', 'ad', 'kod', 'raf', 'bolme', 'kat', 'taraf', 'adet', 'guncelleyen', 'guncelleme'];
 
 function ss_() { return SpreadsheetApp.getActiveSpreadsheet(); }
@@ -39,19 +40,46 @@ function urunler_() {
   }
   return out;
 }
-function durum_() {
+function sorular_() {
+  const v = sayfa_(SH_S, SCOLS).getDataRange().getValues(), out = [], sinir = Date.now() - 12 * 3600 * 1000;
+  for (let i = v.length - 1; i >= 1 && out.length < 40; i--) {
+    const r = v[i], z = r[5] instanceof Date ? r[5].getTime() : Date.parse(r[5]);
+    if (!r[0] || r[10] === true || String(r[10]) === 'evet' || !(z > sinir)) continue;
+    out.push({ id: String(r[0]), urunId: String(r[1]), urun: String(r[2]), yer: String(r[3]), soran: String(r[4]), zaman: z,
+      durum: String(r[6] || 'bekliyor'), adet: r[7] === '' ? '' : r[7], cevaplayan: String(r[8] || ''), cevapZaman: r[9] instanceof Date ? r[9].getTime() : (r[9] ? Date.parse(r[9]) : 0) });
+  }
+  return out;
+}
+function durum_(v) {
   const a = ayarOku_(); let plan = null, users = [];
   try { plan = a.plan ? JSON.parse(a.plan) : null; } catch (e) {}
   try { users = a.kullanicilar ? JSON.parse(a.kullanicilar) : []; } catch (e) {}
   const govde = { plan: plan, prods: urunler_(), users: users };
   const ver = Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, JSON.stringify(govde), Utilities.Charset.UTF_8));
-  return Object.assign({ ok: true, ver: ver }, govde);
+  const sorular = sorular_(), simdi = Date.now();
+  if (v && v === ver) return { ok: true, ver: ver, ayni: true, sorular: sorular, simdi: simdi };
+  return Object.assign({ ok: true, ver: ver, sorular: sorular, simdi: simdi }, govde);
 }
 function cevap_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
 
-function doGet() {
+function doGet(e) {
   const kilit = LockService.getScriptLock(); kilit.waitLock(20000);
-  try { return cevap_(durum_()); } finally { kilit.releaseLock(); }
+  try { return cevap_(durum_(e && e.parameter && e.parameter.v)); } finally { kilit.releaseLock(); }
+}
+const SERBEST = { soru: 1, cevap: 1, kapat: 1 };
+function soruIslem_(op) {
+  const s = sayfa_(SH_S, SCOLS), simdi = new Date();
+  if (op.t === 'soru' && op.s && op.s.id) {
+    s.appendRow([String(op.s.id), String(op.s.urunId || ''), String(op.s.urun || '').slice(0, 80), String(op.s.yer || '').slice(0, 80), String(op.s.soran || '').slice(0, 30), simdi, 'bekliyor', '', '', '', '']);
+    return;
+  }
+  const v = s.getDataRange().getValues();
+  for (let i = v.length - 1; i >= 1; i--) if (String(v[i][0]) === String(op.id)) {
+    if (op.t === 'cevap' && String(v[i][6] || 'bekliyor') === 'bekliyor')
+      s.getRange(i + 1, 7, 1, 4).setValues([[op.durum === 'var' ? 'var' : 'yok', op.adet === '' || op.adet == null ? '' : Number(op.adet) || '', String(op.kim || '').slice(0, 30), simdi]]);
+    if (op.t === 'kapat') s.getRange(i + 1, 11).setValue('evet');
+    return;
+  }
 }
 
 function doPost(e) {
@@ -60,10 +88,12 @@ function doPost(e) {
     const q = JSON.parse(e.postData.contents || '{}'), a = ayarOku_();
     let users = []; try { users = a.kullanicilar ? JSON.parse(a.kullanicilar) : []; } catch (x) {}
     const yetkili = users.length === 0 || users.some(u => u.ad === q.kullanici && u.h === q.h);
-    if (!yetkili) return cevap_({ ok: false, hata: 'yetki' });
+    const sadeceSoru = (q.ops || []).every(o => SERBEST[o.t]);
+    if (!yetkili && !sadeceSoru) return cevap_({ ok: false, hata: 'yetki' });
     const s = sayfa_(SH_U, COLS), zaman = new Date(), kim = String(q.kullanici || '');
     const satir = p => COLS.map(c => c === 'guncelleyen' ? kim : c === 'guncelleme' ? zaman : (p[c] === undefined || p[c] === null ? '' : p[c]));
     for (const op of (q.ops || [])) {
+      if (SERBEST[op.t]) { soruIslem_(op); continue; }
       if (op.t === 'users' && Array.isArray(op.users)) ayarYaz_('kullanicilar', JSON.stringify(op.users.slice(0, 3)));
       else if (op.t === 'plan' && op.plan) ayarYaz_('plan', JSON.stringify(op.plan));
       else if (op.t === 'hepsi') {

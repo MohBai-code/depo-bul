@@ -167,6 +167,16 @@ summary .lk svg{width:12px;height:12px}.acik summary .lk{background:color-mix(in
 .pinb .lbl{font-size:13px;color:var(--mut);text-align:left;margin:0 0 4px}
 .pinf{all:unset;cursor:pointer;color:var(--mut);font-size:13px;margin-top:10px;padding:6px;text-decoration:underline}
 .bulk{border-top:1px solid var(--line);margin-top:6px;padding-top:6px}.bulk h3{font:800 19px "Barlow Condensed",Barlow,sans-serif;margin:8px 0 2px}
+#soruP{display:grid;gap:10px;margin-bottom:14px}
+.sq{background:var(--panel);border-radius:14px;padding:12px 14px;border-left:8px solid #ff6a13;box-shadow:0 4px 16px #0000001a;display:grid;gap:2px}
+.sq.gelen{animation:sqin .35s ease-out}@keyframes sqin{from{transform:translateY(-8px);opacity:0}}
+.sq.ben{border-left-color:var(--yel)}.sq.var{border-left-color:#2e9e5b}.sq.yok{border-left-color:#c2410c}
+.sqh{display:flex;align-items:center;gap:8px;justify-content:space-between}.sqh small{color:var(--mut);font-size:13px}
+.sqb{font:800 14px "Barlow Condensed",Barlow,sans-serif;padding:3px 10px;border-radius:999px;background:#ff6a13;color:#fff}.sqb.bek{background:var(--yel)}.sqb.var{background:#2e9e5b}.sqb.yok{background:#c2410c}
+.sqn{font:800 24px/1.1 "Barlow Condensed",Barlow,sans-serif}.sqy{color:var(--mut);font-size:15px;display:flex;align-items:center;gap:6px}
+.sqa{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.sqa input{width:92px;min-height:44px}.sqa .btn.yok{border-color:#c2410c;color:#c2410c}
+.nokta{width:9px;height:9px;border-radius:50%;background:var(--yel);animation:pl .8s ease-in-out infinite alternate}
+.sorbtn{border-color:#ff6a13;color:#ff6a13}
 #zout:focus-visible{outline:3px solid var(--org);outline-offset:2px}
 </style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script></head>
 <body>
@@ -184,6 +194,7 @@ summary .lk svg{width:12px;height:12px}.acik summary .lk{background:color-mix(in
 <div id="toast" role="status" aria-live="polite" hidden></div>
 <div id="pinm" hidden><div class="pinb" role="dialog" aria-modal="true" aria-labelledby="pint" id="pinb"></div></div>
 <main>
+  <section id="soruP" aria-live="polite" hidden></section>
   <div class="res" id="res"><div class="hosg"><div><div class="big">Ne arıyorsun?</div><p>Ürünü yaz, depodaki yerini girişten başlayarak göstereyim.</p><div class="adim"><span>1 · Yaz</span><span>2 · Seç</span><span>3 · Rafa yürü</span></div></div>
     <svg viewBox="0 0 96 76" aria-hidden="true"><rect x="40" y="8" width="5" height="62" rx="1.5" fill="#2c4f9a"/><rect x="88" y="8" width="5" height="62" rx="1.5" fill="#2c4f9a"/>
     <rect x="42" y="27" width="49" height="3.5" rx="1" fill="#f28c28"/><rect x="42" y="49" width="49" height="3.5" rx="1" fill="#f28c28"/><rect x="38" y="69" width="58" height="2" fill="#c9c5bb"/>
@@ -538,7 +549,7 @@ function show(p,go){if(PK&&!PK.fin&&go){PK=null;renderOrd()}cur=p;const r=rafBy(
   const ch=(l,v,h)=>`<span class="chip${h?" hot":""}"><small>${l}</small><b>${v}</b></span>`;
   res.innerHTML=`<div class="big">${esc(p.ad)}</div><div class="loc" hidden>${isPal(r)?`${esc(r.ad)} paleti · yerde`:`${esc(r.ad)} rafı · ${b}. bölme${t?" · "+tarafAd(r,t):""} · ${k}. kat`}</div>
     <div class="chips">${isPal(r)?ch("Palet",esc(r.ad),1)+ch("Yer","Zemin"):ch("Raf",esc(r.ad),1)+ch("Bölme",b)+(t?ch("Taraf",tarafAd(r,t).replace(" taraf","").replace(/^./,c=>c.toLocaleUpperCase("tr"))):"")+ch("Kat",+k===1?"1 · yer":k)}</div>
-    <div class="meta">${pts?`<span>${IC.yol}Girişten ~${Math.max(0,pts.length-1)} adım</span>`:`<span>${isPal(r)?"Bu palete":"Bu rafa"} yol bulunamadı</span>`}${p.adet!=null&&p.adet!==""?`<span>${IC.kutu}${esc(p.adet)} adet</span>`:""}${p.kod?`<span>${IC.kod}${esc(p.kod)}</span>`:""}</div><div class="acts"><button class="btn" type="button" data-resadd="${esc(p.id)}">+ Siparişe ekle</button></div>`;
+    <div class="meta">${pts?`<span>${IC.yol}Girişten ~${Math.max(0,pts.length-1)} adım</span>`:`<span>${isPal(r)?"Bu palete":"Bu rafa"} yol bulunamadı</span>`}${p.adet!=null&&p.adet!==""?`<span>${IC.kutu}${esc(p.adet)} adet</span>`:""}${p.kod?`<span>${IC.kod}${esc(p.kod)}</span>`:""}</div><div class="acts"><button class="btn" type="button" data-resadd="${esc(p.id)}">+ Siparişe ekle</button>${bulutUrl()?`<button class="btn sorbtn" type="button" data-sor="${esc(p.id)}">Var mı? Depoya sor</button>`:""}</div>`;
   drawMap({r,b,t,pts});drawFront(r,b,k,t);
   if(go&&matchMedia("(max-width:760px)").matches)res.scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})}
 
@@ -598,7 +609,7 @@ $("ol").addEventListener("input",e=>{const q=e.target.dataset.q;if(!q)return;con
 $("ol").addEventListener("click",e=>{const b=e.target.closest("[data-rmo]");if(!b||PK)return;ord=ord.filter(x=>String(x.pid)!==b.dataset.rmo);saveOrd();renderOrd()});
 $("o_clr").addEventListener("click",e=>{const b=e.currentTarget;if(!ord.length)return;if(!b.dataset.sure){b.dataset.sure=1;b.textContent="Emin misin?";setTimeout(()=>{b.textContent="Temizle";delete b.dataset.sure},3000);return}
   delete b.dataset.sure;b.textContent="Temizle";ord=[];PK=null;saveOrd();renderOrd();drawMap()});
-$("res").addEventListener("click",e=>{const a=e.target.closest("[data-resadd]");if(a){addOrder(a.dataset.resadd);a.textContent=a.closest(".rk")?"Eklendi ✓":"Siparişe eklendi ✓";flyBox(a)}});
+$("res").addEventListener("click",e=>{const q=e.target.closest("[data-sor]");if(q){const p=prodById(q.dataset.sor);if(p)soruSor(p);return}const a=e.target.closest("[data-resadd]");if(a){addOrder(a.dataset.resadd);a.textContent=a.closest(".rk")?"Eklendi ✓":"Siparişe eklendi ✓";flyBox(a)}});
 
 /* WhatsApp metnini ayrıştır */
 const toks=t=>norm(t).replace(/(\d)([a-z])/g,"$1 $2").replace(/([a-z])(\d)/g,"$1 $2").replace(/[^a-z0-9.,]+/g," ").split(" ").filter(Boolean);
@@ -784,21 +795,27 @@ function bulutUygula(d){if(!d||!d.ok)return;
   if(Array.isArray(d.users)&&d.users.length){kulKaydet(d.users);if(aktif&&!d.users.some(x=>x.ad===aktif))kilitle();else kilitDurum()}
   bulutVer=d.ver||"";try{localStorage.setItem("rafta-bulut-ver",bulutVer)}catch(e){}lsSessiz();
   const bos=!(PK&&!PK.fin)&&!cur;renderList();if(JSON.stringify(plan)!==plan0){fillPlanForm();if(bos)drawMap()}else if(bos&&!document.getElementById("wk"))drawMap()}
+const mesajOku=()=>{try{return JSON.parse(localStorage.getItem("rafta-mesaj"))||[]}catch(e){return[]}};
+const mesajYaz=k=>{try{localStorage.setItem("rafta-mesaj",JSON.stringify(k))}catch(e){}};
+function mesajEkle(op){const k=mesajOku();k.push(op);mesajYaz(k);setTimeout(bulutEsitle,80)}
 async function bulutEsitle(){const url=bulutUrl();if(!url||bulutMesgul)return;if(navigator.onLine===false){bulutHata="internet yok";renderList();return}
-  bulutMesgul=true;renderList();
-  try{let k=kuyrukOku(),d;
+  bulutMesgul=true;renderList();const post=async b=>{const r=await fetch(url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(b)});return r.json()};
+  try{let d;const mk=mesajOku();
+    if(mk.length){d=await post({kullanici:"",h:"",ops:mk});if(d&&d.ok){mesajYaz(mesajOku().slice(mk.length));sorularGuncelle(d.sorular,d.simdi)}}
+    let k=kuyrukOku();
     if(k.length){const kim=[...k].reverse().find(x=>x.k)?.k||aktifKimlik()||{};
-      const r=await fetch(url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({kullanici:kim.ad||"",h:kim.h||"",ops:k.map(x=>x.op)})});d=await r.json();
-      if(d&&d.ok===false&&d.hata==="yetki"){try{const r2=await fetch(url+(url.includes("?")?"&":"?")+"t="+Date.now());const d2=await r2.json();if(d2.ver!==bulutVer)bulutUygula(d2)}catch(e){}bulutHata="göndermek için giriş yap";bulutMesgul=false;renderList();return}
-      const kalan=kuyrukOku();kuyrukYaz(kalan.slice(k.length))}
-    else{const r=await fetch(url+(url.includes("?")?"&":"?")+"t="+Date.now());d=await r.json();
-      if(d.ok&&!d.prods.length&&!d.plan&&!(d.users||[]).length&&(prods.length||plan)){
+      d=await post({kullanici:kim.ad||"",h:kim.h||"",ops:k.map(x=>x.op)});
+      if(d&&d.ok===false&&d.hata==="yetki"){try{const r2=await fetch(url+(url.includes("?")?"&":"?")+"v="+encodeURIComponent(bulutVer)+"&t="+Date.now());const d2=await r2.json();sorularGuncelle(d2.sorular,d2.simdi);if(!d2.ayni&&d2.ver!==bulutVer)bulutUygula(d2)}catch(e){}bulutHata="göndermek için giriş yap";bulutMesgul=false;renderList();return}
+      const kalan=kuyrukOku();kuyrukYaz(kalan.slice(k.length));sorularGuncelle(d.sorular,d.simdi)}
+    else if(!d||d.ok===false){const r=await fetch(url+(url.includes("?")?"&":"?")+"v="+encodeURIComponent(bulutVer)+"&t="+Date.now());d=await r.json();sorularGuncelle(d.sorular,d.simdi);
+      if(d.ayni||d.ver===bulutVer){bulutHata="";bulutSon=Date.now();bulutMesgul=false;renderList();return}
+      if(d.ok&&!(d.prods||[]).length&&!d.plan&&!(d.users||[]).length&&(prods.length||plan)){
         if(aktif){bulutMesgul=false;bulutEkle({t:"users",users:kullanicilar()});bulutEkle({t:"plan",plan});bulutEkle({t:"hepsi",prods});return}
-        bulutHata="bulut boş, göndermek için giriş yap";bulutMesgul=false;renderList();return}
-      if(d.ver===bulutVer){bulutHata="";bulutSon=Date.now();bulutMesgul=false;renderList();return}}
-    bulutHata="";bulutSon=Date.now();bulutMesgul=false;bulutUygula(d);if(kuyrukOku().length)bulutEsitle()}
+        bulutHata="bulut boş, göndermek için giriş yap";bulutMesgul=false;renderList();return}}
+    bulutHata="";bulutSon=Date.now();bulutMesgul=false;if(d&&!d.ayni&&d.ver!==bulutVer)bulutUygula(d);else renderList();if(kuyrukOku().length||mesajOku().length)bulutEsitle()}
   catch(er){bulutHata="bağlantı yok";bulutMesgul=false;renderList()}}
-setInterval(()=>{if(!document.hidden)bulutEsitle()},45000);
+function yoklamaDongu(){const bek=SOR.some(x=>benim.has(x.id)&&x.durum==="bekliyor"),acik=SOR.some(x=>!benim.has(x.id)&&x.durum==="bekliyor");
+  const ms=document.hidden?60000:(bek?4000:acik?8000:15000);setTimeout(async()=>{if(!document.hidden)await bulutEsitle();yoklamaDongu()},ms)}
 addEventListener("online",()=>bulutEsitle());
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)bulutEsitle()});
 setTimeout(()=>bulutEsitle(),1500);
@@ -806,6 +823,43 @@ $("b_url").value=bulutUrl();
 $("b_kaydet").addEventListener("click",async()=>{const u=$("b_url").value.trim();if(u&&!/^https:\/\/script\.google(usercontent)?\.com\//.test(u)){$("b_msg").textContent="Adres https://script.google.com/… ile başlamalı.";return}
   try{localStorage.setItem("rafta-bulut",u);localStorage.removeItem("rafta-bulut-ver")}catch(e){}bulutVer="";$("b_msg").textContent=u?"Bağlanıyor…":"Bulut kapatıldı.";renderList();showY();if(u){await bulutEsitle();$("b_msg").textContent=bulutHata?("Sorun: "+bulutHata):"Bağlandı ✓"}});
 $("b_simdi").addEventListener("click",async()=>{$("b_msg").textContent="Eşitleniyor…";await bulutEsitle();$("b_msg").textContent=bulutHata?("Sorun: "+bulutHata):"Eşitlendi ✓"});
+
+/* ---------- "Var mı?" tezgâh - depo soruları ---------- */
+let SOR=[],sorIlk=true,saatFark=0;const sorOnceki={};
+const benim=new Set((()=>{try{return JSON.parse(localStorage.getItem("rafta-sorularim"))||[]}catch(e){return[]}})());
+const benimKaydet=()=>{try{localStorage.setItem("rafta-sorularim",JSON.stringify([...benim].slice(-60)))}catch(e){}};
+const cihazAd=()=>{if(aktif)return aktif;try{return localStorage.getItem("rafta-ad")||""}catch(e){return""}};
+let AC=null;addEventListener("pointerdown",()=>{try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume()}catch(e){}},{passive:true});
+function bip(tip){try{navigator.vibrate&&navigator.vibrate(tip==="soru"?[120,80,120,80,220]:[60,50,60])}catch(e){}
+  try{if(!AC)return;const n=AC.currentTime,notalar=tip==="soru"?[880,1175,880,1175]:[660,990];notalar.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(.0001,n+i*.16);g.gain.exponentialRampToValueAtTime(.35,n+i*.16+.02);g.gain.exponentialRampToValueAtTime(.0001,n+i*.16+.15);o.connect(g).connect(AC.destination);o.start(n+i*.16);o.stop(n+i*.16+.16)})}catch(e){}}
+function adSor(cb){pencere(`<h3 id="pint">Adın ne?</h3><p>Sorularda ve cevaplarda bu ad görünecek. Bir kez soruyorum.</p><input id="pin1" maxlength="20" placeholder="Örn. Ali, Tezgâh, Mehmet" style="letter-spacing:0;font-size:20px"><p class="pine"></p><div class="acts"><button class="btn p" type="button">Tamam</button><button class="btn" type="button" data-k="iptal">Vazgeç</button></div>`);
+  PB().querySelector("[data-k=iptal]").onclick=pinKapat;PB().querySelector(".btn.p").onclick=()=>{const a=$("pin1").value.trim();if(a.length<2)return hata("Adını yaz.");try{localStorage.setItem("rafta-ad",a)}catch(e){}pinKapat();cb(a)}}
+function soruSor(p){if(!bulutUrl()){toast("Bunun için bulut bağlantısı gerekiyor");return}const go=ad=>{const id="q"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    s={id,urunId:String(p.id),urun:p.ad,yer:locTxt(p),soran:ad};benim.add(id);benimKaydet();SOR.unshift({...s,zaman:Date.now()+saatFark,durum:"bekliyor",adet:"",cevaplayan:""});sorOnceki[id]="bekliyor";
+    mesajEkle({t:"soru",s});soruCiz();toast("Depoya soruldu, cevap bekleniyor");$("soruP").scrollIntoView({behavior:RM?"auto":"smooth",block:"center"})};
+  const a=cihazAd();if(a)go(a);else adSor(go)}
+function sorularGuncelle(list,simdi){if(!Array.isArray(list))return;if(simdi)saatFark=simdi-Date.now();
+  const bekleyen=new Set(mesajOku().filter(o=>o.t==="soru").map(o=>o.s.id)),kapanan=new Set(mesajOku().filter(o=>o.t==="kapat").map(o=>o.id)),cevaplanan=new Map(mesajOku().filter(o=>o.t==="cevap").map(o=>[o.id,o]));
+  const yeni=list.filter(x=>!kapanan.has(x.id)).map(x=>cevaplanan.has(x.id)&&x.durum==="bekliyor"?{...x,durum:cevaplanan.get(x.id).durum,adet:cevaplanan.get(x.id).adet,cevaplayan:cevaplanan.get(x.id).kim}:x);
+  for(const x of SOR)if(bekleyen.has(x.id)&&!yeni.some(y=>y.id===x.id))yeni.unshift(x);
+  for(const x of yeni){const once=sorOnceki[x.id];
+    if(!sorIlk){if(once===undefined&&!benim.has(x.id)&&x.durum==="bekliyor"){bip("soru");toast(`${x.soran} soruyor: ${x.urun} var mı?`)}
+      if(benim.has(x.id)&&once==="bekliyor"&&x.durum!=="bekliyor"){bip("cevap");toast(x.durum==="var"?`Var${x.adet!==""?` · ${x.adet} adet`:""} — ${x.cevaplayan}`:`Yok — ${x.cevaplayan}`)}}
+    sorOnceki[x.id]=x.durum}
+  sorIlk=false;SOR=yeni;soruCiz()}
+const once=z=>{const d=Math.max(0,Math.round((Date.now()+saatFark-z)/60000));return d<1?"az önce":d<60?`${d} dk önce`:`${Math.round(d/60)} sa önce`};
+function soruCiz(){const P=$("soruP"),ben=SOR.filter(x=>benim.has(x.id)),dig=SOR.filter(x=>!benim.has(x.id)&&x.durum==="bekliyor");P.hidden=!ben.length&&!dig.length;if(P.hidden){P.innerHTML="";return}
+  P.innerHTML=dig.map(x=>`<div class="sq gelen"><div class="sqh"><span class="sqb">Var mı?</span><small>${esc(x.soran)} soruyor · ${once(x.zaman)}</small></div><b class="sqn">${esc(x.urun)}</b><span class="sqy">${esc(x.yer)}</span>
+      <div class="sqa"><input type="number" min="0" inputmode="numeric" placeholder="Adet" aria-label="Adet" data-adet="${esc(x.id)}"><button class="btn p" type="button" data-var="${esc(x.id)}">Var</button><button class="btn yok" type="button" data-yok="${esc(x.id)}">Yok</button><button class="btn" type="button" data-sgo="${esc(x.urunId)}">Göster</button></div></div>`).join("")
+   +ben.map(x=>x.durum==="bekliyor"?`<div class="sq ben"><div class="sqh"><span class="sqb bek">Soruldu</span><small>${once(x.zaman)}</small></div><b class="sqn">${esc(x.urun)}</b><span class="sqy"><span class="nokta"></span> Depodan cevap bekleniyor…</span><div class="sqa"><button class="btn" type="button" data-kapat="${esc(x.id)}">İptal</button></div></div>`
+      :`<div class="sq ben ${x.durum}"><div class="sqh"><span class="sqb ${x.durum}">${x.durum==="var"?"Var":"Yok"}</span><small>${esc(x.cevaplayan)} cevapladı</small></div><b class="sqn">${esc(x.urun)}</b><span class="sqy">${x.durum==="var"?(x.adet!==""&&x.adet!=null?`Depoda ${esc(x.adet)} adet var`:"Depoda var"):"Depoda yok"}</span><div class="sqa"><button class="btn p" type="button" data-kapat="${esc(x.id)}">Tamam</button></div></div>`).join("")}
+$("soruP").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.var||b.dataset.yok){const id=b.dataset.var||b.dataset.yok,durum=b.dataset.var?"var":"yok",inp=$("soruP").querySelector(`[data-adet="${CSS.escape(id)}"]`),adet=durum==="var"&&inp&&inp.value!==""?+inp.value:"";
+    const go=ad=>{const x=SOR.find(y=>y.id===id);if(x){x.durum=durum;x.adet=adet;x.cevaplayan=ad}mesajEkle({t:"cevap",id,durum,adet,kim:ad});tick();soruCiz();toast("Cevap gönderildi")};const a=cihazAd();if(a)go(a);else adSor(go)}
+  if(b.dataset.kapat){const id=b.dataset.kapat;SOR=SOR.filter(y=>y.id!==id);benim.delete(id);benimKaydet();mesajEkle({t:"kapat",id});soruCiz()}
+  if(b.dataset.sgo){const p=prodById(b.dataset.sgo);if(p){qi.value=p.ad;show(p,true)}}});
+setInterval(()=>{if(SOR.length)soruCiz()},30000);
+yoklamaDongu();
 
 /* ---------- paylaş / içe al ---------- */
 const clean=v=>String(v??"").replace(/[;\r\n]/g,",").trim();
