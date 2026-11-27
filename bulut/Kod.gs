@@ -141,7 +141,12 @@ function erisimAnahtari_() {
   const c = CacheService.getScriptCache(), eski = c.get('fcm_erisim'); if (eski) return eski;
   const ham = PropertiesService.getScriptProperties().getProperty('FCM_ANAHTAR');
   if (!ham) throw new Error('FCM_ANAHTAR komut dosyası özelliği eksik');
-  const k = JSON.parse(ham), simdi = Math.floor(Date.now() / 1000);
+  let k; try { k = JSON.parse(ham); } catch (x) { throw new Error('FCM_ANAHTAR içeriği okunamadı. .json dosyasının TAMAMINI ({ ile başlayıp } ile biten) yapıştırın.'); }
+  if (!k.client_email || !k.private_key) throw new Error('FCM_ANAHTAR içinde client_email / private_key yok. Firebase > Hizmet hesapları > Yeni özel anahtar dosyasını kullanın.');
+  // Yapıştırırken bozulan satır sonlarını onar: anahtarı baştan düzgün PEM biçiminde kur
+  const govdeAnahtar = String(k.private_key).replace(/\\n/g, '\n').replace(/-----(BEGIN|END) PRIVATE KEY-----/g, '').replace(/[^A-Za-z0-9+\/=]/g, '');
+  k.private_key = '-----BEGIN PRIVATE KEY-----\n' + govdeAnahtar.match(/.{1,64}/g).join('\n') + '\n-----END PRIVATE KEY-----\n';
+  const simdi = Math.floor(Date.now() / 1000);
   const b64 = o => Utilities.base64EncodeWebSafe(JSON.stringify(o)).replace(/=+$/, '');
   const govde = b64({ alg: 'RS256', typ: 'JWT' }) + '.' + b64({ iss: k.client_email, scope: 'https://www.googleapis.com/auth/firebase.messaging', aud: 'https://oauth2.googleapis.com/token', iat: simdi, exp: simdi + 3600 });
   const imza = Utilities.base64EncodeWebSafe(Utilities.computeRsaSha256Signature(govde, k.private_key)).replace(/=+$/, '');
