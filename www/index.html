@@ -817,7 +817,7 @@ async function bulutEsitle(){const url=bulutUrl();if(!url||bulutMesgul)return;if
     bulutHata="";bulutSon=Date.now();bulutMesgul=false;if(d&&!d.ayni&&d.ver!==bulutVer)bulutUygula(d);else renderList();if(kuyrukOku().length||mesajOku().length)bulutEsitle()}
   catch(er){bulutHata="bağlantı yok";bulutMesgul=false;renderList()}}
 function yoklamaDongu(){const bek=SOR.some(x=>benim.has(x.id)&&x.durum==="bekliyor"),acik=SOR.some(x=>!benim.has(x.id)&&x.durum==="bekliyor");
-  const ms=document.hidden?60000:(bek?4000:acik?8000:15000);setTimeout(async()=>{if(!document.hidden)await bulutEsitle();yoklamaDongu()},ms)}
+  const ms=document.hidden?60000:(bek?2000:acik?3000:5000);setTimeout(async()=>{if(!document.hidden)await bulutEsitle();yoklamaDongu()},ms)}
 addEventListener("online",()=>bulutEsitle());
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)bulutEsitle()});
 setTimeout(()=>bulutEsitle(),1500);

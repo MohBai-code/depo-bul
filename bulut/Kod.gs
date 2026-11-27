@@ -66,8 +66,8 @@ function durum_(v) {
 function cevap_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
 
 function doGet(e) {
-  const kilit = LockService.getScriptLock(); kilit.waitLock(20000);
-  try { return cevap_(durum_(e && e.parameter && e.parameter.v)); } finally { kilit.releaseLock(); }
+  // Okuma: telefonlar birbirini beklemesin diye kilitsiz
+  return cevap_(durum_(e && e.parameter && e.parameter.v));
 }
 const SERBEST = { kayit: true,  soru: 1, cevap: 1, kapat: 1 };
 function soruIslem_(op) {
