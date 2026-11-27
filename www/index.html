@@ -178,6 +178,8 @@ summary .lk svg{width:12px;height:12px}.acik summary .lk{background:color-mix(in
 .gfil{display:flex;flex-direction:column;gap:8px;margin:2px 0 12px}.gseg{display:flex;gap:6px;flex-wrap:wrap}.gseg button{font:600 15px Barlow,sans-serif;min-height:38px;padding:6px 14px;border-radius:999px;border:2px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}.gseg button.on{background:var(--yel);border-color:var(--yel);color:#fff}
 .gara{display:flex;gap:8px}.gara input{flex:1;min-width:0;min-height:44px;font-size:16px;padding:8px 12px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
 .gozet{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:12px}.gozet div{background:var(--bg);border-radius:10px;padding:8px 6px;text-align:center}.gozet b{display:block;font:800 24px "Barlow Condensed",sans-serif;line-height:1.1}.gozet small{font-size:12px;opacity:.7}.gozet .gv b{color:#2e9e5b}.gozet .gy b{color:#c2410c}
+.ghiz{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;text-align:left!important;padding:10px 12px!important;background:color-mix(in srgb,#e0a800 12%,var(--bg))!important;border:1.5px solid color-mix(in srgb,#e0a800 45%,transparent)}.ghi{font-size:26px}.ghiz>span:nth-child(2){display:flex;flex-direction:column;flex:1;min-width:120px}.ghiz>span b{display:block;font:800 24px "Barlow Condensed",sans-serif;line-height:1.1;color:var(--ink)}.ghiz small{font-size:12px;opacity:.7}
+.ghiz ol{list-style:none;margin:0;padding:0;font-size:14px;display:flex;flex-direction:column;gap:2px}.ghiz ol i{font-style:normal;opacity:.6}
 .gyok{margin:0 0 12px}.gyok h4{margin:0 0 6px;font:800 16px "Barlow Condensed",sans-serif;color:#c2410c}.gyok button{font:600 14px Barlow,sans-serif;margin:0 6px 6px 0;padding:5px 10px;border-radius:999px;border:1.5px solid color-mix(in srgb,#c2410c 50%,transparent);background:color-mix(in srgb,#c2410c 8%,transparent);color:var(--ink);cursor:pointer}
 .ggun{font:800 15px "Barlow Condensed",sans-serif;letter-spacing:.04em;text-transform:uppercase;opacity:.65;margin:14px 0 4px}.grow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;padding:10px 4px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer}
 .grow time{font-variant-numeric:tabular-nums;font-size:14px;opacity:.7}.grow b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.grow small{display:block;font-size:13px;opacity:.7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -905,11 +907,16 @@ async function gecYukle(){const url=bulutUrl();if(!url){$("gMsg").textContent="G
     if(!d||!Array.isArray(d.gecmis))throw 0;GEC.liste=d.gecmis;gecSakla();$("gMsg").textContent=""}
   catch(e){$("gMsg").textContent="Geçmiş alınamadı. Apps Script güncel mi?"}
   gecCiz()}
+function hizliCiz(L){const k={};for(const x of L)if(x.cevaplayan&&x.cevapZaman>x.zaman)(k[x.cevaplayan]=k[x.cevaplayan]||[]).push(x.cevapZaman-x.zaman);
+  let sira=Object.entries(k).map(([ad,a])=>{a.sort((p,q)=>p-q);return{ad,n:a.length,ort:a[Math.floor(a.length/2)]}});if(!sira.length)return"";
+  // en az 2 cevabı olanlar öne: tek cevapla şans eseri birinci olunmasın
+  const az=sira.some(x=>x.n>=2);sira.sort((p,q)=>(az?(q.n>=2)-(p.n>=2):0)||p.ort-q.ort);const [bir,...dig]=sira;
+  return `<div class="ghiz"><span class="ghi" aria-hidden="true">⚡</span><span><small>En hızlı cevap veren</small><b>${esc(bir.ad)}</b><small>tipik ${sureYaz(bir.ort)} · ${bir.n} cevap</small></span>${dig.length?`<ol>${dig.slice(0,4).map((x,i)=>`<li><i>${i+2}.</i> ${esc(x.ad)} <small>${sureYaz(x.ort)} · ${x.n}</small></li>`).join("")}</ol>`:""}</div>`}
 function gecCiz(){const L=GEC.liste||[],q=norm(GEC.ara),bas=GEC.gun===1?gunBas(Date.now()):Date.now()-GEC.gun*864e5;
   const zaman=L.filter(x=>x.zaman>=bas),gor=zaman.filter(x=>(!GEC.d||x.durum===GEC.d)&&(!q||norm(`${x.urun} ${x.soran} ${x.cevaplayan}`).includes(q)));
   const v=zaman.filter(x=>x.durum==="var"),y=zaman.filter(x=>x.durum==="yok"),sur=zaman.filter(x=>x.cevapZaman>x.zaman).map(x=>x.cevapZaman-x.zaman).sort((a,b)=>a-b);
   const orta=sur.length?sur[Math.floor(sur.length/2)]:0;
-  $("gOzet").innerHTML=`<div><b>${zaman.length}</b><small>Soru</small></div><div class="gv"><b>${v.length}</b><small>Var</small></div><div class="gy"><b>${y.length}</b><small>Yok</small></div><div><b>${orta?sureYaz(orta):"–"}</b><small>Cevap süresi</small></div>`;
+  $("gOzet").innerHTML=`<div><b>${zaman.length}</b><small>Soru</small></div><div class="gv"><b>${v.length}</b><small>Var</small></div><div class="gy"><b>${y.length}</b><small>Yok</small></div><div><b>${orta?sureYaz(orta):"–"}</b><small>Cevap süresi</small></div>`+hizliCiz(zaman);
   const say={};for(const x of y)say[x.urun]=(say[x.urun]||0)+1;const top=Object.entries(say).sort((a,b)=>b[1]-a[1]).slice(0,6);
   $("gYok").innerHTML=top.length?`<div class="gyok"><h4>En çok “yok” denenler — sipariş edilmeli</h4>${top.map(([u,n])=>`<button type="button" data-gara="${esc(u)}">${esc(u)}${n>1?` ×${n}`:""}</button>`).join("")}</div>`:"";
   let son="",h="";for(const x of gor){const g=gunAdi(x.zaman);if(g!==son){h+=`<div class="ggun">${esc(g)}</div>`;son=g}
